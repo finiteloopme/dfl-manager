@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
+	version="2.1">
+	<persistence-unit name="dflmngr" transaction-type="RESOURCE_LOCAL">
+		
+		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+		<non-jta-data-source>java:comp/env/jdbc/dflmngrDB</non-jta-data-source>
+		
+
+		<mapping-file>META-INF/orm.xml</mapping-file>
+
+		<class>net.dflmngr.model.entity.InsAndOuts</class>
+		<class>net.dflmngr.model.entity.AflFixture</class>
+		<class>net.dflmngr.model.entity.Globals</class>
+		<class>net.dflmngr.model.entity.DflRoundInfo</class>
+		<class>net.dflmngr.model.entity.DflRoundEarlyGames</class>
+		<class>net.dflmngr.model.entity.DflRoundMapping</class>
+		<class>net.dflmngr.model.entity.RawPlayerStats</class>
+		<class>net.dflmngr.model.entity.AflPlayer</class>
+		<class>net.dflmngr.model.entity.AflTeam</class>
+		<class>net.dflmngr.model.entity.DflPlayer</class>
+		<class>net.dflmngr.model.entity.DflSelectedPlayer</class>
+		<class>net.dflmngr.model.entity.DflTeam</class>
+		<class>net.dflmngr.model.entity.DflTeamPlayer</class>
+		<class>net.dflmngr.model.entity.DflFixture</class>
+		<class>net.dflmngr.model.entity.DflPlayerScores</class>
+		<class>net.dflmngr.model.entity.DflTeamScores</class>
+		<class>net.dflmngr.model.entity.DflLadder</class>
+		<class>net.dflmngr.model.entity.DflMatthewAllen</class>
+		<class>net.dflmngr.model.entity.DflTeamPredictedScores</class>
+		<class>net.dflmngr.model.entity.DflPlayerPredictedScores</class>
+		<class>net.dflmngr.model.entity.DflEarlyInsAndOuts</class>
+
+		<properties>
+			<!-- <property name="javax.persistence.jdbc.password" value="${db.user}" />
+			<property name="javax.persistence.jdbc.user" value="${db.pass}" />
+			<property name="javax.persistence.jdbc.driver" value="org.mariadb.jdbc.Driver" />
+			<property name="javax.persistence.jdbc.url" value="${db.url}" /> -->
+			<property name="javax.persistence.logging.level" value="INFO"/>
+			<property name="eclipselink.logging.level" value="INFO"/>
+			<property name="eclipselink.logging.parameters" value="true"/>
+			<property name="eclipselink.logging.timestamp" value="true"/>
+			<property name="eclipselink.logging.logger"	value="net.dflmngr.persistance.logging.Slf4jSessionLogger"/>
+		</properties>
+		
+	</persistence-unit>
+</persistence>
