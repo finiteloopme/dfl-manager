@@ -35,7 +35,6 @@ public class AflFixtureLoaderHandler {
 		loggerUtils = new LoggingUtils("AflFixtureLoader");
 		
 		try {
-			JndiProvider.bind();
 			
 			globalsService = new GlobalsServiceImpl();
 			aflFixtureService = new AflFixtureServiceImpl();
