@@ -31,7 +31,8 @@ public class AflFixtureLoaderHandler {
 	
 	public AflFixtureLoaderHandler() {
 		
-		loggerUtils = new LoggingUtils("batch-logger", "batch.name", "AflFixtureLoader");
+		//loggerUtils = new LoggingUtils("batch-logger", "batch.name", "AflFixtureLoader");
+		loggerUtils = new LoggingUtils("AflFixtureLoader");
 		
 		try {
 			JndiProvider.bind();
@@ -156,11 +157,9 @@ public class AflFixtureLoaderHandler {
 	
 	// For internal testing
 	public static void main(String[] args) {
-		
-		AflFixtureLoaderHandler testing = new AflFixtureLoaderHandler();
-
 		try {
-						
+			
+			AflFixtureLoaderHandler testing = new AflFixtureLoaderHandler();				
 			List<Integer> testRounds = new ArrayList<>();
 			
 			for(int i = 1; i < 24; i++) {

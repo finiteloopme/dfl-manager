@@ -16,11 +16,11 @@ public class JndiProvider {
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.apache.naming.java.javaURLContextFactory");
         System.setProperty(Context.URL_PKG_PREFIXES, "org.apache.naming");
         
-        Properties properties = new Properties();
+        //Properties properties = new Properties();
         
-        InputStream stream = JndiProvider.class.getClassLoader().getResourceAsStream("jndiProvider.properties");
-        properties.load(stream);
-        stream.close();
+        //InputStream stream = JndiProvider.class.getClassLoader().getResourceAsStream("jndiProvider.properties");
+        //properties.load(stream);
+        //stream.close();
 
         BasicDataSource dataSource = new BasicDataSource();
 
