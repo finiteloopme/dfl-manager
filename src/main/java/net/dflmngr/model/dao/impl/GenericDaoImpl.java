@@ -1,7 +1,9 @@
 package net.dflmngr.model.dao.impl;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -32,8 +34,22 @@ public class GenericDaoImpl<E, K> implements GenericDao<E, K> {
 	public GenericDaoImpl() {
 		ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
 		this.entityClass = (Class<E>) genericSuperclass.getActualTypeArguments()[0];
+
+		String url = System.getenv("JDBC_DATABASE_URL");
+
+		Map<String, Object> configOverrides = new HashMap<>();
+		configOverrides.put("javax.persistence.jdbc.url", url);
+
+		Map<String, String> env = System.getenv();
+		for (String envName : env.keySet()) {
+			if(envName.contains("javax.persistence")) {
+				configOverrides.put(envName, env.get(envName));
+			} else if(envName.contains("eclipselink")) {
+				configOverrides.put(envName, env.get(envName));
+			}
+		}
 		
-		factory = Persistence.createEntityManagerFactory("dflmngr");
+		factory = Persistence.createEntityManagerFactory("dflmngr", configOverrides);
 		entityManager = factory.createEntityManager();
 	}
 	

@@ -5,10 +5,8 @@
 	version="2.1">
 	<persistence-unit name="dflmngr" transaction-type="RESOURCE_LOCAL">
 		
-		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-		<non-jta-data-source>java:comp/env/jdbc/dflmngrDB</non-jta-data-source>
+		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
 		
-
 		<mapping-file>META-INF/orm.xml</mapping-file>
 
 		<class>net.dflmngr.model.entity.InsAndOuts</class>
@@ -32,13 +30,6 @@
 		<class>net.dflmngr.model.entity.DflTeamPredictedScores</class>
 		<class>net.dflmngr.model.entity.DflPlayerPredictedScores</class>
 		<class>net.dflmngr.model.entity.DflEarlyInsAndOuts</class>
-
-		<properties>
-		    <property name="hibernate.show_sql" value="true" />
-		    <property name="hibernate.format_sql" value="true" />
-		    <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />
-		    <property name="hibernate.hbm2ddl.auto" value="validate" />
-		</properties>
 		
 	</persistence-unit>
 </persistence>
