@@ -4,7 +4,7 @@
 
 	<timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss" />
 
-	<property name="LOG.DIR" value="${app.logdir}" />
+	<!--property name="LOG.DIR" value="${app.logdir}" />
 
 	<appender name="BATCH" class="ch.qos.logback.classic.sift.SiftingAppender">
 		<discriminator>
@@ -39,7 +39,7 @@
 				</encoder>
 			</appender>
 		</sift>
-	</appender>
+	</appender-->
 
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
@@ -47,7 +47,7 @@
 		</encoder>
 	</appender>
 
-	<appender name="db" class="ch.qos.logback.classic.db.DBAppender">
+	<!--appender name="db" class="ch.qos.logback.classic.db.DBAppender">
 		<connectionSource
 			class="ch.qos.logback.core.db.DriverManagerConnectionSource">
 			<driverClass>org.mariadb.jdbc.Driver</driverClass>
@@ -55,9 +55,9 @@
 			<user>${db.user}</user>
 			<password>${db.pass}</password>
 		</connectionSource>
-	</appender>
+	</appender-->
 
-	<logger name="databaseLogger" level="INFO">
+	<!--logger name="databaseLogger" level="INFO">
 		<appender-ref ref="db" />
 	</logger>
 	
@@ -67,7 +67,7 @@
     
     <logger name="online-logger" level="INFO">
         <appender-ref ref="ONLINE" />
-    </logger>
+    </logger-->
 
     <logger name="stdout-logger" level="INFO">
         <appender-ref ref="STDOUT" />
