@@ -27,6 +27,7 @@ public class LoggingUtils {
 
 	public LoggingUtils(String process) {
 		this.process = process;
+		this.stdoutLogging = true;
 		logger = LoggerFactory.getLogger("stdout-logger");
 	}
 	
