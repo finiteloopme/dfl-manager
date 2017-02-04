@@ -8,13 +8,14 @@ public class LoggingUtils {
 	
 	private Logger logger;
 	
-	private String loggerName;
+	//private String loggerName;
 	private String loggerKey;
 	private String logFileBase;
 
 	private String process;
 	private boolean stdoutLogging;
 
+	/*
 	public LoggingUtils(String loggerName, String loggerKey, String logFileBase) {
 		this.loggerName = loggerName;
 		this.loggerKey = loggerKey;
@@ -24,6 +25,7 @@ public class LoggingUtils {
 		
 		logger = LoggerFactory.getLogger(this.loggerName);
 	}
+	*/
 
 	public LoggingUtils(String process) {
 		this.process = process;

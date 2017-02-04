@@ -12,6 +12,7 @@ public class JndiProvider {
 	
 	private static final String JNDI = "java:comp/env/jdbc/dflmngrDB";
 	
+	/*
     public static void bind() throws Exception {
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.apache.naming.java.javaURLContextFactory");
         System.setProperty(Context.URL_PKG_PREFIXES, "org.apache.naming");
@@ -45,4 +46,5 @@ public class JndiProvider {
             context.close();
         }
     }
+    */
 }

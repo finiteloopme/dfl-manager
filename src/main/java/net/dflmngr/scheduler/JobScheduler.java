@@ -13,7 +13,7 @@ import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerFactory;
 import org.quartz.Trigger;
-import org.quartz.ee.servlet.QuartzInitializerListener;
+//import org.quartz.ee.servlet.QuartzInitializerListener;
 import org.quartz.impl.StdSchedulerFactory;
 
 import net.dflmngr.logging.LoggingUtils;
@@ -87,7 +87,7 @@ public class JobScheduler {
 		LoggingUtils loggerUtils = new LoggingUtils("Scheduler");
 		loggerUtils.log("info", "Final job details: jobNameKey={}; group={}; jobClassStr={}; jobTriggerKey={}; jobParams={}; cronStr={}; isImmediate={};", jobNameKey, group, jobClassStr, jobTriggerKey, jobParams, cronStr, isImmediate);
 		
-		Class<? extends Job> jobClass = (Class<? extends Job>) Class.forName(jobClassStr);
+		Class<? extends Job> jobClass = Class.forName(jobClassStr).asSubclass(Job.class);
 		
 		JobDetail job = null;
 		Trigger trigger = null;

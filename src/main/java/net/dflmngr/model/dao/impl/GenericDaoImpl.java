@@ -1,6 +1,6 @@
 package net.dflmngr.model.dao.impl;
 
-import java.lang.reflect.ParameterizedType;
+//import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,23 +17,31 @@ import javax.persistence.criteria.Root;
 
 import net.dflmngr.model.dao.GenericDao;
 
-public class GenericDaoImpl<E, K> implements GenericDao<E, K> {
-
+public abstract class GenericDaoImpl<E, K> implements GenericDao<E, K> {
+	
 	protected Class<E> entityClass;
 	protected CriteriaBuilder criteriaBuilder;
 	protected CriteriaQuery<E> criteriaQuery;
 	protected CriteriaDelete<E> criteriaDelete;
 	protected TypedQuery<E> query;
 	protected Root<E> entity;
-	
+	/*
+	protected Class<?> entityClass;
+	protected CriteriaBuilder criteriaBuilder;
+	protected CriteriaQuery<?> criteriaQuery;
+	protected CriteriaDelete<?> criteriaDelete;
+	protected TypedQuery<?> query;
+	protected Root<?> entity;
+	*/
 	private static EntityManagerFactory factory;
 	
 	@PersistenceContext
 	protected EntityManager entityManager;
 	
-	public GenericDaoImpl() {
-		ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
-		this.entityClass = (Class<E>) genericSuperclass.getActualTypeArguments()[0];
+	public GenericDaoImpl(Class<E> entityClass) {
+		//ParameterizedType genericSuperclass = (ParameterizedType) getClass().getGenericSuperclass();
+		//this.entityClass = (Class<E>) genericSuperclass.getActualTypeArguments()[0];
+		this.entityClass = entityClass;
 
 		String url = System.getenv("JDBC_DATABASE_URL");
 
