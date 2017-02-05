@@ -11,6 +11,10 @@ import net.dflmngr.model.entity.keys.DflEarlyInsAndOutsPK;
 
 public class DflEarlyInsAndOutsDaoImpl extends GenericDaoImpl<DflEarlyInsAndOuts, DflEarlyInsAndOutsPK>	implements DflEarlyInsAndOutsDao {
 	
+	public DflEarlyInsAndOutsDaoImpl() {
+		super(DflEarlyInsAndOuts.class);
+	}
+	
 	public List<DflEarlyInsAndOuts> findByTeamAndRound(int round, String teamCode) {
 		criteriaBuilder = entityManager.getCriteriaBuilder();
 		criteriaQuery = criteriaBuilder.createQuery(entityClass);

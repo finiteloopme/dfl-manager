@@ -11,6 +11,10 @@ import net.dflmngr.model.entity.keys.DflFixturePK;
 
 public class DflFixtureDaoImpl extends GenericDaoImpl<DflFixture, DflFixturePK> implements DflFixtureDao {
 	
+	public DflFixtureDaoImpl() {
+		super(DflFixture.class);
+	}
+	
 	public List<DflFixture> findAflFixturesForRound(int round) {
 		
 		criteriaBuilder = entityManager.getCriteriaBuilder();

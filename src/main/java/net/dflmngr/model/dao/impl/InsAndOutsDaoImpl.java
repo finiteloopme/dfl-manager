@@ -11,6 +11,10 @@ import net.dflmngr.model.entity.keys.InsAndOutsPK;
 
 public class InsAndOutsDaoImpl extends GenericDaoImpl<InsAndOuts, InsAndOutsPK>implements InsAndOutsDao {
 	
+	public InsAndOutsDaoImpl() {
+		super(InsAndOuts.class);
+	}
+	
 	public List<InsAndOuts> findByTeamAndRound(int round, String teamCode) {
 		criteriaBuilder = entityManager.getCriteriaBuilder();
 		criteriaQuery = criteriaBuilder.createQuery(entityClass);

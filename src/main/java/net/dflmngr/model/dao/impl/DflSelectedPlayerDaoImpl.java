@@ -11,6 +11,9 @@ import net.dflmngr.model.entity.keys.DflSelectedPlayerPK;
 
 public class DflSelectedPlayerDaoImpl extends GenericDaoImpl<DflSelectedPlayer, DflSelectedPlayerPK> implements DflSelectedPlayerDao {
 	
+	public DflSelectedPlayerDaoImpl() {
+		super(DflSelectedPlayer.class);
+	}
 	
 	public List<DflSelectedPlayer> findSelectedTeamForRound(int round, String teamCode) {
 		

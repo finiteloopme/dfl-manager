@@ -10,6 +10,11 @@ import net.dflmngr.model.entity.DflTeamScores_;
 import net.dflmngr.model.entity.keys.DflTeamScoresPK;
 
 public class DflTeamScoresDaoImpl extends GenericDaoImpl<DflTeamScores, DflTeamScoresPK> implements DflTeamScoresDao {
+	
+	public DflTeamScoresDaoImpl() {
+		super(DflTeamScores.class);
+	}
+	
 	public List<DflTeamScores> findForRound(int round) {
 		criteriaBuilder = entityManager.getCriteriaBuilder();
 		criteriaQuery = criteriaBuilder.createQuery(entityClass);

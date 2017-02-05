@@ -11,6 +11,10 @@ import net.dflmngr.model.entity.keys.DflLadderPK;
 
 public class DflLadderDaoImpl extends GenericDaoImpl<DflLadder, DflLadderPK> implements DflLadderDao {
 	
+	public DflLadderDaoImpl() {
+		super(DflLadder.class);
+	}
+	
 	public List<DflLadder> findLadderForRound(int round) {
 		criteriaBuilder = entityManager.getCriteriaBuilder();
 		criteriaQuery = criteriaBuilder.createQuery(entityClass);

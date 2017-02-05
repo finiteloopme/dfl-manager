@@ -25,14 +25,6 @@ public abstract class GenericDaoImpl<E, K> implements GenericDao<E, K> {
 	protected CriteriaDelete<E> criteriaDelete;
 	protected TypedQuery<E> query;
 	protected Root<E> entity;
-	/*
-	protected Class<?> entityClass;
-	protected CriteriaBuilder criteriaBuilder;
-	protected CriteriaQuery<?> criteriaQuery;
-	protected CriteriaDelete<?> criteriaDelete;
-	protected TypedQuery<?> query;
-	protected Root<?> entity;
-	*/
 	private static EntityManagerFactory factory;
 	
 	@PersistenceContext

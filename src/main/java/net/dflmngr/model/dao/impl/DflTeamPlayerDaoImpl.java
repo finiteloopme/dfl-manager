@@ -10,6 +10,9 @@ import net.dflmngr.model.entity.DflTeamPlayer_;
 
 public class DflTeamPlayerDaoImpl extends GenericDaoImpl<DflTeamPlayer, Integer> implements DflTeamPlayerDao {
 	
+	public DflTeamPlayerDaoImpl() {
+		super(DflTeamPlayer.class);
+	}
 	
 	public DflTeamPlayer findTeamPlayerForTeam(String teamCode, int teamPlayerId) {
 		

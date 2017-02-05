@@ -23,7 +23,7 @@ import net.dflmngr.model.service.impl.GlobalsServiceImpl;
 public class EmailUtils {
 	
 	private static GlobalsService globalsService = new GlobalsServiceImpl();
-	private static String incomingMailHost = globalsService.getEmailConfig().get("incomingMailHost");
+	//private static String incomingMailHost = globalsService.getEmailConfig().get("incomingMailHost");
 	private static String outgoingMailHost = globalsService.getEmailConfig().get("outgoingMailHost");
 	private static String outgoingMailPort = globalsService.getEmailConfig().get("outgoingMailPort");
 	private static String mailUsername = globalsService.getEmailConfig().get("mailUsername");;

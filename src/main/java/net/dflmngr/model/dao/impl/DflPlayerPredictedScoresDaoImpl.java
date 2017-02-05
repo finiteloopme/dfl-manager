@@ -11,6 +11,10 @@ import net.dflmngr.model.entity.keys.DflPlayerPredictedScoresPK;
 
 public class DflPlayerPredictedScoresDaoImpl extends GenericDaoImpl<DflPlayerPredictedScores, DflPlayerPredictedScoresPK> implements DflPlayerPredictedScoresDao {
 	
+	public DflPlayerPredictedScoresDaoImpl() {
+		super(DflPlayerPredictedScores.class);
+	}
+	
 	public List<DflPlayerPredictedScores> findForRound(int round) {
 		criteriaBuilder = entityManager.getCriteriaBuilder();
 		criteriaQuery = criteriaBuilder.createQuery(entityClass);

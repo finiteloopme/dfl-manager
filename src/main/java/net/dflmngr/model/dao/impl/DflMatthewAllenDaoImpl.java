@@ -12,6 +12,11 @@ import net.dflmngr.model.entity.DflMatthewAllen;
 import net.dflmngr.model.entity.DflMatthewAllen_;
 
 public class DflMatthewAllenDaoImpl extends GenericDaoImpl<DflMatthewAllen, Integer> implements DflMatthewAllenDao {
+	
+	public DflMatthewAllenDaoImpl() {
+		super(DflMatthewAllen.class);
+	}
+	
 	public List<DflMatthewAllen> findForRound(int round) {
 		criteriaBuilder = entityManager.getCriteriaBuilder();
 		criteriaQuery = criteriaBuilder.createQuery(entityClass);

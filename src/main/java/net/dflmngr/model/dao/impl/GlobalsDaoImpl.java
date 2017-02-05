@@ -11,6 +11,10 @@ import net.dflmngr.model.entity.keys.GlobalsPK;
 
 public class GlobalsDaoImpl extends GenericDaoImpl<Globals, GlobalsPK> implements GlobalsDao {
 	
+	public GlobalsDaoImpl() {
+		super(Globals.class);
+	}
+	
 	public List<Globals> findCodesForGroup(String groupCode) {
 		criteriaBuilder = entityManager.getCriteriaBuilder();
 		criteriaQuery = criteriaBuilder.createQuery(entityClass);

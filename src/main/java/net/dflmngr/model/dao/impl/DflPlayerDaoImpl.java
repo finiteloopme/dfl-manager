@@ -10,6 +10,10 @@ import net.dflmngr.model.entity.DflPlayer_;
 
 public class DflPlayerDaoImpl extends GenericDaoImpl<DflPlayer, Integer> implements DflPlayerDao {
 	
+	public DflPlayerDaoImpl() {
+		super(DflPlayer.class);
+	}
+	
 	public DflPlayer findByAflPlayerId(String aflPlayerId) {
 		DflPlayer player = null;
 		

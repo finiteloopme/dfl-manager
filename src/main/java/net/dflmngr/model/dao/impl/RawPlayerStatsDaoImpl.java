@@ -11,6 +11,10 @@ import net.dflmngr.model.entity.keys.RawPlayerStatsPK;
 
 public class RawPlayerStatsDaoImpl extends GenericDaoImpl<RawPlayerStats, RawPlayerStatsPK> implements RawPlayerStatsDao {
 	
+	public RawPlayerStatsDaoImpl() {
+		super(RawPlayerStats.class);
+	}
+	
 	public List<RawPlayerStats> findForRound(int round) {
 		criteriaBuilder = entityManager.getCriteriaBuilder();
 		criteriaQuery = criteriaBuilder.createQuery(entityClass);
