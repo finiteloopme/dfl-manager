@@ -1,6 +1,8 @@
 package net.dflmngr.model.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.dflmngr.model.dao.DflPlayerDao;
 import net.dflmngr.model.dao.impl.DflPlayerDaoImpl;
@@ -26,5 +28,17 @@ public class DflPlayerServiceImpl extends GenericServiceImpl<DflPlayer, Integer>
 		List<DflPlayer> adamGoodesEligible = null;
 		adamGoodesEligible = dao.findAdamGoodesEligible();
 		return adamGoodesEligible;
+	}
+	
+	public Map<String, DflPlayer> getCrossRefPlayers() {
+		Map<String, DflPlayer> crossRefPlayers = new HashMap<>();
+		List<DflPlayer> allPlayers = dao.findAll();
+		
+		for(DflPlayer player : allPlayers) {
+			String crossRefId = (player.getFirstName() + "-" + player.getLastName() + "-" + player.getAflClub()).toLowerCase();
+			crossRefPlayers.put(crossRefId, player);
+		}
+		
+		return crossRefPlayers;
 	}
 }

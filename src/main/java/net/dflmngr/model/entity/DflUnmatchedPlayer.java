@@ -6,8 +6,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "dfl_player")
-public class DflPlayer {
+@Table(name = "dfl_unmatched_player")
+public class DflUnmatchedPlayer {
 	
 	@Id
 	@Column(name = "player_id")
@@ -60,8 +60,8 @@ public class DflPlayer {
 		return initial;
 	}
 
-	public void setInitial(String inital) {
-		this.initial = inital;
+	public void setInitial(String initial) {
+		this.initial = initial;
 	}
 
 	public String getStatus() {
@@ -134,7 +134,7 @@ public class DflPlayer {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		DflPlayer other = (DflPlayer) obj;
+		DflUnmatchedPlayer other = (DflUnmatchedPlayer) obj;
 		if (aflClub == null) {
 			if (other.aflClub != null)
 				return false;

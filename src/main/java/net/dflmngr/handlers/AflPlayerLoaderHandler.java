@@ -5,6 +5,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -15,20 +16,31 @@ import org.jsoup.select.Elements;
 import net.dflmngr.logging.LoggingUtils;
 import net.dflmngr.model.entity.AflPlayer;
 import net.dflmngr.model.entity.AflTeam;
+import net.dflmngr.model.entity.DflPlayer;
+import net.dflmngr.model.entity.DflUnmatchedPlayer;
 import net.dflmngr.model.service.AflPlayerService;
 import net.dflmngr.model.service.AflTeamService;
+import net.dflmngr.model.service.DflPlayerService;
+import net.dflmngr.model.service.DflUnmatchedPlayerService;
+import net.dflmngr.model.service.GlobalsService;
 import net.dflmngr.model.service.impl.AflPlayerServiceImpl;
 import net.dflmngr.model.service.impl.AflTeamServiceImpl;
+import net.dflmngr.model.service.impl.DflPlayerServiceImpl;
+import net.dflmngr.model.service.impl.DflUnmatchedPlayerServiceImpl;
+import net.dflmngr.model.service.impl.GlobalsServiceImpl;
 
-public class AflPlayerLoader {
+public class AflPlayerLoaderHandler {
 	private LoggingUtils loggerUtils;
 	
 	private AflTeamService aflTeamService;
 	private AflPlayerService aflPlayerService;
+	private DflPlayerService dflPlayerService;
+	private GlobalsService globalsService;
+	private DflUnmatchedPlayerService dflUnmatchedPlayerService;
 	
 	private DateFormat df = new SimpleDateFormat("dd.MM.yy");
 	
-	public AflPlayerLoader() {
+	public AflPlayerLoaderHandler() {
 		
 		//loggerUtils = new LoggingUtils("batch-logger", "batch.name", "AflPlayerLoader");
 		loggerUtils = new LoggingUtils("AflPlayerLoader");
@@ -39,6 +51,9 @@ public class AflPlayerLoader {
 			
 			aflTeamService = new AflTeamServiceImpl();
 			aflPlayerService = new AflPlayerServiceImpl();
+			dflPlayerService = new DflPlayerServiceImpl();
+			globalsService = new GlobalsServiceImpl();
+			dflUnmatchedPlayerService = new DflUnmatchedPlayerServiceImpl();
 			
 		} catch (Exception ex) {
 			loggerUtils.log("error", "Error in ... ", ex);
@@ -95,6 +110,9 @@ public class AflPlayerLoader {
 		
 		loggerUtils.log("info", "Saving players to database ...");
 		aflPlayerService.insertAll(aflPlayers, false);
+		
+		loggerUtils.log("info", "Creating afl-dfl player cross references");
+		crossRefAflDflPlayers(aflPlayers);
 	}
 	
 	private List<AflPlayer> extractPlayers(String teamId, Document doc) throws Exception {
@@ -130,9 +148,60 @@ public class AflPlayerLoader {
 		return aflPlayers;
 	}
 	
+	private void crossRefAflDflPlayers(List<AflPlayer> aflPlayers) {
+		
+		Map<String, DflPlayer> dflPlayerCrossRefs = dflPlayerService.getCrossRefPlayers();
+		
+		for(AflPlayer aflPlayer : aflPlayers) {
+			String aflPlayerCrossRef = (aflPlayer.getFirstName() + "-" + aflPlayer.getSecondName() + "-" + globalsService.getAflTeamMap(aflPlayer.getTeamId())).toLowerCase();
+			DflPlayer dflPlayer = dflPlayerCrossRefs.get(aflPlayerCrossRef);
+			
+			if(dflPlayer != null) {
+				
+				int dflPlayerId = dflPlayer.getPlayerId();
+				String aflPlayerId = aflPlayer.getPlayerId();
+				
+				loggerUtils.log("info", "Matched player - CrossRef: {}, DflPlayerId: {}, AflPlayerId {}", aflPlayerCrossRef, dflPlayerId, aflPlayerId);
+				
+				dflPlayer.setAflPlayerId(aflPlayerId);
+				aflPlayer.setDflPlayerId(dflPlayerId);
+				
+				dflPlayerService.insert(dflPlayer);
+				aflPlayerService.insert(aflPlayer);
+				
+				dflPlayerCrossRefs.remove(aflPlayerCrossRef);
+			}
+		}
+		
+		List<DflUnmatchedPlayer> unmatchedPlayers = new ArrayList<>();
+		
+		for (Map.Entry<String, DflPlayer> entry : dflPlayerCrossRefs.entrySet()) {
+		    String crossRef = entry.getKey();
+		    DflPlayer player = entry.getValue();
+		    
+		    loggerUtils.log("info", "Unmatched player: {}", crossRef);
+		    
+		    DflUnmatchedPlayer unmatchedPlayer = new DflUnmatchedPlayer();
+		    unmatchedPlayer.setPlayerId(player.getPlayerId());
+		    unmatchedPlayer.setFirstName(player.getFirstName());
+		    unmatchedPlayer.setLastName(player.getLastName());
+		    unmatchedPlayer.setInitial(player.getInitial());
+		    unmatchedPlayer.setStatus(player.getStatus());
+		    unmatchedPlayer.setAflClub(player.getAflClub());
+		    unmatchedPlayer.setPosition(player.getPosition());
+		    unmatchedPlayer.setFirstYear(player.isFirstYear());
+		    
+		    unmatchedPlayers.add(unmatchedPlayer);
+		}
+		
+		
+		dflUnmatchedPlayerService.insertAll(unmatchedPlayers, false);
+		
+	}
+	
 	public static void main(String[] args) {
 		
-		AflPlayerLoader aflPlayerLoader = new AflPlayerLoader();
+		AflPlayerLoaderHandler aflPlayerLoader = new AflPlayerLoaderHandler();
 		aflPlayerLoader.execute();
 		
 	}

@@ -29,4 +29,5 @@ public interface GlobalsService extends GenericService<Globals, GlobalsPK> {
 	public int getWebdriverTimeout();
 	public Map<String, String> getDraftOrder();
 	public void setCurrentRound(int newRound);
+	public String getAflTeamMap(String team);
 }

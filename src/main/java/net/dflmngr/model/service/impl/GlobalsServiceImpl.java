@@ -324,4 +324,16 @@ public class GlobalsServiceImpl extends GenericServiceImpl<Globals, GlobalsPK>im
 		dao.persist(currentRound);
 		dao.commit();
 	}
+	
+	public String getAflTeamMap(String team) {
+		String teamDecode = "";
+		
+		String code = team;
+		String groupCode = "aflTeamMape";
+		
+		teamDecode = getValue(code, groupCode);
+		
+		return teamDecode;
+		
+	}
 }
