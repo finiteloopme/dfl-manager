@@ -1,5 +1,6 @@
 package net.dflmngr.handlers;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -90,6 +91,33 @@ public class AflPlayerLoaderHandler {
 			String teamListUrlS = team.getWebsite() + "/" + team.getSeniorUri();
 			loggerUtils.log("info", "Senior list URL: {}", teamListUrlS);
 			
+			boolean isStreamOpen = false;
+			int maxRetries = 5;
+			int retries = 0;
+			
+			InputStream teamPage = null;
+			
+			while(!isStreamOpen) {
+				try {
+					teamPage = new URL(teamListUrlS).openStream();
+				} catch (Exception ex) {
+					retries++;
+					loggerUtils.log("info", "Failed to open team page retries {} of {}", retries, maxRetries);
+					if(retries == maxRetries) {
+						throw ex;
+					}
+				}
+				if(teamPage == null) {
+					retries++;
+					loggerUtils.log("info", "Failed to open team page retries {} of {}", retries, maxRetries);
+					if(retries == maxRetries) {
+						Exception ex = new Exception("Max re-tries hit failed");
+						throw ex;
+					}
+				}
+				isStreamOpen = true;
+			}
+			
 			Document doc = Jsoup.parse(new URL(teamListUrlS).openStream(), "UTF-8", teamListUrlS);
 			aflPlayers.addAll(extractPlayers(team.getTeamId(), doc));
 			
@@ -114,6 +142,22 @@ public class AflPlayerLoaderHandler {
 		loggerUtils.log("info", "Creating afl-dfl player cross references");
 		crossRefAflDflPlayers(aflPlayers);
 	}
+	
+	/*
+	private void processTeamsAlt(List<AflTeam> aflTeams) throws Exception {
+		
+		List<AflPlayer> aflPlayers = new ArrayList<>();
+		
+		int webdriverTimeout = globalsService.getWebdriverTimeout();
+		
+		for(AflTeam team : aflTeams) {
+			loggerUtils.log("info", "Working on team: {}", team.getTeamId());
+			
+			
+		}
+		
+	}
+	*/
 	
 	private List<AflPlayer> extractPlayers(String teamId, Document doc) throws Exception {
 		
