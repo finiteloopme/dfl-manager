@@ -118,7 +118,8 @@ public class AflPlayerLoaderHandler {
 				isStreamOpen = true;
 			}
 			
-			Document doc = Jsoup.parse(new URL(teamListUrlS).openStream(), "UTF-8", teamListUrlS);
+			//Document doc = Jsoup.parse(new URL(teamListUrlS).openStream(), "UTF-8", teamListUrlS);
+			Document doc = Jsoup.parse(teamPage, "UTF-8", teamListUrlS);
 			aflPlayers.addAll(extractPlayers(team.getTeamId(), doc));
 			
 			loggerUtils.log("info", "Seniors added to list");
