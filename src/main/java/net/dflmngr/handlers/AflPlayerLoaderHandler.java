@@ -98,24 +98,29 @@ public class AflPlayerLoaderHandler {
 			InputStream teamPage = null;
 			
 			while(!isStreamOpen) {
+				boolean exception = false;
 				try {
 					teamPage = new URL(teamListUrlS).openStream();
 				} catch (Exception ex) {
+					exception = true;
 					retries++;
 					loggerUtils.log("info", "Failed to open team page retries {} of {}", retries, maxRetries);
 					if(retries == maxRetries) {
 						throw ex;
 					}
 				}
-				if(teamPage == null) {
-					retries++;
-					loggerUtils.log("info", "Failed to open team page retries {} of {}", retries, maxRetries);
-					if(retries == maxRetries) {
-						Exception ex = new Exception("Max re-tries hit failed");
-						throw ex;
+				if(!exception) {
+					if(teamPage == null) {
+						retries++;
+						loggerUtils.log("info", "Failed to open team page retries {} of {}", retries, maxRetries);
+						if(retries == maxRetries) {
+							Exception ex = new Exception("Max re-tries hit failed");
+							throw ex;
+						}
+					} else {
+						isStreamOpen = true;
 					}
 				}
-				isStreamOpen = true;
 			}
 			
 			//Document doc = Jsoup.parse(new URL(teamListUrlS).openStream(), "UTF-8", teamListUrlS);
