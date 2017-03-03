@@ -30,6 +30,7 @@
 		<class>net.dflmngr.model.entity.DflTeamPredictedScores</class>
 		<class>net.dflmngr.model.entity.DflPlayerPredictedScores</class>
 		<class>net.dflmngr.model.entity.DflEarlyInsAndOuts</class>
+		<class>net.dflmngr.model.entity.DflUnmatchedPlayer</class>
 		
 	</persistence-unit>
 </persistence>
