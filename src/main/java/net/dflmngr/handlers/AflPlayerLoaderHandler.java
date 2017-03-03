@@ -92,7 +92,7 @@ public class AflPlayerLoaderHandler {
 			loggerUtils.log("info", "Senior list URL: {}", teamListUrlS);
 			
 			boolean isStreamOpen = false;
-			int maxRetries = 5;
+			int maxRetries = 10;
 			int retries = 0;
 			
 			InputStream teamPage = null;
@@ -106,7 +106,8 @@ public class AflPlayerLoaderHandler {
 					retries++;
 					loggerUtils.log("info", "Failed to open team page retries {} of {}", retries, maxRetries);
 					if(retries == maxRetries) {
-						throw ex;
+						Exception ex2 = new Exception("Max re-tries hit failed", ex);
+						throw ex2;
 					}
 				}
 				if(!exception) {
