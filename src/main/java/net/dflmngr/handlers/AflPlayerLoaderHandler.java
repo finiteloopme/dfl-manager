@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -109,6 +110,10 @@ public class AflPlayerLoaderHandler {
 						Exception ex2 = new Exception("Max re-tries hit failed", ex);
 						throw ex2;
 					}
+					try {
+						loggerUtils.log("info", "Waiting...");
+						TimeUnit.SECONDS.sleep(5);
+					} catch (Exception ex3) {}
 				}
 				if(!exception) {
 					if(teamPage == null) {
