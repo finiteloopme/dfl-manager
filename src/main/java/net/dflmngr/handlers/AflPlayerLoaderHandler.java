@@ -273,7 +273,7 @@ public class AflPlayerLoaderHandler {
 					dflPlayerService.update(player);
 					aflPlayerService.update(aflPlayer);
 		    		
-		    		dflPlayerCrossRefs.remove(crossRef);
+		    		//dflPlayerCrossRefs.remove(crossRef);
 		    		
 		    		matched = true;
 		    	}
@@ -294,7 +294,7 @@ public class AflPlayerLoaderHandler {
 						dflPlayerService.update(player);
 						aflPlayerService.update(aflPlayer);
 			    		
-			    		dflPlayerCrossRefs.remove(crossRef);
+			    		//dflPlayerCrossRefs.remove(crossRef);
 			    		
 			    		matched = true;
 		    		}
