@@ -2,7 +2,6 @@ package net.dflmngr.handlers;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.net.URLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -85,63 +84,16 @@ public class AflPlayerLoaderHandler {
 		
 		List<AflPlayer> aflPlayers = new ArrayList<>();
 		
-		
-		URL teamPageUrl = null;
-		URLConnection teamPageConn = null;
 		InputStream teamPageInput = null;
 		
 		for(AflTeam team : aflTeams) {
 			
 			loggerUtils.log("info", "Working on team: {}", team.getTeamId());
 			
-			
 			String teamListUrlS = team.getWebsite() + "/" + team.getSeniorUri();
 			loggerUtils.log("info", "Senior list URL: {}", teamListUrlS);
 			
-			teamPageUrl = new URL(teamListUrlS);
-			teamPageConn = teamPageUrl.openConnection();
-			teamPageConn.setConnectTimeout(30000);
-			teamPageInput = teamPageConn.getInputStream();
-			
-			/*
-			boolean isStreamOpen = false;
-			int maxRetries = 10;
-			int retries = 0;
-			
-			
-			InputStream teamPage = null;
-			
-			while(!isStreamOpen) {
-				boolean exception = false;
-				try {
-					teamPage = new URL(teamListUrlS).openStream();
-				} catch (Exception ex) {
-					exception = true;
-					retries++;
-					loggerUtils.log("info", "Failed to open team page retries {} of {}", retries, maxRetries);
-					if(retries == maxRetries) {
-						Exception ex2 = new Exception("Max re-tries hit failed", ex);
-						throw ex2;
-					}
-					try {
-						loggerUtils.log("info", "Waiting...");
-						TimeUnit.SECONDS.sleep(5);
-					} catch (Exception ex3) {}
-				}
-				if(!exception) {
-					if(teamPage == null) {
-						retries++;
-						loggerUtils.log("info", "Failed to open team page retries {} of {}", retries, maxRetries);
-						if(retries == maxRetries) {
-							Exception ex = new Exception("Max re-tries hit failed");
-							throw ex;
-						}
-					} else {
-						isStreamOpen = true;
-					}
-				}
-			}
-			*/
+			teamPageInput = getInputStream(teamListUrlS);
 			
 			//Document doc = Jsoup.parse(new URL(teamListUrlS).openStream(), "UTF-8", teamListUrlS);
 			Document doc = Jsoup.parse(teamPageInput, "UTF-8", teamListUrlS);
@@ -153,10 +105,7 @@ public class AflPlayerLoaderHandler {
 				String teamListUrlR = team.getWebsite() + "/" + team.getRookieUri();
 				loggerUtils.log("info", "Rookie list URL: {}", teamListUrlS);
 				
-				teamPageUrl = new URL(teamListUrlR);
-				teamPageConn = teamPageUrl.openConnection();
-				teamPageConn.setConnectTimeout(30);
-				teamPageInput = teamPageConn.getInputStream();
+				teamPageInput = getInputStream(teamListUrlR);
 				
 				//doc = Jsoup.parse(new URL(teamListUrlR).openStream(), "UTF-8", teamListUrlR);
 				doc = Jsoup.parse(teamPageInput, "UTF-8", teamListUrlR);
@@ -173,6 +122,48 @@ public class AflPlayerLoaderHandler {
 		
 		loggerUtils.log("info", "Creating afl-dfl player cross references");
 		crossRefAflDflPlayers(aflPlayers);
+	}
+	
+	private InputStream getInputStream(String url) throws Exception {
+		
+		InputStream inputStream = null;
+		
+		boolean isStreamOpen = false;
+		int maxRetries = 10;
+		int retries = 0;
+				
+		while(!isStreamOpen) {
+			boolean exception = false;
+			try {
+				inputStream = new URL(url).openStream();
+			} catch (Exception ex) {
+				exception = true;
+				retries++;
+				loggerUtils.log("info", "Failed to open team page retries {} of {}", retries, maxRetries);
+				if(retries == maxRetries) {
+					Exception ex2 = new Exception("Max re-tries hit failed", ex);
+					throw ex2;
+				}
+				try {
+					loggerUtils.log("info", "Waiting...");
+					TimeUnit.SECONDS.sleep(5);
+				} catch (Exception ex3) {}
+			}
+			if(!exception) {
+				if(inputStream == null) {
+					retries++;
+					loggerUtils.log("info", "Failed to open team page retries {} of {}", retries, maxRetries);
+					if(retries == maxRetries) {
+						Exception ex = new Exception("Max re-tries hit failed");
+						throw ex;
+					}
+				} else {
+					isStreamOpen = true;
+				}
+			}
+		}
+		
+		return inputStream;		
 	}
 	
 	/*
