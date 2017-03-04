@@ -329,7 +329,7 @@ public class GlobalsServiceImpl extends GenericServiceImpl<Globals, GlobalsPK>im
 		String teamDecode = "";
 		
 		String code = team;
-		String groupCode = "aflTeamMape";
+		String groupCode = "aflTeamMap";
 		
 		teamDecode = getValue(code, groupCode);
 		

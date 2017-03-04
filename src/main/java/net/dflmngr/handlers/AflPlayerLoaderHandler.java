@@ -210,6 +210,7 @@ public class AflPlayerLoaderHandler {
 		
 		for(AflPlayer aflPlayer : aflPlayers) {
 			String aflPlayerCrossRef = (aflPlayer.getFirstName() + "-" + aflPlayer.getSecondName() + "-" + globalsService.getAflTeamMap(aflPlayer.getTeamId())).toLowerCase();
+			loggerUtils.log("info", "Searching for player: {}", aflPlayerCrossRef);
 			DflPlayer dflPlayer = dflPlayerCrossRefs.get(aflPlayerCrossRef);
 			
 			if(dflPlayer != null) {
