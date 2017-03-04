@@ -259,6 +259,10 @@ public class AflPlayerLoaderHandler {
 	public static void main(String[] args) {
 		
 		AflPlayerLoaderHandler aflPlayerLoader = new AflPlayerLoaderHandler();
+		
+		java.security.Security.setProperty("networkaddress.cache.ttl", "30");
+		java.security.Security.setProperty("networkaddress.cache.negative.ttl", "0");
+		
 		aflPlayerLoader.execute();
 		
 	}
