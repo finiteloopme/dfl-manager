@@ -41,4 +41,17 @@ public class DflPlayerServiceImpl extends GenericServiceImpl<DflPlayer, Integer>
 		
 		return crossRefPlayers;
 	}
+	
+	public void bulkUpdateAflPlayerId(Map<String, DflPlayer> entitys) {
+		dao.beginTransaction();
+		
+		for(Map.Entry<String, DflPlayer> entry : entitys.entrySet()) {
+		    String aflPlayerId = entry.getKey();
+		    DflPlayer player = entry.getValue();
+		    
+		    player.setAflPlayerId(aflPlayerId);
+		}
+		
+		dao.commit();
+	}
 }

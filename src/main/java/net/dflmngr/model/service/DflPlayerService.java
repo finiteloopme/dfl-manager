@@ -9,4 +9,5 @@ public interface DflPlayerService extends GenericService<DflPlayer, Integer> {
 	public DflPlayer getByAflPlayerId(String aflPlayerId);
 	public List<DflPlayer> getAdamGoodesEligible();
 	public Map<String, DflPlayer> getCrossRefPlayers();
+	public void bulkUpdateAflPlayerId(Map<String, DflPlayer> entitys);
 }
