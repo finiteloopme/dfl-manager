@@ -231,7 +231,7 @@ public class AflPlayerLoaderHandler {
 				String aflPlayerId = aflPlayer.getPlayerId();
 				
 				loggerUtils.log("info", "Matched player - CrossRef: {}, DflPlayerId: {}, AflPlayerId {}", aflPlayerCrossRef, dflPlayerId, aflPlayerId);
-				
+								
 				dflPlayer.setAflPlayerId(aflPlayerId);
 				aflPlayer.setDflPlayerId(dflPlayerId);
 				
