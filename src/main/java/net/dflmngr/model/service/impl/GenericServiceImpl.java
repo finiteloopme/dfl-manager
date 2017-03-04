@@ -26,6 +26,10 @@ public class GenericServiceImpl<E, K> implements GenericService<E, K>  {
 		dao.persist(entity);
 	}
 	
+	public void update(E entity) {
+		dao.merge(entity);
+	}
+	
 	public void insertAll(List<E> entitys, boolean inTx) {
 		
 		if(!inTx) {
@@ -34,6 +38,21 @@ public class GenericServiceImpl<E, K> implements GenericService<E, K>  {
 		
 		for(E e : entitys) {
 			dao.persist(e);
+		}
+		
+		if(!inTx) {
+			dao.commit();
+		}
+	}
+	
+	public void updateAll(List<E> entitys, boolean inTx) {
+		
+		if(!inTx) {
+			dao.beginTransaction();
+		}
+		
+		for(E e : entitys) {
+			dao.merge(e);
 		}
 		
 		if(!inTx) {

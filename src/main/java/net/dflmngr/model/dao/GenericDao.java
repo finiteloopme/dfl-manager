@@ -4,6 +4,7 @@ import java.util.List;
 
 public interface GenericDao<E, K> {
 	void persist(E entity);
+	void merge(E entity);
 	void remove(E enitiy);
 	E findById(K id);
 	public List<E> findAll();

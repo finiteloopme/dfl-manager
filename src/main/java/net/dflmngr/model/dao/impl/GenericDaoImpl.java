@@ -57,6 +57,10 @@ public abstract class GenericDaoImpl<E, K> implements GenericDao<E, K> {
 		entityManager.persist(entity);
 	}
 	
+	public void merge(E entity) {
+		entityManager.merge(entity);
+	}
+	
 	public void remove(E entity) {
 		entityManager.remove(entity);
 	}
