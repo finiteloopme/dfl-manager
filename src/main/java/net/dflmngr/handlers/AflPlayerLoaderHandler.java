@@ -2,6 +2,7 @@ package net.dflmngr.handlers;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -84,6 +85,11 @@ public class AflPlayerLoaderHandler {
 		
 		List<AflPlayer> aflPlayers = new ArrayList<>();
 		
+		
+		URL teamPageUrl = null;
+		URLConnection teamPageConn = null;
+		InputStream teamPageInput = null;
+		
 		for(AflTeam team : aflTeams) {
 			
 			loggerUtils.log("info", "Working on team: {}", team.getTeamId());
@@ -92,9 +98,16 @@ public class AflPlayerLoaderHandler {
 			String teamListUrlS = team.getWebsite() + "/" + team.getSeniorUri();
 			loggerUtils.log("info", "Senior list URL: {}", teamListUrlS);
 			
+			teamPageUrl = new URL(teamListUrlS);
+			teamPageConn = teamPageUrl.openConnection();
+			teamPageConn.setConnectTimeout(30);
+			teamPageInput = teamPageConn.getInputStream();
+			
+			/*
 			boolean isStreamOpen = false;
 			int maxRetries = 10;
 			int retries = 0;
+			
 			
 			InputStream teamPage = null;
 			
@@ -128,9 +141,10 @@ public class AflPlayerLoaderHandler {
 					}
 				}
 			}
+			*/
 			
 			//Document doc = Jsoup.parse(new URL(teamListUrlS).openStream(), "UTF-8", teamListUrlS);
-			Document doc = Jsoup.parse(teamPage, "UTF-8", teamListUrlS);
+			Document doc = Jsoup.parse(teamPageInput, "UTF-8", teamListUrlS);
 			aflPlayers.addAll(extractPlayers(team.getTeamId(), doc));
 			
 			loggerUtils.log("info", "Seniors added to list");
@@ -139,7 +153,13 @@ public class AflPlayerLoaderHandler {
 				String teamListUrlR = team.getWebsite() + "/" + team.getRookieUri();
 				loggerUtils.log("info", "Rookie list URL: {}", teamListUrlS);
 				
-				doc = Jsoup.parse(new URL(teamListUrlR).openStream(), "UTF-8", teamListUrlR);
+				teamPageUrl = new URL(teamListUrlR);
+				teamPageConn = teamPageUrl.openConnection();
+				teamPageConn.setConnectTimeout(30);
+				teamPageInput = teamPageConn.getInputStream();
+				
+				//doc = Jsoup.parse(new URL(teamListUrlR).openStream(), "UTF-8", teamListUrlR);
+				doc = Jsoup.parse(teamPageInput, "UTF-8", teamListUrlR);
 				aflPlayers.addAll(extractPlayers(team.getTeamId(), doc));
 				
 				loggerUtils.log("info", "Rookies added to list");
