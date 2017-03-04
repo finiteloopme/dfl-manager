@@ -100,7 +100,7 @@ public class AflPlayerLoaderHandler {
 			
 			teamPageUrl = new URL(teamListUrlS);
 			teamPageConn = teamPageUrl.openConnection();
-			teamPageConn.setConnectTimeout(30);
+			teamPageConn.setConnectTimeout(30000);
 			teamPageInput = teamPageConn.getInputStream();
 			
 			/*
