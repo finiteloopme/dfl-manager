@@ -239,10 +239,10 @@ public class AflPlayerLoaderHandler {
 				aflPlayerService.update(aflPlayer);
 				
 				dflPlayerCrossRefs.remove(aflPlayerCrossRef);
+			} else {
+				loggerUtils.log("info", "Unmatched AFL player: {}", aflPlayer);
+				aflUnmatchedPlayers.add(aflPlayer);
 			}
-			
-			loggerUtils.log("info", "Unmatched AFL player: {}", aflPlayer);
-			aflUnmatchedPlayers.add(aflPlayer);
 		}
 		
 		List<DflUnmatchedPlayer> unmatchedPlayers = new ArrayList<>();
