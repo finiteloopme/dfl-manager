@@ -259,6 +259,8 @@ public class AflPlayerLoaderHandler {
 		    for(AflPlayer aflPlayer : aflUnmatchedPlayers) {
 		    	String aflCheckOne = (aflPlayer.getSecondName() + "-" + globalsService.getAflTeamMap(aflPlayer.getTeamId())).toLowerCase();
 		    	
+		    	loggerUtils.log("info", "Check one {} vs {}", dflCheckOne, aflCheckOne);
+		    	
 		    	if(dflCheckOne == aflCheckOne) {
 		    		int dflPlayerId = player.getPlayerId();
 					String aflPlayerId = aflPlayer.getPlayerId();
@@ -277,6 +279,8 @@ public class AflPlayerLoaderHandler {
 		    	}
 		    	if(!matched) {
 		    		String aflCheckTwo = (aflPlayer.getFirstName() + "-" + globalsService.getAflTeamMap(aflPlayer.getTeamId())).toLowerCase();
+		    		
+		    		loggerUtils.log("info", "Check two {} vs {}", dflCheckTwo, aflCheckTwo);
 		    		
 		    		if(dflCheckTwo == aflCheckTwo) {
 			    		int dflPlayerId = player.getPlayerId();
