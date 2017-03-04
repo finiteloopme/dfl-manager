@@ -261,7 +261,7 @@ public class AflPlayerLoaderHandler {
 		    	
 		    	loggerUtils.log("info", "Check one {} vs {}", dflCheckOne, aflCheckOne);
 		    	
-		    	if(dflCheckOne == aflCheckOne) {
+		    	if(dflCheckOne.equals(aflCheckOne)) {
 		    		int dflPlayerId = player.getPlayerId();
 					String aflPlayerId = aflPlayer.getPlayerId();
 		    		
@@ -282,7 +282,7 @@ public class AflPlayerLoaderHandler {
 		    		
 		    		loggerUtils.log("info", "Check two {} vs {}", dflCheckTwo, aflCheckTwo);
 		    		
-		    		if(dflCheckTwo == aflCheckTwo) {
+		    		if(dflCheckTwo.equals(aflCheckTwo)) {
 			    		int dflPlayerId = player.getPlayerId();
 						String aflPlayerId = aflPlayer.getPlayerId();
 			    		
