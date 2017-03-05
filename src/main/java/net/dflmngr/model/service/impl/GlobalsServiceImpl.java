@@ -346,21 +346,22 @@ public class GlobalsServiceImpl extends GenericServiceImpl<Globals, GlobalsPK>im
 		
 		System.out.println("Fixture Template: " + globalsTemplate);
 		
-		for(int i = 1; i < globalsTemplate.size(); i++) {
-			String roundTempate = globalsTemplate.get(i);
+		for (Map.Entry<String, String> entry : globalsTemplate.entrySet()) {
+		    int round = Integer.parseInt(entry.getKey());
+		    String roundTemplate = entry.getValue();
 			
-			System.out.println("i: " + roundTempate);
+			System.out.println("i: " + roundTemplate);
 			
-			String[] games = roundTempate.substring(roundTempate.length()-1).substring(1).split("][");
+			String[] games = roundTemplate.substring(roundTemplate.length()-1).substring(1).split("][");
 			
-			Map<Integer, String[]> round = new HashMap<>();
+			Map<Integer, String[]> roundFixtures = new HashMap<>();
 			
 			for(int j = 0; j < games.length; j++) {
 				String[] g = games[j].split(",");			
-				round.put(j+1, g);
+				roundFixtures.put(round, g);
 			}
 			
-			fixtureTemplate.put(i, round);
+			fixtureTemplate.put(round, roundFixtures);
 		}
 		
 		return fixtureTemplate;
