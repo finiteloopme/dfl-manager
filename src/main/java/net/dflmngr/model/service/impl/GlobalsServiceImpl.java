@@ -344,8 +344,13 @@ public class GlobalsServiceImpl extends GenericServiceImpl<Globals, GlobalsPK>im
 		
 		Map<String, String> globalsTemplate = getGroupValues(groupCode);
 		
+		System.out.println("Fixture Template: " + globalsTemplate);
+		
 		for(int i = 1; i < globalsTemplate.size(); i++) {
 			String roundTempate = globalsTemplate.get(i);
+			
+			System.out.println("i: " + roundTempate);
+			
 			String[] games = roundTempate.substring(roundTempate.length()-1).substring(1).split("][");
 			
 			Map<Integer, String[]> round = new HashMap<>();
