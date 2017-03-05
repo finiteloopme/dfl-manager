@@ -29,19 +29,28 @@ import net.dflmngr.utils.DflmngrUtils;
 public class DflRoundInfoCalculatorHandler {
 	private LoggingUtils loggerUtils;
 	
+	String defaultMdcKey = "batch.name";
+	String defaultLoggerName = "batch-logger";
+	String defaultLogfile = "DflRoundInfoCalculatorHandler";
+	
+	String mdcKey;
+	String loggerName;
+	String logfile;
+	
+	boolean isExecutable;
+	
 	SimpleDateFormat lockoutFormat = new SimpleDateFormat("dd/MM/yyyy h:mm a");
 	
 	GlobalsService globalsService;
 	AflFixtureService aflFixtrureService;
 	DflRoundInfoService dflRoundInfoService;
 	
-	
 	String standardLockout;
 	
 	public DflRoundInfoCalculatorHandler() {
 		
 		//loggerUtils = new LoggingUtils("batch-logger", "batch.name", "DflRoundInfoCalculator");
-		loggerUtils = new LoggingUtils("DflRoundInfoCalculator");
+		//loggerUtils = new LoggingUtils("DflRoundInfoCalculator");
 		
 		try{
 			//JndiProvider.bind();
@@ -54,9 +63,22 @@ public class DflRoundInfoCalculatorHandler {
 		}
 	}
 	
+	public void configureLogging(String mdcKey, String loggerName, String logfile) {
+		loggerUtils = new LoggingUtils(logfile);
+		this.mdcKey = mdcKey;
+		this.loggerName = loggerName;
+		this.logfile = logfile;
+		isExecutable = true;
+	}
+	
 	public void execute() {
 		
 		try {
+			if(!isExecutable) {
+				configureLogging(defaultMdcKey, defaultLoggerName, defaultLogfile);
+				loggerUtils.log("info", "Default logging configured");
+			}
+			
 			standardLockout = globalsService.getStandardLockoutTime();
 			int aflRoundsMax = Integer.parseInt(globalsService.getAflRoundsMax());
 			

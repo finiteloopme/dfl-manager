@@ -336,4 +336,38 @@ public class GlobalsServiceImpl extends GenericServiceImpl<Globals, GlobalsPK>im
 		return teamDecode;
 		
 	}
+	
+	public Map<Integer, Map<Integer, String[]>> getDflFixuteTemplate() {
+		Map<Integer, Map<Integer, String[]>> fixtureTemplate = new HashMap<>();
+		
+		String groupCode = "dflFixtureTemplate";
+		
+		Map<String, String> globalsTemplate = getGroupValues(groupCode);
+		
+		for(int i = 1; i < globalsTemplate.size(); i++) {
+			String roundTempate = globalsTemplate.get(i);
+			String[] games = roundTempate.substring(roundTempate.length()-1).substring(1).split("][");
+			
+			Map<Integer, String[]> round = new HashMap<>();
+			
+			for(int j = 0; j < games.length; j++) {
+				String[] g = games[j].split(",");			
+				round.put(j+1, g);
+			}
+			
+			fixtureTemplate.put(i, round);
+		}
+		
+		return fixtureTemplate;
+	}
+	
+	public Map<String, String> getDflFixtureOrder() {
+		
+		Map<String, String> fixtureOrder = null;
+		String groupCode = "dflFixtureOrder";
+		
+		fixtureOrder = getGroupValues(groupCode);
+		
+		return fixtureOrder;
+	}
 }
