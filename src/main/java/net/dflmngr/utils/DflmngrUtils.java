@@ -1,10 +1,15 @@
 package net.dflmngr.utils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
+
+import net.dflmngr.model.service.GlobalsService;
+import net.dflmngr.model.service.impl.GlobalsServiceImpl;
 
 public class DflmngrUtils {
 	
@@ -13,6 +18,19 @@ public class DflmngrUtils {
 		
 		return new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
 		
+	}
+	
+	public static Date applyDefaultTimezone(Date date) throws Exception {
+		GlobalsService globalsService = new GlobalsServiceImpl();
+		String defaultTimezone = globalsService.getGroundTimeZone("default");
+		
+		SimpleDateFormat formatter = new SimpleDateFormat("EEEE, MMMM dd h:mma yyyy");
+		formatter.setTimeZone(TimeZone.getTimeZone(defaultTimezone));
+		
+		String defaultDateStr = formatter.format(date);
+		Date defaultDate = formatter.parse(defaultDateStr);
+
+		return defaultDate;
 	}
 	
 	public static final Map<String, Integer> weekDaysInt;

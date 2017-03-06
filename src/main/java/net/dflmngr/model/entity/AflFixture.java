@@ -4,6 +4,7 @@ import java.io.Serializable;
 import javax.persistence.*;
 
 import net.dflmngr.model.entity.keys.AflFixturePK;
+import net.dflmngr.utils.DflmngrUtils;
 
 import java.util.Comparator;
 import java.util.Date;
@@ -68,8 +69,12 @@ public class AflFixture implements Comparator<AflFixture>, Comparable<AflFixture
 		this.round = round;
 	}
 
-	public Date getStart() {
-		return this.start;
+	public Date getStart(boolean applyDefaultTimezone) throws Exception {
+		if(applyDefaultTimezone) {
+			return DflmngrUtils.applyDefaultTimezone(this.start);
+		} else {
+			return this.start;
+		}
 	}
 
 	public void setStart(Date start) {
