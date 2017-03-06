@@ -353,10 +353,12 @@ public class GlobalsServiceImpl extends GenericServiceImpl<Globals, GlobalsPK>im
 			
 			Map<Integer, String[]> roundFixtures = new HashMap<>();
 			
+			System.out.print(round + " - ");
+			
 			for(int j = 0; j < games.length; j++) {
 				String[] g = games[j].split(",");			
-				roundFixtures.put(round, g);
-				System.out.print(round + ": " + g[0] + " vs " + g[1] + " ");
+				roundFixtures.put(j+1, g);
+				System.out.print(j+1 + ": " + g[0] + " vs " + g[1] + " ");
 			}
 			System.out.print("\n");
 			
