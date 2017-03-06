@@ -50,7 +50,7 @@ public class AflFixtureServiceImpl extends GenericServiceImpl<AflFixture, AflFix
 		return fxitureRoundBlocks;
 	}
 	
-	public List<AflFixture> getAflFixturesPlayedForRound(int round) {
+	public List<AflFixture> getAflFixturesPlayedForRound(int round) throws Exception {
 		
 		List<AflFixture> playedFixtures = new ArrayList<>();
 		List<AflFixture> aflFixtures = dao.findAflFixturesForRound(round);
@@ -62,7 +62,7 @@ public class AflFixtureServiceImpl extends GenericServiceImpl<AflFixture, AflFix
 		for(AflFixture fixture : aflFixtures) {
 			
 			Calendar startCal = Calendar.getInstance();
-			startCal.setTime(fixture.getStart());
+			startCal.setTime(fixture.getStart(true));
 			startCal.add(Calendar.HOUR_OF_DAY, 3);
 						
 			if(nowCal.after(startCal)) {
@@ -74,7 +74,7 @@ public class AflFixtureServiceImpl extends GenericServiceImpl<AflFixture, AflFix
 		return playedFixtures;
 	}
 	
-	public AflFixture getPlayedGame(int round, int game) {
+	public AflFixture getPlayedGame(int round, int game) throws Exception {
 		
 		AflFixture playedFixture = null;
 		
@@ -89,7 +89,7 @@ public class AflFixtureServiceImpl extends GenericServiceImpl<AflFixture, AflFix
 		nowCal.setTime(now);
 		
 		Calendar startCal = Calendar.getInstance();
-		startCal.setTime(fixture.getStart());
+		startCal.setTime(fixture.getStart(true));
 		startCal.add(Calendar.HOUR_OF_DAY, 3);
 		
 		if(nowCal.after(startCal)) {
@@ -99,7 +99,7 @@ public class AflFixtureServiceImpl extends GenericServiceImpl<AflFixture, AflFix
 		return playedFixture;
 	}
 	
-	public List<String> getAflTeamsPlayedForRound(int round) {
+	public List<String> getAflTeamsPlayedForRound(int round) throws Exception {
 		List<String> playedTeams = new ArrayList<>();
 		
 		List<AflFixture> playedFixtures = getAflFixturesPlayedForRound(round);

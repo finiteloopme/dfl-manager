@@ -306,7 +306,7 @@ public class ResultsReport {
 		}
 	}
 	
-	private void writeFixtureSheetData(XSSFSheet sheet, DflFixture fixture) {
+	private void writeFixtureSheetData(XSSFSheet sheet, DflFixture fixture) throws Exception {
 		
 		loggerUtils.log("info", "Writing fixture sheet data");
 		
