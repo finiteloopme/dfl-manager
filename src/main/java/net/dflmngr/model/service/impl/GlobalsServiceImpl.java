@@ -343,20 +343,10 @@ public class GlobalsServiceImpl extends GenericServiceImpl<Globals, GlobalsPK>im
 		String groupCode = "dflFixtureTemplate";
 		
 		Map<String, String> globalsTemplate = getGroupValues(groupCode);
-		
-		System.out.println("Fixture Template: " + globalsTemplate);
-		
+				
 		for (Map.Entry<String, String> entry : globalsTemplate.entrySet()) {
 		    int round = Integer.parseInt(entry.getKey());
 		    String roundTemplate = entry.getValue();
-			
-			System.out.println("i: " + roundTemplate);
-			
-			String s1 = roundTemplate.substring(0, roundTemplate.length()-1);
-			String s2 = s1.substring(1);
-			
-			System.out.println("s1: " + s1);
-			System.out.println("s2: " + s2);
 			
 			String[] games = roundTemplate.substring(0, roundTemplate.length()-1).substring(1).split("\\]\\[");
 			//String[] games = s2.split("][");
@@ -366,7 +356,9 @@ public class GlobalsServiceImpl extends GenericServiceImpl<Globals, GlobalsPK>im
 			for(int j = 0; j < games.length; j++) {
 				String[] g = games[j].split(",");			
 				roundFixtures.put(round, g);
+				System.out.print(round + ": " + g[0] + " vs " + g[1] + " ");
 			}
+			System.out.print("\n");
 			
 			fixtureTemplate.put(round, roundFixtures);
 		}
