@@ -355,6 +355,9 @@ public class GlobalsServiceImpl extends GenericServiceImpl<Globals, GlobalsPK>im
 			String s1 = roundTemplate.substring(roundTemplate.length()-1);
 			String s2 = s1.substring(1);
 			
+			System.out.println("s1: " + s1);
+			System.out.println("s2: " + s2);
+			
 			//String[] games = roundTemplate.substring(roundTemplate.length()-1).substring(1).split("][");
 			String[] games = s2.split("][");
 			
