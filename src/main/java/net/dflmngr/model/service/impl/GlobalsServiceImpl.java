@@ -352,7 +352,11 @@ public class GlobalsServiceImpl extends GenericServiceImpl<Globals, GlobalsPK>im
 			
 			System.out.println("i: " + roundTemplate);
 			
-			String[] games = roundTemplate.substring(roundTemplate.length()-1).substring(1).split("][");
+			String s1 = roundTemplate.substring(roundTemplate.length()-1);
+			String s2 = s1.substring(1);
+			
+			//String[] games = roundTemplate.substring(roundTemplate.length()-1).substring(1).split("][");
+			String[] games = s2.split("][");
 			
 			Map<Integer, String[]> roundFixtures = new HashMap<>();
 			
