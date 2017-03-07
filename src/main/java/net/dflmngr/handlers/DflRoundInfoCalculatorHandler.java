@@ -109,10 +109,10 @@ public class DflRoundInfoCalculatorHandler {
 					dflRoundInfo.setRound(dflRound);
 					dflRoundInfo.setSplitRound(DomainDecodes.DFL_ROUND_INFO.SPLIT_ROUND.NO);
 					
-					Map<Integer, Date> gameStartTimes = new HashMap<>();
+					Map<Integer, String> gameStartTimes = new HashMap<>();
 					
 					for(AflFixture fixture : aflRoundFixtures) {
-						gameStartTimes.put(fixture.getGame(), fixture.getStart(true));
+						gameStartTimes.put(fixture.getGame(), fixture.getStart());
 					}
 					
 					loggerUtils.log("info", "AFL game start times: {}", gameStartTimes);
@@ -294,11 +294,11 @@ public class DflRoundInfoCalculatorHandler {
 				dflRoundInfo.setRoundMapping(roundMappings);
 					
 				Collections.sort(gamesInSplitRound);
-				Map<Integer, Date> gameStartTimes = new HashMap<>();
+				Map<Integer, String> gameStartTimes = new HashMap<>();
 				
 				for(AflFixture gameInSplitRound : gamesInSplitRound) {
 					Integer key = Integer.parseInt(Integer.toString(gameInSplitRound.getRound()) + Integer.toString(gameInSplitRound.getGame()));
-					gameStartTimes.put(key, gameInSplitRound.getStart(true));
+					gameStartTimes.put(key, gameInSplitRound.getStart());
 				}
 				
 				loggerUtils.log("info", "Calculating hard lockout time");
@@ -385,11 +385,11 @@ public class DflRoundInfoCalculatorHandler {
 					dflRoundInfo.setRoundMapping(roundMappings);
 					
 					Collections.sort(gamesInSplitRound);
-					Map<Integer, Date> gameStartTimes = new HashMap<>();
+					Map<Integer, String> gameStartTimes = new HashMap<>();
 					
 					for(AflFixture gameInSplitRound : gamesInSplitRound) {
 						Integer key = Integer.parseInt(Integer.toString(gameInSplitRound.getGame()) + Integer.toString(gameInSplitRound.getGame()));
-						gameStartTimes.put(key, gameInSplitRound.getStart(true));
+						gameStartTimes.put(key, gameInSplitRound.getStart());
 					}
 					
 					loggerUtils.log("info", "Calculating hard lockout time");
@@ -413,7 +413,7 @@ public class DflRoundInfoCalculatorHandler {
 		return splitRoundInfo;
 	}
 	
-	private Date calculateHardLockout(int dflRound, Map<Integer, Date> gameStartTimes) throws Exception {
+	private Date calculateHardLockout(int dflRound, Map<Integer, String> gameStartTimes) throws Exception {
 		
 		Date hardLockoutTime = null;
 		
@@ -427,7 +427,7 @@ public class DflRoundInfoCalculatorHandler {
 		loggerUtils.log("info", "Standard lockout details: day={}; hour={}; min={}; AMPM={};", standardLockoutDay, standardLockoutHour, standardLockoutMinute, standardLockoutHourAMPM);
 		
 		int lastGame = Collections.max(gameStartTimes.keySet());
-		Date lastGameTime = gameStartTimes.get(lastGame);
+		Date lastGameTime = DflmngrUtils.dateDbFormat.parse(gameStartTimes.get(lastGame));
 		
 		Calendar startTimeCal = Calendar.getInstance();
 		startTimeCal.setTime(lastGameTime);
@@ -473,14 +473,14 @@ public class DflRoundInfoCalculatorHandler {
 		
 		for(AflFixture game : gamesInRound) {
 			
-			if(game.getStart(true).before(hardLockout)) {
+			if(DflmngrUtils.dateDbFormat.parse(game.getStart()).before(hardLockout)) {
 				loggerUtils.log("info", "Adding early game");
 				
 				DflRoundEarlyGames earlyGame = new DflRoundEarlyGames();
 				earlyGame.setRound(dflRound);
 				earlyGame.setAflRound(game.getRound());
 				earlyGame.setAflGame(game.getGame());
-				earlyGame.setStartTime(game.getStart(true));
+				earlyGame.setStartTime(DflmngrUtils.dateDbFormat.parse(game.getStart()));
 				
 				earlyGames.add(earlyGame);
 			}

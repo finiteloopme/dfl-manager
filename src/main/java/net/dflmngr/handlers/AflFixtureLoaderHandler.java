@@ -20,6 +20,7 @@ import net.dflmngr.model.service.AflFixtureService;
 import net.dflmngr.model.service.GlobalsService;
 import net.dflmngr.model.service.impl.AflFixtureServiceImpl;
 import net.dflmngr.model.service.impl.GlobalsServiceImpl;
+import net.dflmngr.utils.DflmngrUtils;
 
 public class AflFixtureLoaderHandler {
 	private LoggingUtils loggerUtils;
@@ -126,12 +127,14 @@ public class AflFixtureLoaderHandler {
 						Date localDate = formatter.parse(dateStr + " " + timeStr + " " + currentYear);
 						
 						if(timezone.equals(defaultTimezone)) {
-							fixture.setStart(localDate);
+							String dbDateStr = DflmngrUtils.dateDbFormat.format(localDate);
+							fixture.setStart(dbDateStr);
 						} else {
 							formatter.setTimeZone(TimeZone.getTimeZone(defaultTimezone));
 							String defaultDateStr = formatter.format(localDate);
 							Date defaultDate = formatter.parse(defaultDateStr);
-							fixture.setStart(defaultDate);
+							String dbDateStr = DflmngrUtils.dateDbFormat.format(defaultDate);
+							fixture.setStart(dbDateStr);
 						}
 						
 						fixture.setTimezone(timezone);

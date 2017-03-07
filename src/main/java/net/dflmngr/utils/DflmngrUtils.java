@@ -1,12 +1,12 @@
 package net.dflmngr.utils;
 
-import java.text.ParseException;
+//import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TimeZone;
+//import java.util.TimeZone;
 
 import net.dflmngr.model.service.GlobalsService;
 import net.dflmngr.model.service.impl.GlobalsServiceImpl;
@@ -20,6 +20,16 @@ public class DflmngrUtils {
 		
 	}
 	
+	public static final String defaultTimezone;
+	static
+	{
+			GlobalsService globalsService = new GlobalsServiceImpl();
+			defaultTimezone = globalsService.getGroundTimeZone("default");	
+	};
+	
+	public static final SimpleDateFormat dateDbFormat = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+	
+	/*
 	public static Date applyDefaultTimezone(Date date) throws Exception {
 		GlobalsService globalsService = new GlobalsServiceImpl();
 		String defaultTimezone = globalsService.getGroundTimeZone("default");
@@ -31,7 +41,7 @@ public class DflmngrUtils {
 		Date defaultDate = formatter.parse(defaultDateStr);
 
 		return defaultDate;
-	}
+	}*/
 	
 	public static final Map<String, Integer> weekDaysInt;
 	static

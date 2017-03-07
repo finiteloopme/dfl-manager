@@ -6,12 +6,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import net.dflmngr.model.dao.AflFixtureDao;
 import net.dflmngr.model.dao.impl.AflFixtureDaoImpl;
 import net.dflmngr.model.entity.AflFixture;
 import net.dflmngr.model.entity.keys.AflFixturePK;
 import net.dflmngr.model.service.AflFixtureService;
+import net.dflmngr.utils.DflmngrUtils;
 
 public class AflFixtureServiceImpl extends GenericServiceImpl<AflFixture, AflFixturePK> implements AflFixtureService {
 
@@ -62,7 +64,8 @@ public class AflFixtureServiceImpl extends GenericServiceImpl<AflFixture, AflFix
 		for(AflFixture fixture : aflFixtures) {
 			
 			Calendar startCal = Calendar.getInstance();
-			startCal.setTime(fixture.getStart(true));
+			startCal.setTimeZone(TimeZone.getTimeZone(DflmngrUtils.defaultTimezone));
+			startCal.setTime(DflmngrUtils.dateDbFormat.parse(fixture.getStart()));
 			startCal.add(Calendar.HOUR_OF_DAY, 3);
 						
 			if(nowCal.after(startCal)) {
@@ -86,10 +89,13 @@ public class AflFixtureServiceImpl extends GenericServiceImpl<AflFixture, AflFix
 		
 		Date now = new Date();
 		Calendar nowCal = Calendar.getInstance();
+		nowCal.setTimeZone(TimeZone.getTimeZone(DflmngrUtils.defaultTimezone));
 		nowCal.setTime(now);
 		
+		
 		Calendar startCal = Calendar.getInstance();
-		startCal.setTime(fixture.getStart(true));
+		startCal.setTimeZone(TimeZone.getTimeZone(DflmngrUtils.defaultTimezone));
+		startCal.setTime(DflmngrUtils.dateDbFormat.parse(fixture.getStart()));
 		startCal.add(Calendar.HOUR_OF_DAY, 3);
 		
 		if(nowCal.after(startCal)) {

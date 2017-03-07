@@ -4,10 +4,8 @@ import java.io.Serializable;
 import javax.persistence.*;
 
 import net.dflmngr.model.entity.keys.AflFixturePK;
-import net.dflmngr.utils.DflmngrUtils;
 
 import java.util.Comparator;
-import java.util.Date;
 
 @Entity
 @Table(name="afl_fixture")
@@ -31,8 +29,8 @@ public class AflFixture implements Comparator<AflFixture>, Comparable<AflFixture
 	@Column
 	private String ground;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date start;
+	@Column
+	private String start;
 	
 	@Column
 	private String timezone;
@@ -69,15 +67,11 @@ public class AflFixture implements Comparator<AflFixture>, Comparable<AflFixture
 		this.round = round;
 	}
 
-	public Date getStart(boolean applyDefaultTimezone) throws Exception {
-		if(applyDefaultTimezone) {
-			return DflmngrUtils.applyDefaultTimezone(this.start);
-		} else {
-			return this.start;
-		}
+	public String getStart() {
+		return this.start;
 	}
 
-	public void setStart(Date start) {
+	public void setStart(String start) {
 		this.start = start;
 	}
 
