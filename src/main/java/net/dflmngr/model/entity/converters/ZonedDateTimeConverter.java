@@ -4,6 +4,8 @@ import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
@@ -18,6 +20,8 @@ public class ZonedDateTimeConverter implements AttributeConverter<ZonedDateTime,
     @Override
     public ZonedDateTime convertToEntityAttribute(Date value) {
         Instant instant = value.toInstant();
-        return ZonedDateTime.from(instant);
+        LocalDateTime localTime = LocalDateTime.from(instant);
+        //return ZonedDateTime.from(instant);
+        return localTime.atZone(ZoneId.of("UTC"));
     }
 }
