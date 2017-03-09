@@ -471,7 +471,7 @@ public class DflRoundInfoCalculatorHandler {
 			//startTimeCal.set(Calendar.AM_PM, DflmngrUtils.AMPM.get(standardLockoutHourAMPM));
 			
 			//hardLockoutTime = startTimeCal.getTime();
-			hardLockoutTime = lastGameTime.withDayOfMonth(lockoutOffset).withHour(standardLockoutHour).withMinute(standardLockoutMinute);
+			hardLockoutTime = lastGameTime.plusDays(lockoutOffset).withHour(standardLockoutHour).withMinute(standardLockoutMinute);
 			
 			loggerUtils.log("info", "Lockout time: {}", hardLockoutTime);
 		}
