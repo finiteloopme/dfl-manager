@@ -20,8 +20,8 @@ public class ZonedDateTimeConverter implements AttributeConverter<ZonedDateTime,
     @Override
     public ZonedDateTime convertToEntityAttribute(Date value) {
         Instant instant = value.toInstant();
-        LocalDateTime localTime = LocalDateTime.from(instant);
-        //return ZonedDateTime.from(instant);
-        return localTime.atZone(ZoneId.of("UTC"));
+        //LocalDateTime localTime = LocalDateTime.from(instant);
+        return ZonedDateTime.ofInstant(instant, ZoneId.of("UTC"));
+        //return localTime.atZone(ZoneId.of("UTC"));
     }
 }
