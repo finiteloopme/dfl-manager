@@ -445,7 +445,7 @@ public class DflRoundInfoCalculatorHandler {
 		
 		//loggerUtils.log("info", "Rebase to DFL week");
 		int lastGameDayBaseWed = (lastGameDay.getValue() + DayOfWeek.WEDNESDAY.getValue()) % 7;
-		int standardLockoutDayBaseWed = (DayOfWeek.valueOf(standardLockoutDay).getValue() + DayOfWeek.WEDNESDAY.getValue()) % 7;
+		int standardLockoutDayBaseWed = (DayOfWeek.valueOf(standardLockoutDay.toUpperCase()).getValue() + DayOfWeek.WEDNESDAY.getValue()) % 7;
 		
 		//if((lastGameDayBaseWed < standardLockoutDayBaseWed) || (lastGameDay == Calendar.TUESDAY) || (lastGameDay == Calendar.WEDNESDAY)) {
 		if((lastGameDayBaseWed < standardLockoutDayBaseWed) || (lastGameDay == DayOfWeek.TUESDAY) || (lastGameDay == DayOfWeek.WEDNESDAY)) {
