@@ -8,7 +8,11 @@
 		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
 		
 		<mapping-file>META-INF/orm.xml</mapping-file>
-
+		
+		<!-- Converters -->
+		<class>net.dflmngr.model.entity.converters.ZonedDateTimeConverter</class>
+		
+		<!-- Entities / Model -->
 		<class>net.dflmngr.model.entity.InsAndOuts</class>
 		<class>net.dflmngr.model.entity.AflFixture</class>
 		<class>net.dflmngr.model.entity.Globals</class>
