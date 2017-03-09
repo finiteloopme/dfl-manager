@@ -1,10 +1,11 @@
 package net.dflmngr.handlers;
 
 import java.net.URL;
-import java.text.SimpleDateFormat;
+//import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 //import java.util.Date;
 import java.util.Iterator;
@@ -28,7 +29,8 @@ import net.dflmngr.model.service.impl.GlobalsServiceImpl;
 public class AflFixtureLoaderHandler {
 	private LoggingUtils loggerUtils;
 	
-	SimpleDateFormat formatter = new SimpleDateFormat("EEEE, MMMM dd h:mma yyyy");
+	//SimpleDateFormat formatter = new SimpleDateFormat("EEEE, MMMM dd h:mma yyyy");
+	DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, MMMM dd h:mma yyyy");
 	
 	GlobalsService globalsService;
 	AflFixtureService aflFixtureService;
@@ -128,7 +130,7 @@ public class AflFixtureLoaderHandler {
 						//formatter.setTimeZone(TimeZone.getTimeZone(timezone));
 						String timeStr = fixtureRow.select(".time").text();
 						//Date localDate = formatter.parse(dateStr + " " + timeStr + " " + currentYear);
-						ZonedDateTime localStart = LocalDateTime.parse(dateStr + " " + timeStr + " " + currentYear).atZone(ZoneId.of(timezone));
+						ZonedDateTime localStart = LocalDateTime.parse((dateStr + " " + timeStr + " " + currentYear), formatter).atZone(ZoneId.of(timezone));
 						
 						
 						if(timezone.equals(defaultTimezone)) {
