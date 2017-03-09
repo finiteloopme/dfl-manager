@@ -1,6 +1,8 @@
 package net.dflmngr.model.entity;
 
 import java.io.Serializable;
+import java.time.ZonedDateTime;
+
 import javax.persistence.*;
 
 import net.dflmngr.model.entity.keys.AflFixturePK;
@@ -30,7 +32,7 @@ public class AflFixture implements Comparator<AflFixture>, Comparable<AflFixture
 	private String ground;
 
 	@Column
-	private String start;
+	private ZonedDateTime start;
 	
 	@Column
 	private String timezone;
@@ -67,11 +69,11 @@ public class AflFixture implements Comparator<AflFixture>, Comparable<AflFixture
 		this.round = round;
 	}
 
-	public String getStart() {
+	public ZonedDateTime getStart() {
 		return this.start;
 	}
 
-	public void setStart(String start) {
+	public void setStart(ZonedDateTime start) {
 		this.start = start;
 	}
 

@@ -1,9 +1,11 @@
 package net.dflmngr.handlers;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
+//import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
+//import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +35,7 @@ import net.dflmngr.model.service.DflSelectedTeamService;
 import net.dflmngr.model.service.DflTeamPlayerService;
 import net.dflmngr.model.service.DflTeamScoresService;
 import net.dflmngr.model.service.DflTeamService;
+import net.dflmngr.model.service.GlobalsService;
 import net.dflmngr.model.service.InsAndOutsService;
 import net.dflmngr.model.service.RawPlayerStatsService;
 import net.dflmngr.model.service.impl.AflFixtureServiceImpl;
@@ -45,6 +48,7 @@ import net.dflmngr.model.service.impl.DflSelectedTeamServiceImpl;
 import net.dflmngr.model.service.impl.DflTeamPlayerServiceImpl;
 import net.dflmngr.model.service.impl.DflTeamScoresServiceImpl;
 import net.dflmngr.model.service.impl.DflTeamServiceImpl;
+import net.dflmngr.model.service.impl.GlobalsServiceImpl;
 import net.dflmngr.model.service.impl.InsAndOutsServiceImpl;
 import net.dflmngr.model.service.impl.RawPlayerStatsServiceImpl;
 import net.dflmngr.structs.DflPlayerAverage;
@@ -74,6 +78,7 @@ public class ScoresCalculatorHandler {
 	AflFixtureService aflFixtureService;
 	DflPlayerPredictedScoresService dflPlayerPredictedScoresService;
 	InsAndOutsService insAndOutsService;
+	GlobalsService globalsService;
 	
 	public ScoresCalculatorHandler() {
 		rawPlayerStatsService = new RawPlayerStatsServiceImpl();
@@ -88,6 +93,7 @@ public class ScoresCalculatorHandler {
 		aflFixtureService = new AflFixtureServiceImpl();
 		dflPlayerPredictedScoresService = new DflPlayerPredictedScoresServiceImpl();
 		insAndOutsService = new InsAndOutsServiceImpl();
+		globalsService = new GlobalsServiceImpl();
 	}
 	
 	public void configureLogging(String mdcKey, String loggerName, String logfile) {
@@ -115,24 +121,26 @@ public class ScoresCalculatorHandler {
 			loggerUtils.log("info", "Checking Early Games");
 			DflRoundInfo dflRoundInfo = dflRoundInfoService.get(round);
 			
-			Date now = new Date();
-			Calendar nowCal = Calendar.getInstance();
-			nowCal.setTime(now);
+			ZonedDateTime now = ZonedDateTime.now(ZoneId.of(globalsService.getGroundTimeZone("default")));
+			//Calendar nowCal = Calendar.getInstance();
+			//nowCal.setTime(now);
 			
 			boolean earlyGamesCompleted = false;
-			List<String> earlyGameTeams = new ArrayList<>();
 			
 			List<DflRoundEarlyGames> earlyGames = dflRoundInfo.getEarlyGames();
+			List<String> earlyGameTeams = new ArrayList<>();
 			
 			if(earlyGames != null && dflRoundInfo.getEarlyGames().size() > 0) {
 				loggerUtils.log("info", "Early Games exist, checking if completed");
 				int completedCount = 0;
 				for(DflRoundEarlyGames earlyGame : earlyGames) {
-					Calendar startCal = Calendar.getInstance();
-					startCal.setTime(earlyGame.getStartTime());
-					startCal.add(Calendar.HOUR_OF_DAY, 3);
+					//Calendar startCal = Calendar.getInstance();
+					//startCal.setTime(earlyGame.getStartTime());
+					//startCal.add(Calendar.HOUR_OF_DAY, 3);
+					ZonedDateTime gameEndTime = earlyGame.getStartTime().plusHours(3);
 					
-					if(nowCal.after(startCal)) {
+					//if(nowCal.after(startCal)) {
+					if(now.isAfter(gameEndTime)) {
 						completedCount++;
 					}
 					

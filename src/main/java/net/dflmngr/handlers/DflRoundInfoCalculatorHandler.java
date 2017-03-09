@@ -1,13 +1,19 @@
 package net.dflmngr.handlers;
 
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
-import java.util.Calendar;
+//import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
+//import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
@@ -25,7 +31,7 @@ import net.dflmngr.model.service.GlobalsService;
 import net.dflmngr.model.service.impl.AflFixtureServiceImpl;
 import net.dflmngr.model.service.impl.DflRoundInfoServiceImpl;
 import net.dflmngr.model.service.impl.GlobalsServiceImpl;
-import net.dflmngr.utils.DflmngrUtils;
+//import net.dflmngr.utils.DflmngrUtils;
 
 public class DflRoundInfoCalculatorHandler {
 	private LoggingUtils loggerUtils;
@@ -109,7 +115,7 @@ public class DflRoundInfoCalculatorHandler {
 					dflRoundInfo.setRound(dflRound);
 					dflRoundInfo.setSplitRound(DomainDecodes.DFL_ROUND_INFO.SPLIT_ROUND.NO);
 					
-					Map<Integer, String> gameStartTimes = new HashMap<>();
+					Map<Integer, ZonedDateTime> gameStartTimes = new HashMap<>();
 					
 					for(AflFixture fixture : aflRoundFixtures) {
 						gameStartTimes.put(fixture.getGame(), fixture.getStart());
@@ -118,7 +124,7 @@ public class DflRoundInfoCalculatorHandler {
 					loggerUtils.log("info", "AFL game start times: {}", gameStartTimes);
 					
 					loggerUtils.log("info", "Calculating hard lockout time");
-					Date hardLockout = calculateHardLockout(dflRound, gameStartTimes);
+					ZonedDateTime hardLockout = calculateHardLockout(dflRound, gameStartTimes);
 					dflRoundInfo.setHardLockoutTime(hardLockout);
 					
 					loggerUtils.log("info", "Creating round mapping: DFL rouund={}; AFL round={};", dflRound, i);
@@ -294,7 +300,7 @@ public class DflRoundInfoCalculatorHandler {
 				dflRoundInfo.setRoundMapping(roundMappings);
 					
 				Collections.sort(gamesInSplitRound);
-				Map<Integer, String> gameStartTimes = new HashMap<>();
+				Map<Integer, ZonedDateTime> gameStartTimes = new HashMap<>();
 				
 				for(AflFixture gameInSplitRound : gamesInSplitRound) {
 					Integer key = Integer.parseInt(Integer.toString(gameInSplitRound.getRound()) + Integer.toString(gameInSplitRound.getGame()));
@@ -302,7 +308,7 @@ public class DflRoundInfoCalculatorHandler {
 				}
 				
 				loggerUtils.log("info", "Calculating hard lockout time");
-				Date hardLockout = calculateHardLockout(dflRound, gameStartTimes);
+				ZonedDateTime hardLockout = calculateHardLockout(dflRound, gameStartTimes);
 				dflRoundInfo.setHardLockoutTime(hardLockout);
 				
 				loggerUtils.log("info", "Calculating early games");
@@ -385,7 +391,7 @@ public class DflRoundInfoCalculatorHandler {
 					dflRoundInfo.setRoundMapping(roundMappings);
 					
 					Collections.sort(gamesInSplitRound);
-					Map<Integer, String> gameStartTimes = new HashMap<>();
+					Map<Integer, ZonedDateTime> gameStartTimes = new HashMap<>();
 					
 					for(AflFixture gameInSplitRound : gamesInSplitRound) {
 						Integer key = Integer.parseInt(Integer.toString(gameInSplitRound.getGame()) + Integer.toString(gameInSplitRound.getGame()));
@@ -393,7 +399,7 @@ public class DflRoundInfoCalculatorHandler {
 					}
 					
 					loggerUtils.log("info", "Calculating hard lockout time");
-					Date hardLockout = calculateHardLockout(dflRound, gameStartTimes);
+					ZonedDateTime hardLockout = calculateHardLockout(dflRound, gameStartTimes);
 					dflRoundInfo.setHardLockoutTime(hardLockout);
 					
 					loggerUtils.log("info", "Calculating early games");
@@ -413,39 +419,44 @@ public class DflRoundInfoCalculatorHandler {
 		return splitRoundInfo;
 	}
 	
-	private Date calculateHardLockout(int dflRound, Map<Integer, String> gameStartTimes) throws Exception {
+	private ZonedDateTime calculateHardLockout(int dflRound, Map<Integer, ZonedDateTime> gameStartTimes) throws Exception {
 		
-		Date hardLockoutTime = null;
+		ZonedDateTime hardLockoutTime = null;
 		
 		loggerUtils.log("info", "Calculating hard lockout for round={}; from start times: {};", dflRound, gameStartTimes);
 		
 		String standardLockoutDay = (standardLockout.split(";"))[0];
 		int standardLockoutHour = Integer.parseInt((standardLockout.split(";"))[1]);
 		int standardLockoutMinute = Integer.parseInt((standardLockout.split(";"))[2]);
-		String standardLockoutHourAMPM = (standardLockout.split(";"))[3];
+		//String standardLockoutHourAMPM = (standardLockout.split(";"))[3];
 		
-		loggerUtils.log("info", "Standard lockout details: day={}; hour={}; min={}; AMPM={};", standardLockoutDay, standardLockoutHour, standardLockoutMinute, standardLockoutHourAMPM);
+		loggerUtils.log("info", "Standard lockout details: day={}; hour={}; min={}; AMPM={};", standardLockoutDay, standardLockoutHour, standardLockoutMinute);
 		
 		int lastGame = Collections.max(gameStartTimes.keySet());
-		Date lastGameTime = DflmngrUtils.dateDbFormat.parse(gameStartTimes.get(lastGame));
+		ZonedDateTime lastGameTime = gameStartTimes.get(lastGame);
 		
-		Calendar startTimeCal = Calendar.getInstance();
-		startTimeCal.setTime(lastGameTime);
-		int lastGameDay = startTimeCal.get(Calendar.DAY_OF_WEEK);
+		//Calendar startTimeCal = Calendar.getInstance();
+		//startTimeCal.setTime(lastGameTime);
+		//int lastGameDay = startTimeCal.get(Calendar.DAY_OF_WEEK);
+		DayOfWeek lastGameDay = lastGameTime.getDayOfWeek();
 		
-		loggerUtils.log("info", "Last day for round: {}", DflmngrUtils.weekDaysString.get(lastGameDay));
+		//loggerUtils.log("info", "Last day for round: {}", DflmngrUtils.weekDaysString.get(lastGameDay));
+		loggerUtils.log("info", "Last day for round: {}", lastGameDay.getDisplayName(TextStyle.FULL, Locale.ENGLISH));
 		
-		loggerUtils.log("info", "Rebase to DFL week");
-		int lastGameDayBaseWed = (lastGameDay + Calendar.WEDNESDAY) % 7;
-		int standardLockoutDayBaseWed = (DflmngrUtils.weekDaysInt.get(standardLockoutDay) + Calendar.WEDNESDAY) % 7;
+		//loggerUtils.log("info", "Rebase to DFL week");
+		int lastGameDayBaseWed = (lastGameDay.getValue() + DayOfWeek.WEDNESDAY.getValue()) % 7;
+		int standardLockoutDayBaseWed = (DayOfWeek.valueOf(standardLockoutDay).getValue() + DayOfWeek.WEDNESDAY.getValue()) % 7;
 		
-		if((lastGameDayBaseWed < standardLockoutDayBaseWed) || (lastGameDay == Calendar.TUESDAY) || (lastGameDay == Calendar.WEDNESDAY)) {
+		//if((lastGameDayBaseWed < standardLockoutDayBaseWed) || (lastGameDay == Calendar.TUESDAY) || (lastGameDay == Calendar.WEDNESDAY)) {
+		if((lastGameDayBaseWed < standardLockoutDayBaseWed) || (lastGameDay == DayOfWeek.TUESDAY) || (lastGameDay == DayOfWeek.WEDNESDAY)) {
 			loggerUtils.log("info", "Last game of round is late in week, get custome lockout time");
 			
 			String nonStandardLockoutStr = globalsService.getNonStandardLockout(dflRound);
 			
 			if(nonStandardLockoutStr != null && !nonStandardLockoutStr.equals("")) {
-				hardLockoutTime = lockoutFormat.parse(nonStandardLockoutStr);
+				//hardLockoutTime = lockoutFormat.parse(nonStandardLockoutStr);
+				hardLockoutTime = LocalDateTime.parse(nonStandardLockoutStr).atZone(ZoneId.of(globalsService.getGroundTimeZone("default")));
+				//hardLockoutTime = .parse(nonStandardLockoutStr);
 				loggerUtils.log("info", "Custom lockout time: {}", hardLockoutTime);
 			} else {
 				throw new Exception();
@@ -454,12 +465,13 @@ public class DflRoundInfoCalculatorHandler {
 		
 			int lockoutOffset = standardLockoutDayBaseWed - lastGameDayBaseWed;
 			
-			startTimeCal.add(Calendar.DAY_OF_MONTH, lockoutOffset);
-			startTimeCal.set(Calendar.HOUR, standardLockoutHour);
-			startTimeCal.set(Calendar.MINUTE, standardLockoutMinute);
-			startTimeCal.set(Calendar.AM_PM, DflmngrUtils.AMPM.get(standardLockoutHourAMPM));
+			//startTimeCal.add(Calendar.DAY_OF_MONTH, lockoutOffset);
+			//startTimeCal.set(Calendar.HOUR, standardLockoutHour);
+			//startTimeCal.set(Calendar.MINUTE, standardLockoutMinute);
+			//startTimeCal.set(Calendar.AM_PM, DflmngrUtils.AMPM.get(standardLockoutHourAMPM));
 			
-			hardLockoutTime = startTimeCal.getTime();
+			//hardLockoutTime = startTimeCal.getTime();
+			hardLockoutTime = lastGameTime.withDayOfMonth(lockoutOffset).withHour(standardLockoutHour).withMinute(standardLockoutMinute);
 			
 			loggerUtils.log("info", "Lockout time: {}", hardLockoutTime);
 		}
@@ -467,20 +479,20 @@ public class DflRoundInfoCalculatorHandler {
 		return hardLockoutTime;
 	}
 	
-	private List<DflRoundEarlyGames> calculateEarlyGames(Date hardLockout, List<AflFixture> gamesInRound, int dflRound) throws Exception {
+	private List<DflRoundEarlyGames> calculateEarlyGames(ZonedDateTime hardLockout, List<AflFixture> gamesInRound, int dflRound) throws Exception {
 		
 		List<DflRoundEarlyGames> earlyGames = new ArrayList<>();
 		
 		for(AflFixture game : gamesInRound) {
 			
-			if(DflmngrUtils.dateDbFormat.parse(game.getStart()).before(hardLockout)) {
+			if(game.getStart().isBefore(hardLockout)) {
 				loggerUtils.log("info", "Adding early game");
 				
 				DflRoundEarlyGames earlyGame = new DflRoundEarlyGames();
 				earlyGame.setRound(dflRound);
 				earlyGame.setAflRound(game.getRound());
 				earlyGame.setAflGame(game.getGame());
-				earlyGame.setStartTime(DflmngrUtils.dateDbFormat.parse(game.getStart()));
+				earlyGame.setStartTime(game.getStart());
 				
 				earlyGames.add(earlyGame);
 			}

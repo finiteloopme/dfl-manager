@@ -1,8 +1,10 @@
 package net.dflmngr.handlers;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+//import java.util.Calendar;
+//import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +34,7 @@ import net.dflmngr.model.service.impl.DflTeamServiceImpl;
 import net.dflmngr.model.service.impl.GlobalsServiceImpl;
 import net.dflmngr.model.service.impl.InsAndOutsServiceImpl;
 import net.dflmngr.reports.InsAndOutsReport;
+import net.dflmngr.utils.DflmngrUtils;
 import net.dflmngr.utils.EmailUtils;
 import net.dflmngr.validation.SelectedTeamValidation;
 
@@ -87,11 +90,13 @@ public class StartRoundHandler {
 			boolean earlyGamesCompleted = false;
 			
 			DflRoundInfo dflRoundInfo = dflRoundInfoService.get(round);
-			Date dummyReceivedDate = new Date(dflRoundInfo.getHardLockoutTime().getTime() - 600000);
+			//Date dummyReceivedDate = new Date(dflRoundInfo.getHardLockoutTime().getTime() - 600000);
+			ZonedDateTime dummyReceivedDate = ZonedDateTime.now(ZoneId.of(DflmngrUtils.defaultTimezone)).minusMinutes(10);
 			
-			Date now = new Date();
-			Calendar nowCal = Calendar.getInstance();
-			nowCal.setTime(now);
+			//Date now = new Date();
+			//Calendar nowCal = Calendar.getInstance();
+			//nowCal.setTime(now);
+			ZonedDateTime now = ZonedDateTime.now(ZoneId.of(DflmngrUtils.defaultTimezone));
 			
 			List<DflRoundEarlyGames> earlyGames = dflRoundInfo.getEarlyGames();
 			
@@ -100,11 +105,13 @@ public class StartRoundHandler {
 				earlyGamesExist = true;
 				int completedCount = 0;
 				for(DflRoundEarlyGames earlyGame : earlyGames) {
-					Calendar startCal = Calendar.getInstance();
-					startCal.setTime(earlyGame.getStartTime());
-					startCal.add(Calendar.HOUR_OF_DAY, 3);
+					//Calendar startCal = Calendar.getInstance();
+					//startCal.setTime(earlyGame.getStartTime());
+					//startCal.add(Calendar.HOUR_OF_DAY, 3);
+					ZonedDateTime gameEndTime = earlyGame.getStartTime().minusHours(3);
 					
-					if(nowCal.after(startCal)) {
+					//if(nowCal.after(startCal)) {
+					if(now.isAfter(gameEndTime)) {
 						completedCount++;
 					}
 					
@@ -156,7 +163,7 @@ public class StartRoundHandler {
 		
 	}
 	
-	private void createTeamSelections(int round, boolean earlyGamesExist, boolean earlyGamesCompleted, Date dummyReceivedDate) throws Exception {
+	private void createTeamSelections(int round, boolean earlyGamesExist, boolean earlyGamesCompleted, ZonedDateTime dummyReceivedDate) throws Exception {
 
 		loggerUtils.log("info", "Creating team selections");
 		

@@ -1,7 +1,8 @@
 package net.dflmngr.handlers;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Date;
+//import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -65,7 +66,7 @@ public class SelectedTeamValidationHandler {
 		isExecutable = true;
 	}
 	
-	public SelectedTeamValidation execute(int round, String teamCode, Map<String, List<Integer>> insAndOuts, Date receivedDate, boolean skipEarlyGames) {
+	public SelectedTeamValidation execute(int round, String teamCode, Map<String, List<Integer>> insAndOuts, ZonedDateTime receivedDate, boolean skipEarlyGames) {
 		
 		SelectedTeamValidation validationResult = null;
 		
@@ -79,7 +80,7 @@ public class SelectedTeamValidationHandler {
 			
 			int currentRound = Integer.parseInt(globalsService.getCurrentRound());
 			DflRoundInfo roundInfo = dflRoundInfoService.get(round);
-			Date lockoutTime = roundInfo.getHardLockoutTime();
+			ZonedDateTime lockoutTime = roundInfo.getHardLockoutTime();
 			
 			boolean earlyGamesCompleted = false;
 			boolean playedSelections = false;
@@ -89,7 +90,7 @@ public class SelectedTeamValidationHandler {
 				List<DflRoundEarlyGames> earlyGames = roundInfo.getEarlyGames();
 				int completedCount = 0;
 				for(DflRoundEarlyGames earlyGame : earlyGames) {
-					if(receivedDate.after(earlyGame.getStartTime())) {
+					if(receivedDate.isAfter(earlyGame.getStartTime())) {
 						completedCount++;
 					}
 				}
@@ -140,13 +141,13 @@ public class SelectedTeamValidationHandler {
 		return validationResult;
 	}
 	
-	private boolean checkForPlayedSelections(String teamCode, Date receivedDate, DflRoundInfo roundInfo, Map<String, List<Integer>> insAndOuts, List<DflEarlyInsAndOuts> earlyInsAndOuts) {
+	private boolean checkForPlayedSelections(String teamCode, ZonedDateTime receivedDate, DflRoundInfo roundInfo, Map<String, List<Integer>> insAndOuts, List<DflEarlyInsAndOuts> earlyInsAndOuts) {
 		boolean playedSelections = false;
 		
 		List<DflRoundEarlyGames> earlyGames = roundInfo.getEarlyGames();
 		
 		for(DflRoundEarlyGames earlyGame : earlyGames) {
-			if(receivedDate.after(earlyGame.getStartTime())) {
+			if(receivedDate.isAfter(earlyGame.getStartTime())) {
 				List<Integer> ins = insAndOuts.get("in");
 				List<Integer> outs = insAndOuts.get("out");
 				
@@ -209,7 +210,7 @@ public class SelectedTeamValidationHandler {
 		return playedSelections;
 	}
 	
-	private SelectedTeamValidation standardValidation(int round, int currentRound, String teamCode, Map<String, List<Integer>> insAndOuts, Date receivedDate, Date lockoutTime) {
+	private SelectedTeamValidation standardValidation(int round, int currentRound, String teamCode, Map<String, List<Integer>> insAndOuts, ZonedDateTime receivedDate, ZonedDateTime lockoutTime) {
 		
 		SelectedTeamValidation validationResult = null;
 		
@@ -222,7 +223,7 @@ public class SelectedTeamValidationHandler {
 			validationResult.selectionFileMissing = false;
 			validationResult.roundCompleted = true;
 			loggerUtils.log("info", "Team invalid round is completed");
-		} else if(receivedDate.after(lockoutTime)) {
+		} else if(receivedDate.isAfter(lockoutTime)) {
 			validationResult = new SelectedTeamValidation();
 			validationResult.selectionFileMissing = false;
 			validationResult.roundCompleted = false;

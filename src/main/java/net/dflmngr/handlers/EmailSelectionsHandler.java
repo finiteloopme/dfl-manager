@@ -3,8 +3,10 @@ package net.dflmngr.handlers;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Date;
+//import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +33,7 @@ import net.dflmngr.model.service.DflTeamService;
 import net.dflmngr.model.service.GlobalsService;
 import net.dflmngr.model.service.impl.DflTeamServiceImpl;
 import net.dflmngr.model.service.impl.GlobalsServiceImpl;
+import net.dflmngr.utils.DflmngrUtils;
 import net.dflmngr.validation.SelectedTeamValidation;
 import net.freeutils.tnef.Attachment;
 import net.freeutils.tnef.TNEFInputStream;
@@ -175,11 +178,14 @@ public class EmailSelectionsHandler {
 		
 						if (disposition != null && (disposition.equalsIgnoreCase(Part.ATTACHMENT) || disposition.equalsIgnoreCase(Part.INLINE))) {
 							String attachementName = part.getFileName();
+							ZonedDateTime receivedDate = ZonedDateTime.from(messages[i].getReceivedDate().toInstant())
+															.withZoneSameInstant(ZoneId.of(DflmngrUtils.defaultTimezone));
 							loggerUtils.log("info", "Attachement found, name={}", attachementName);
 							if(attachementName.equals("selections.txt")) {
 								loggerUtils.log("info", "Message from {}, has selection attachment", from);
 								selectionsFileAttached = true;
-								validationResult = handleSelectionFile(part.getInputStream(), messages[i].getReceivedDate());
+								//validationResult = handleSelectionFile(part.getInputStream(), messages[i].getReceivedDate());
+								validationResult = handleSelectionFile(part.getInputStream(), receivedDate);
 								//String key = from + ";" + teamCode;
 								//this.responses.put(key, true);
 								validationResult.setFrom(from);
@@ -187,7 +193,8 @@ public class EmailSelectionsHandler {
 								loggerUtils.log("info", "Message from {} handled with ... SUCCESS!", from);
 							} else if (attachementName.equalsIgnoreCase("WINMAIL.DAT") || attachementName.equalsIgnoreCase("ATT00001.DAT")) {
 								loggerUtils.log("info", "Message from {}, is a TNEF message", from);
-								validationResult = handleTNEFMessage(part.getInputStream(), from, messages[i].getReceivedDate());
+								//validationResult = handleTNEFMessage(part.getInputStream(), from, messages[i].getReceivedDate());
+								validationResult = handleTNEFMessage(part.getInputStream(), from, receivedDate);
 								//String key = from + ";" + teamCode;
 								//this.responses.put(key, true);
 								validationResult.setFrom(from);
@@ -264,7 +271,7 @@ public class EmailSelectionsHandler {
 		store.close();
 	}
 	
-	private SelectedTeamValidation handleTNEFMessage(InputStream inputStream, String from, Date receivedDate) throws Exception {
+	private SelectedTeamValidation handleTNEFMessage(InputStream inputStream, String from, ZonedDateTime receivedDate) throws Exception {
 
 		SelectedTeamValidation validationResult = null;
 		
@@ -288,7 +295,7 @@ public class EmailSelectionsHandler {
 		return validationResult;
 	}
 	
-	private SelectedTeamValidation handleSelectionFile(InputStream inputStream, Date receivedDate) throws Exception {
+	private SelectedTeamValidation handleSelectionFile(InputStream inputStream, ZonedDateTime receivedDate) throws Exception {
 		
 		String line = "";
 		String teamCode = "";

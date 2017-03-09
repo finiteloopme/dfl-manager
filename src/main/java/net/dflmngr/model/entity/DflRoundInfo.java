@@ -1,5 +1,6 @@
 package net.dflmngr.model.entity;
 
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class DflRoundInfo {
 	
 	@Column(name = "hard_lockout")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date hardLockoutTime;
+	private ZonedDateTime hardLockoutTime;
 	
 	@Column(name = "split_round")
 	private String splitRound;
@@ -44,11 +45,11 @@ public class DflRoundInfo {
 		this.round = round;
 	}
 	
-	public Date getHardLockoutTime() {
+	public ZonedDateTime getHardLockoutTime() {
 		return hardLockoutTime;
 	}
 	
-	public void setHardLockoutTime(Date hardLockoutTime) {
+	public void setHardLockoutTime(ZonedDateTime hardLockoutTime) {
 		this.hardLockoutTime = hardLockoutTime;
 	}
 	

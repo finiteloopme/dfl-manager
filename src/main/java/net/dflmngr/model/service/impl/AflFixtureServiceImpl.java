@@ -1,5 +1,7 @@
 package net.dflmngr.model.service.impl;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -57,18 +59,21 @@ public class AflFixtureServiceImpl extends GenericServiceImpl<AflFixture, AflFix
 		List<AflFixture> playedFixtures = new ArrayList<>();
 		List<AflFixture> aflFixtures = dao.findAflFixturesForRound(round);
 		
-		Date now = new Date();
-		Calendar nowCal = Calendar.getInstance();
-		nowCal.setTime(now);
+		//Date now = new Date();
+		//Calendar nowCal = Calendar.getInstance();
+		//nowCal.setTime(now);
+		ZonedDateTime now = ZonedDateTime.now(ZoneId.of(DflmngrUtils.defaultTimezone));
 		
 		for(AflFixture fixture : aflFixtures) {
 			
-			Calendar startCal = Calendar.getInstance();
-			startCal.setTimeZone(TimeZone.getTimeZone(DflmngrUtils.defaultTimezone));
-			startCal.setTime(DflmngrUtils.dateDbFormat.parse(fixture.getStart()));
-			startCal.add(Calendar.HOUR_OF_DAY, 3);
+			//Calendar startCal = Calendar.getInstance();
+			//startCal.setTimeZone(TimeZone.getTimeZone(DflmngrUtils.defaultTimezone));
+			//startCal.setTime(DflmngrUtils.dateDbFormat.parse(fixture.getStart()));
+			//startCal.add(Calendar.HOUR_OF_DAY, 3);
+			ZonedDateTime gameEndTime = fixture.getStart().plusHours(3);
 						
-			if(nowCal.after(startCal)) {
+			//if(nowCal.after(startCal)) {
+			if(now.isAfter(gameEndTime)) {
 				playedFixtures.add(fixture);
 			}
 			
@@ -87,18 +92,21 @@ public class AflFixtureServiceImpl extends GenericServiceImpl<AflFixture, AflFix
 		
 		AflFixture fixture = get(aflFixturePK);
 		
-		Date now = new Date();
-		Calendar nowCal = Calendar.getInstance();
-		nowCal.setTimeZone(TimeZone.getTimeZone(DflmngrUtils.defaultTimezone));
-		nowCal.setTime(now);
+		//Date now = new Date();
+		//Calendar nowCal = Calendar.getInstance();
+		//nowCal.setTimeZone(TimeZone.getTimeZone(DflmngrUtils.defaultTimezone));
+		//nowCal.setTime(now);
+		ZonedDateTime now = ZonedDateTime.now(ZoneId.of(DflmngrUtils.defaultTimezone));
 		
 		
-		Calendar startCal = Calendar.getInstance();
-		startCal.setTimeZone(TimeZone.getTimeZone(DflmngrUtils.defaultTimezone));
-		startCal.setTime(DflmngrUtils.dateDbFormat.parse(fixture.getStart()));
-		startCal.add(Calendar.HOUR_OF_DAY, 3);
+		//Calendar startCal = Calendar.getInstance();
+		//startCal.setTimeZone(TimeZone.getTimeZone(DflmngrUtils.defaultTimezone));
+		//startCal.setTime(DflmngrUtils.dateDbFormat.parse(fixture.getStart()));
+		//startCal.add(Calendar.HOUR_OF_DAY, 3);
+		ZonedDateTime gameEndTime = fixture.getStart().plusHours(3);
 		
-		if(nowCal.after(startCal)) {
+		//if(nowCal.after(startCal)) {
+		if(now.isAfter(gameEndTime)) {
 			playedFixture = fixture;
 		}
 		

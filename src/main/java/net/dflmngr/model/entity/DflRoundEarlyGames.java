@@ -1,6 +1,6 @@
 package net.dflmngr.model.entity;
 
-import java.util.Date;
+import java.time.ZonedDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,7 +27,7 @@ public class DflRoundEarlyGames {
 	private int aflGame;
 	
 	@Column(name="start_time")
-	private Date startTime;
+	private ZonedDateTime startTime;
 
 	public int getId() {
 		return id;
@@ -61,11 +61,11 @@ public class DflRoundEarlyGames {
 		this.aflGame = aflGame;
 	}
 
-	public Date getStartTime() {
+	public ZonedDateTime getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(Date startTime) {
+	public void setStartTime(ZonedDateTime startTime) {
 		this.startTime = startTime;
 	}
 

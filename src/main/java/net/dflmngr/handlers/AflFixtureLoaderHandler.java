@@ -2,11 +2,14 @@ package net.dflmngr.handlers;
 
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Date;
+//import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TimeZone;
+//import java.util.TimeZone;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,7 +23,7 @@ import net.dflmngr.model.service.AflFixtureService;
 import net.dflmngr.model.service.GlobalsService;
 import net.dflmngr.model.service.impl.AflFixtureServiceImpl;
 import net.dflmngr.model.service.impl.GlobalsServiceImpl;
-import net.dflmngr.utils.DflmngrUtils;
+//import net.dflmngr.utils.DflmngrUtils;
 
 public class AflFixtureLoaderHandler {
 	private LoggingUtils loggerUtils;
@@ -122,19 +125,23 @@ public class AflFixtureLoaderHandler {
 						String timezone = globalsService.getGroundTimeZone(ground);
 						String defaultTimezone = globalsService.getGroundTimeZone("default");
 						
-						formatter.setTimeZone(TimeZone.getTimeZone(timezone));
+						//formatter.setTimeZone(TimeZone.getTimeZone(timezone));
 						String timeStr = fixtureRow.select(".time").text();
-						Date localDate = formatter.parse(dateStr + " " + timeStr + " " + currentYear);
+						//Date localDate = formatter.parse(dateStr + " " + timeStr + " " + currentYear);
+						ZonedDateTime localStart = LocalDateTime.parse(dateStr + " " + timeStr + " " + currentYear).atZone(ZoneId.of(timezone));
+						
 						
 						if(timezone.equals(defaultTimezone)) {
-							String dbDateStr = DflmngrUtils.dateDbFormat.format(localDate);
-							fixture.setStart(dbDateStr);
+							//String dbDateStr = DflmngrUtils.dateDbFormat.format(localDate);
+							//fixture.setStart(dbDateStr);
+							fixture.setStart(localStart);
 						} else {
-							formatter.setTimeZone(TimeZone.getTimeZone(defaultTimezone));
-							String defaultDateStr = formatter.format(localDate);
-							Date defaultDate = formatter.parse(defaultDateStr);
-							String dbDateStr = DflmngrUtils.dateDbFormat.format(defaultDate);
-							fixture.setStart(dbDateStr);
+							//formatter.setTimeZone(TimeZone.getTimeZone(defaultTimezone));
+							//String defaultDateStr = formatter.format(localDate);
+							//Date defaultDate = formatter.parse(defaultDateStr);
+							//String dbDateStr = DflmngrUtils.dateDbFormat.format(defaultDate);
+							ZonedDateTime defualtStart = localStart.withZoneSameInstant(ZoneId.of(defaultTimezone));
+							fixture.setStart(defualtStart);
 						}
 						
 						fixture.setTimezone(timezone);
