@@ -5,6 +5,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 //import java.util.Calendar;
@@ -455,7 +456,7 @@ public class DflRoundInfoCalculatorHandler {
 			
 			if(nonStandardLockoutStr != null && !nonStandardLockoutStr.equals("")) {
 				//hardLockoutTime = lockoutFormat.parse(nonStandardLockoutStr);
-				hardLockoutTime = LocalDateTime.parse(nonStandardLockoutStr).atZone(ZoneId.of(globalsService.getGroundTimeZone("default")));
+				hardLockoutTime = LocalDateTime.parse(nonStandardLockoutStr, DateTimeFormatter.ISO_DATE_TIME).atZone(ZoneId.of(globalsService.getGroundTimeZone("default")));
 				//hardLockoutTime = .parse(nonStandardLockoutStr);
 				loggerUtils.log("info", "Custom lockout time: {}", hardLockoutTime);
 			} else {
