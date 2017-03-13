@@ -17,7 +17,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TimeZone;
+import java.util.TreeSet;
 
 //import net.dflmngr.jndi.JndiProvider;
 import net.dflmngr.logging.LoggingUtils;
@@ -159,7 +161,8 @@ public class DflRoundInfoCalculatorHandler {
 						
 						if(gamesCount % 9 == 0)  {
 							loggerUtils.log("info", "Found enough games to make DFL rounds ... calculation split round");
-							allRoundInfo.addAll(calculateSplitRound(dflRound, gamesInsSplitRound));
+							//allRoundInfo.addAll(calculateSplitRound(dflRound, gamesInsSplitRound));
+							allRoundInfo.addAll(altCalculateSplitRound(dflRound, gamesInsSplitRound));
 							for(DflRoundInfo roundInfo : allRoundInfo) {
 								if(roundInfo.getRound() > dflRound) {
 									dflRound = roundInfo.getRound();
@@ -179,6 +182,109 @@ public class DflRoundInfoCalculatorHandler {
 			loggerUtils.log("error", "Error in ... ", ex);
 		}
 	}
+	
+	private List<DflRoundInfo> altCalculateSplitRound(int dflRound, Map<Integer, List<AflFixture>> gamesInsSplitRound) throws Exception {
+		
+		List<DflRoundInfo> splitRoundInfo = new ArrayList<>();
+		
+		Set<Integer> aflSplitRounds = gamesInsSplitRound.keySet();
+		int aflFirstSplitRound = Collections.min(aflSplitRounds);
+		
+		loggerUtils.log("info", "AFL rounds used in split round: {}", aflSplitRounds);
+		
+		DflRoundInfo dflRoundInfo = new DflRoundInfo();
+		dflRoundInfo.setRound(dflRound);
+		dflRoundInfo.setSplitRound(DomainDecodes.DFL_ROUND_INFO.SPLIT_ROUND.YES);
+		
+		List<DflRoundMapping> roundMappings = new ArrayList<>();
+		
+		Map<String, AflFixture> workingWithGames = new HashMap<>();
+		
+		for(int i = 0; i < aflSplitRounds.size(); i++) {
+			
+			int currentSplitRound = aflFirstSplitRound + i;
+			
+			loggerUtils.log("info", "Working with AFL round: {}", currentSplitRound);
+			
+			List<AflFixture> splitRoundGames = gamesInsSplitRound.get(currentSplitRound);
+			for(AflFixture splitRoundGame : splitRoundGames) {
+				String homeKey = splitRoundGame.getRound() + "-" + splitRoundGame.getGame() + "-1";
+				String awayKey = splitRoundGame.getRound() + "-" + splitRoundGame.getGame() + "-2";
+				
+				if(!workingWithGames.containsKey(homeKey)) {
+					loggerUtils.log("info", "Adding working with AFL game: {}", splitRoundGame);
+					workingWithGames.put(homeKey, splitRoundGame);
+				}
+				if(!workingWithGames.containsKey(awayKey)) {
+					loggerUtils.log("info", "Adding working with AFL game: {}", splitRoundGame);
+					workingWithGames.put(awayKey, splitRoundGame);
+				}
+			}
+				
+			if(roundMappings.size() < 18) {
+				
+				loggerUtils.log("info", "Find teams to fill out round");
+				
+				SortedSet<String> keys = new TreeSet<String>(workingWithGames.keySet());
+				for(String key : keys) {
+					AflFixture aflFixture = workingWithGames.get(key);
+					
+					String[] homeOrAway = key.split("-");
+					String aflTeam = "";
+					
+					if(homeOrAway[2].equals("1")) {
+						aflTeam = aflFixture.getHomeTeam();
+					} else {
+						aflTeam = aflFixture.getHomeTeam();
+					}
+					
+					
+					boolean teamAlreadyMapped = false;
+					
+					for(DflRoundMapping roundMap : roundMappings) {
+						if(aflTeam.equals(roundMap.getAflTeam())) {
+							loggerUtils.log("info", "Team: {} already mapped in round: {}", aflTeam, dflRound);
+							teamAlreadyMapped = true;
+							break;
+						}
+					}
+					
+					if(!teamAlreadyMapped) {
+					
+						DflRoundMapping roundMapping = new DflRoundMapping();
+						
+						roundMapping.setRound(dflRound);
+						roundMapping.setAflRound(currentSplitRound);
+						roundMapping.setAflRound(aflFixture.getRound());
+						roundMapping.setAflGame(aflFixture.getGame());					
+						roundMapping.setAflTeam(aflTeam);
+						
+						
+						loggerUtils.log("info", "Round mapping created: {}", roundMapping);
+						
+						roundMappings.add(roundMapping);
+						
+						workingWithGames.remove(key);
+						
+						if(roundMappings.size() == 18) {
+							loggerUtils.log("info", "Round {} fully mapped, reminder teams: {}", dflRound, workingWithGames);
+							dflRoundInfo.setRoundMapping(roundMappings);
+							splitRoundInfo.add(dflRoundInfo);
+							dflRound++;
+							dflRoundInfo = new DflRoundInfo();
+							dflRoundInfo.setRound(dflRound);
+							dflRoundInfo.setSplitRound(DomainDecodes.DFL_ROUND_INFO.SPLIT_ROUND.YES);
+							roundMappings = new ArrayList<>();
+						}
+					}
+				}
+				
+			}	
+		}
+		
+		return splitRoundInfo;
+	}
+	
 	
 	private List<DflRoundInfo> calculateSplitRound(int dflRound, Map<Integer, List<AflFixture>> gamesInsSplitRound) throws Exception {
 		
@@ -234,7 +340,7 @@ public class DflRoundInfoCalculatorHandler {
 				roundMapping.setAflRound(currentSplitRound);
 				roundMappings.add(roundMapping);
 				
-				loggerUtils.log("info", "Find teams to fill out round");
+				
 				
 				for(AflFixture nextSplitRoundGame : nextSplitRoundGames) {
 					
@@ -340,16 +446,17 @@ public class DflRoundInfoCalculatorHandler {
 					
 					loggerUtils.log("info", "Creating round mapping: DFL rouund={}; AFL round={};", dflRound, currentSplitRound+1);
 					
-					DflRoundMapping roundMapping = new DflRoundMapping();
-					roundMapping.setRound(dflRound);
-					roundMapping.setAflRound(currentSplitRound+1);
-					roundMappings.add(roundMapping);
+					//DflRoundMapping roundMapping = new DflRoundMapping();
+					//roundMapping.setRound(dflRound);
+					//roundMapping.setAflRound(currentSplitRound+1);
+					//roundMappings.add(roundMapping);
 					
 					Set<AflFixture> removeGames = new HashSet<>();
 					
 					for(AflFixture remainderGame : remainderGames) {
 						
-						roundMapping = new DflRoundMapping();
+						DflRoundMapping roundMapping = new DflRoundMapping();
+						roundMapping.setRound(dflRound);
 						
 						boolean homeTeamAdded = false;
 						boolean awayTeamAdded = false;
@@ -361,7 +468,7 @@ public class DflRoundInfoCalculatorHandler {
 						}
 						
 						if(remainderTeams.contains(remainderGame.getAwayTeam())) {
-							loggerUtils.log("info", "Away team={}; in remainder for DFL round={}; team will be added to round", remainderGame.getHomeTeam(), dflRound);
+							loggerUtils.log("info", "Away team={}; in remainder for DFL round={}; team will be added to round", remainderGame.getAwayTeam(), dflRound);
 							remainderTeams.remove(remainderGame.getAwayTeam());
 							awayTeamAdded = true;
 						}
@@ -411,7 +518,9 @@ public class DflRoundInfoCalculatorHandler {
 					
 					splitRoundInfo.add(dflRoundInfo);
 					
-					i++;
+					if(remainderGames.isEmpty()) {
+						i++;
+					}
 				} else {
 					throw new Exception();
 				}
