@@ -198,6 +198,8 @@ public class DflRoundInfoCalculatorHandler {
 		
 		List<DflRoundMapping> roundMappings = new ArrayList<>();
 		
+		Map<Integer, ZonedDateTime> gameStartTimes = new HashMap<>();
+		
 		Map<String, AflFixture> workingWithGames = new HashMap<>();
 		
 		for(int i = 0; i < aflSplitRounds.size(); i++) {
@@ -235,7 +237,7 @@ public class DflRoundInfoCalculatorHandler {
 					if(homeOrAway[2].equals("1")) {
 						aflTeam = aflFixture.getHomeTeam();
 					} else {
-						aflTeam = aflFixture.getHomeTeam();
+						aflTeam = aflFixture.getAwayTeam();
 					}
 					
 					
@@ -262,6 +264,11 @@ public class DflRoundInfoCalculatorHandler {
 						
 						loggerUtils.log("info", "Round mapping created: {}", roundMapping);
 						
+						Integer gameStartTimeKey = Integer.parseInt(Integer.toString(aflFixture.getRound()) + Integer.toString(aflFixture.getGame()));
+						if(!gameStartTimes.containsKey(gameStartTimeKey)) {
+							gameStartTimes.put(gameStartTimeKey, aflFixture.getStart());
+						}
+						
 						roundMappings.add(roundMapping);
 						
 						workingWithGames.remove(key);
@@ -269,12 +276,19 @@ public class DflRoundInfoCalculatorHandler {
 						if(roundMappings.size() == 18) {
 							loggerUtils.log("info", "Round {} fully mapped, reminder teams: {}", dflRound, workingWithGames);
 							dflRoundInfo.setRoundMapping(roundMappings);
+														
+							loggerUtils.log("info", "Calculating hard lockout time");
+							ZonedDateTime hardLockout = calculateHardLockout(dflRound, gameStartTimes);
+							dflRoundInfo.setHardLockoutTime(hardLockout);
+							
 							splitRoundInfo.add(dflRoundInfo);
+							
 							dflRound++;
 							dflRoundInfo = new DflRoundInfo();
 							dflRoundInfo.setRound(dflRound);
 							dflRoundInfo.setSplitRound(DomainDecodes.DFL_ROUND_INFO.SPLIT_ROUND.YES);
 							roundMappings = new ArrayList<>();
+							gameStartTimes = new HashMap<>();
 						}
 					}
 				}
