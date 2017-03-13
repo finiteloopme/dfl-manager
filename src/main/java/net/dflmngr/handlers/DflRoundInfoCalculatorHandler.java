@@ -261,13 +261,13 @@ public class DflRoundInfoCalculatorHandler {
 						}
 						
 						if(teamsInRound.contains(nextSplitRoundGame.getAwayTeam())) {
-							loggerUtils.log("info", "Away team={}; alredy in DFL round={}", nextSplitRoundGame.getHomeTeam(), dflRound);
+							loggerUtils.log("info", "Away team={}; alredy in DFL round={}", nextSplitRoundGame.getAwayTeam(), dflRound);
 							remainderTeams.add(nextSplitRoundGame.getAwayTeam());
 							if(!remainderGames.contains(nextSplitRoundGame)) {
 								remainderGames.add(nextSplitRoundGame);
 							}
 						} else {
-							loggerUtils.log("info", "Away team={}; not in DFL round={}; team will be added to round", nextSplitRoundGame.getHomeTeam(), dflRound);
+							loggerUtils.log("info", "Away team={}; not in DFL round={}; team will be added to round", nextSplitRoundGame.getAwayTeam(), dflRound);
 							if(!gamesInSplitRound.contains(nextSplitRoundGame)) {
 								gamesInSplitRound.add(nextSplitRoundGame);
 							}
@@ -323,11 +323,13 @@ public class DflRoundInfoCalculatorHandler {
 				List<AflFixture> nextSplitRoundGames = gamesInsSplitRound.get(currentSplitRound+1);
 				
 				int gamesInRound = nextSplitRoundGames.size();
-				int teamsToMakeFull = (gamesInRound * 2) + remainderTeams.size();
+				//int teamsToMakeFull = (gamesInRound * 2) + remainderTeams.size();
+				int teamsToMakeFull = 18 - (gamesInRound * 2);
 				
 				loggerUtils.log("info", "Games in current AFL round: {}; Teams required for full DFL round: {}", gamesInRound, teamsToMakeFull);
 				
-				if(teamsToMakeFull == 18) {
+				//if(teamsToMakeFull == 18) {
+				if(teamsToMakeFull <= remainderTeams.size() && teamsToMakeFull >= 0) {
 					
 					for(AflFixture game : nextSplitRoundGames) {
 						gamesInSplitRound.add(game);
