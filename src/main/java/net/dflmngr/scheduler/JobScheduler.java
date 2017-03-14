@@ -13,7 +13,6 @@ import java.util.Properties;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
-import org.quartz.SchedulerFactory;
 import org.quartz.Trigger;
 //import org.quartz.ee.servlet.QuartzInitializerListener;
 import org.quartz.impl.StdSchedulerFactory;
@@ -24,38 +23,44 @@ import net.dflmngr.utils.DflmngrUtils;
 public class JobScheduler {
 	//private LoggingUtils loggerUtils;
 	
-	public static void main(String[] args) {
-
-		final LoggingUtils loggerUtils = new LoggingUtils("Scheduler");
-
+	final static LoggingUtils loggerUtils = new LoggingUtils("Scheduler");
+	
+	Scheduler scheduler;
+	
+	public JobScheduler() {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
         	@Override
             public void run() {
                 loggerUtils.log("info", "---- Shutting down DFL Manager Scheduler ----");
+            	if(scheduler != null) {
+            		try {
+						scheduler.shutdown();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+            	}
             }   
         });
-
-		try {
-			
-			loggerUtils.log("info", "---- Starting DFL Manager Scheduler ----");
-			
-			Properties schedulerProperties = getSchedulerConfig();
-			
-			loggerUtils.log("info", "DFL Manager scheduler config: {}", schedulerProperties);
-			
-			StdSchedulerFactory factory = new StdSchedulerFactory();
-			factory.initialize(schedulerProperties);
-			Scheduler scheduler = factory.getScheduler();
-
-			scheduler.start();
-			scheduler.shutdown();
-
-			loggerUtils.log("info", "---- Running DFL Manager Scheduler ----");
-		} catch (Exception ex) {
-			loggerUtils.log("error", "Error in ... ", ex);
-		}
 	}
 	
+	public void execute() throws Exception {			
+		loggerUtils.log("info", "---- Starting DFL Manager Scheduler ----");
+		
+		Properties schedulerProperties = getSchedulerConfig();
+		
+		loggerUtils.log("info", "DFL Manager scheduler config: {}", schedulerProperties);
+		
+		StdSchedulerFactory factory = new StdSchedulerFactory();
+		factory.initialize(schedulerProperties);
+		scheduler = factory.getScheduler();
+
+		scheduler.start();
+		//scheduler.shutdown();
+
+		loggerUtils.log("info", "---- Running DFL Manager Scheduler ----");
+	}
+	
+		
 	private static Properties getSchedulerConfig() throws Exception {
 		
 		Properties schedulerProperties = new Properties();
@@ -72,7 +77,7 @@ public class JobScheduler {
 	public static void schedule(String jobName, String jobGroup, Class<? extends Job> jobClass, Map<String, Object> jobParams, String cronStr, boolean isImmediate) throws Exception {
 		
 		//loggerUtils = new LoggingUtils("online-logger", "online.name", "Scheduler");
-		LoggingUtils loggerUtils = new LoggingUtils("Scheduler");
+		//LoggingUtils loggerUtils = new LoggingUtils("Scheduler");
 
 		try {			
 			String now = DflmngrUtils.getNowStr();
@@ -107,7 +112,7 @@ public class JobScheduler {
 	//private static void createAndSchedule(String jobNameKey, String group, String jobClassStr, String jobTriggerKey, Map<String, Object> jobParams, String cronStr, boolean isImmediate) throws Exception {
 	private static void createAndSchedule(String jobNameKey, String group, Class<? extends Job> jobClass, String jobTriggerKey, Map<String, Object> jobParams, String cronStr, boolean isImmediate) throws Exception {
 		
-		LoggingUtils loggerUtils = new LoggingUtils("Scheduler");
+		//LoggingUtils loggerUtils = new LoggingUtils("Scheduler");
 		loggerUtils.log("info", "Final job details: jobNameKey={}; group={}; jobClassStr={}; jobTriggerKey={}; jobParams={}; cronStr={}; isImmediate={};", jobNameKey, group, jobClass.getName(), jobTriggerKey, jobParams, cronStr, isImmediate);
 		
 		//Class<? extends Job> jobClass = Class.forName(jobClassStr).asSubclass(Job.class);
@@ -127,12 +132,19 @@ public class JobScheduler {
 				trigger = newTrigger().withIdentity(jobTriggerKey, group).withSchedule(cronSchedule(cronStr)).forJob(job).build();
 			}
 			
-			SchedulerFactory factory = new StdSchedulerFactory();
-			Scheduler scheduler = factory.getScheduler("DflmngrScheduler");
+			Properties schedulerProperties = getSchedulerConfig();
+			StdSchedulerFactory factory = new StdSchedulerFactory();
+			factory.initialize(schedulerProperties);
+			Scheduler scheduler = factory.getScheduler();
 			scheduler.scheduleJob(job, trigger);
 		} catch (Exception ex) {
 			loggerUtils.log("error", "Error in ... ", ex);
 		}
+	}
+	
+	public static void main(String[] args) {
+
+
 	}
 
 }
