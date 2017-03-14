@@ -2,9 +2,11 @@ package net.dflmngr.scheduler;
 
 import static org.quartz.JobBuilder.*;
 import static org.quartz.TriggerBuilder.*;
-import static org.quartz.CronScheduleBuilder.*;  
+import static org.quartz.CronScheduleBuilder.*;
 
+import java.io.InputStream;
 import java.util.Map;
+import java.util.Properties;
 
 //import javax.servlet.ServletContext;
 
@@ -34,10 +36,15 @@ public class JobScheduler {
         });
 
 		try {
-			SchedulerFactory factory = new StdSchedulerFactory();
-			Scheduler scheduler = factory.getScheduler("DflmngrScheduler");
-
+			
 			loggerUtils.log("info", "---- Starting DFL Manager Scheduler ----");
+			
+			Properties schedulerProperties = getSchedulerConfig();
+			
+			loggerUtils.log("info", "DFL Manager scheduler config: {}", schedulerProperties);
+			
+			SchedulerFactory factory = new StdSchedulerFactory(schedulerProperties);
+			Scheduler scheduler = factory.getScheduler("DflmngrScheduler");
 
 			scheduler.start();
 			scheduler.shutdown();
@@ -46,6 +53,18 @@ public class JobScheduler {
 		} catch (Exception ex) {
 			loggerUtils.log("error", "Error in ... ", ex);
 		}
+	}
+	
+	private static Properties getSchedulerConfig() throws Exception {
+		
+		Properties schedulerProperties = new Properties();
+		
+		InputStream stream = JobScheduler.class.getResourceAsStream("scheduler.properties");
+		schedulerProperties.load(stream);
+		
+		schedulerProperties.setProperty("org.quartz.dataSource.dflmngrDB.URL", System.getenv("DATABASE_URL"));
+		
+		return schedulerProperties;	
 	}
 		
 	//public static void schedule(String jobName, String jobGroup, String jobClassStr, Map<String, Object> jobParams, String cronStr, boolean isImmediate, ServletContext context) throws Exception {

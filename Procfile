@@ -1,0 +1,1 @@
+worker: java -classpath /app/target/dflmngr.jar:/app/target/dependency/* net.dflmngr.scheduler.JobScheduler

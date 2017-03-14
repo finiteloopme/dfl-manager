@@ -37,7 +37,7 @@ public class LoggingUtils {
 
 		//String callingClass = Thread.currentThread().getStackTrace()[2].getClassName();
 		String callingClass = Thread.currentThread().getStackTrace()[2].getClassName();
-		String callingClassShort = callingClass.substring(callingClass.lastIndexOf("."), callingClass.length()-1);
+		String callingClassShort = callingClass.substring(callingClass.lastIndexOf(".")+1, callingClass.length());
 		String callingMethod = Thread.currentThread().getStackTrace()[2].getMethodName();
 		int lineNo = Thread.currentThread().getStackTrace()[2].getLineNumber();
 		

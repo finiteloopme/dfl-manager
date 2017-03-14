@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 //import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
+//import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -161,8 +161,8 @@ public class DflRoundInfoCalculatorHandler {
 						
 						if(gamesCount % 9 == 0)  {
 							loggerUtils.log("info", "Found enough games to make DFL rounds ... calculation split round");
-							//allRoundInfo.addAll(calculateSplitRound(dflRound, gamesInsSplitRound));
-							allRoundInfo.addAll(altCalculateSplitRound(dflRound, gamesInsSplitRound));
+							allRoundInfo.addAll(calculateSplitRound(dflRound, gamesInsSplitRound));
+							//allRoundInfo.addAll(altCalculateSplitRound(dflRound, gamesInsSplitRound));
 							for(DflRoundInfo roundInfo : allRoundInfo) {
 								if(roundInfo.getRound() > dflRound) {
 									dflRound = roundInfo.getRound();
@@ -183,7 +183,7 @@ public class DflRoundInfoCalculatorHandler {
 		}
 	}
 	
-	private List<DflRoundInfo> altCalculateSplitRound(int dflRound, Map<Integer, List<AflFixture>> gamesInsSplitRound) throws Exception {
+	private List<DflRoundInfo> calculateSplitRound(int dflRound, Map<Integer, List<AflFixture>> gamesInsSplitRound) throws Exception {
 		
 		List<DflRoundInfo> splitRoundInfo = new ArrayList<>();
 		
@@ -299,7 +299,7 @@ public class DflRoundInfoCalculatorHandler {
 		return splitRoundInfo;
 	}
 	
-	
+	/*
 	private List<DflRoundInfo> calculateSplitRound(int dflRound, Map<Integer, List<AflFixture>> gamesInsSplitRound) throws Exception {
 		
 		List<DflRoundInfo> splitRoundInfo = new ArrayList<>();
@@ -543,7 +543,7 @@ public class DflRoundInfoCalculatorHandler {
 		}
 		
 		return splitRoundInfo;
-	}
+	}*/
 	
 	private ZonedDateTime calculateHardLockout(int dflRound, Map<Integer, ZonedDateTime> gameStartTimes) throws Exception {
 		
