@@ -3,6 +3,8 @@ package net.dflmngr.model.entity.converters;
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 
+import net.dflmngr.utils.DflmngrUtils;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -21,7 +23,7 @@ public class ZonedDateTimeConverter implements AttributeConverter<ZonedDateTime,
     public ZonedDateTime convertToEntityAttribute(Date value) {
         Instant instant = value.toInstant();
         //LocalDateTime localTime = LocalDateTime.from(instant);
-        return ZonedDateTime.ofInstant(instant, ZoneId.of("UTC"));
+        return ZonedDateTime.ofInstant(instant, ZoneId.of(DflmngrUtils.defaultTimezone));
         //return localTime.atZone(ZoneId.of("UTC"));
     }
 }
