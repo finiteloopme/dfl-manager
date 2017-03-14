@@ -143,8 +143,11 @@ public class JobScheduler {
 	}
 	
 	public static void main(String[] args) {
-
-
+		JobScheduler jobScheduler = new JobScheduler();
+		try {
+			jobScheduler.execute();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
-
 }
