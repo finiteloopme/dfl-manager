@@ -43,8 +43,9 @@ public class JobScheduler {
 			
 			loggerUtils.log("info", "DFL Manager scheduler config: {}", schedulerProperties);
 			
-			SchedulerFactory factory = new StdSchedulerFactory(schedulerProperties);
-			Scheduler scheduler = factory.getScheduler("DflmngrScheduler");
+			StdSchedulerFactory factory = new StdSchedulerFactory();
+			factory.initialize(schedulerProperties);
+			Scheduler scheduler = factory.getScheduler();
 
 			scheduler.start();
 			scheduler.shutdown();
