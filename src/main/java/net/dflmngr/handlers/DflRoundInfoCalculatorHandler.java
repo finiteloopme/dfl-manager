@@ -557,10 +557,10 @@ public class DflRoundInfoCalculatorHandler {
 		String standardLockoutHourAMPM = (standardLockout.split(";"))[3];
 		
 		if(standardLockoutHourAMPM.equals("PM")) {
-			standardLockoutMinute = standardLockoutMinute + 12;
+			standardLockoutHour = standardLockoutHour + 12;
 		}
 		
-		loggerUtils.log("info", "Standard lockout details: day={}; hour={}; min={}; AMPM={};", standardLockoutDay, standardLockoutHour, standardLockoutMinute);
+		loggerUtils.log("info", "Standard lockout details: day={}; hour={}; min={}; AMPM={};", standardLockoutDay, standardLockoutHour, standardLockoutMinute, standardLockoutHourAMPM);
 		
 		int lastGame = Collections.max(gameStartTimes.keySet());
 		ZonedDateTime lastGameTime = gameStartTimes.get(lastGame);
