@@ -63,7 +63,7 @@ public class JobScheduler {
 		InputStream stream = JobScheduler.class.getResourceAsStream("/scheduler.properties");
 		schedulerProperties.load(stream);
 		
-		schedulerProperties.setProperty("org.quartz.dataSource.dflmngrDB.URL", System.getenv("DATABASE_URL"));
+		schedulerProperties.setProperty("org.quartz.dataSource.dflmngrDB.URL", System.getenv("JDBC_DATABASE_URL"));
 		
 		return schedulerProperties;	
 	}
