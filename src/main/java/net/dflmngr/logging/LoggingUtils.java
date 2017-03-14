@@ -35,11 +35,13 @@ public class LoggingUtils {
 	
 	public void log(String level, String msg, Object...arguments) {
 
+		//String callingClass = Thread.currentThread().getStackTrace()[2].getClassName();
 		String callingClass = Thread.currentThread().getStackTrace()[2].getClassName();
+		String callingClassShort = callingClass.substring(callingClass.lastIndexOf("."), callingClass.length()-1);
 		String callingMethod = Thread.currentThread().getStackTrace()[2].getMethodName();
 		int lineNo = Thread.currentThread().getStackTrace()[2].getLineNumber();
 		
-		String loggerMsg = "[" + callingClass + "." +  callingMethod + "(Line:" + lineNo +")] - " + msg;
+		String loggerMsg = "[" + callingClassShort + "." +  callingMethod + "(Line:" + lineNo +")] - " + msg;
 
 		if(stdoutLogging) {
 			loggerMsg = "[" + process + "]" + loggerMsg;
