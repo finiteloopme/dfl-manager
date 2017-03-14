@@ -554,7 +554,11 @@ public class DflRoundInfoCalculatorHandler {
 		String standardLockoutDay = (standardLockout.split(";"))[0];
 		int standardLockoutHour = Integer.parseInt((standardLockout.split(";"))[1]);
 		int standardLockoutMinute = Integer.parseInt((standardLockout.split(";"))[2]);
-		//String standardLockoutHourAMPM = (standardLockout.split(";"))[3];
+		String standardLockoutHourAMPM = (standardLockout.split(";"))[3];
+		
+		if(standardLockoutHourAMPM.equals("PM")) {
+			standardLockoutMinute = standardLockoutMinute + 12;
+		}
 		
 		loggerUtils.log("info", "Standard lockout details: day={}; hour={}; min={}; AMPM={};", standardLockoutDay, standardLockoutHour, standardLockoutMinute);
 		
