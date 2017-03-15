@@ -53,6 +53,7 @@ public class EmailSelectionsHandler {
 
 	private String dflmngrEmailAddr;
 	private String incomingMailHost;
+	private String incomingMailPort;
 	private String outgoingMailHost;
 	private String outgoingMailPort;
 	private String mailUsername;
@@ -101,13 +102,14 @@ public class EmailSelectionsHandler {
 			
 			this.dflmngrEmailAddr = emailConfig.get("dflmngrEmailAddr");
 			this.incomingMailHost = emailConfig.get("incomingMailHost");
+			this.incomingMailPort = emailConfig.get("incomingMailPort");
 			this.outgoingMailHost = emailConfig.get("outgoingMailHost");
 			this.outgoingMailPort = emailConfig.get("outgoingMailPort");
 			this.mailUsername = emailConfig.get("mailUsername");
 			this.mailPassword = emailConfig.get("mailPassword");
 						
-			loggerUtils.log("info", "Email config: dflmngrEmailAddr={}; incomingMailHost={}; outgoingMailHost={}; outgoingMailHost={}; mailUsername={}; mailPassword={}",
-						dflmngrEmailAddr, incomingMailHost, outgoingMailHost, outgoingMailPort, mailUsername, mailPassword);
+			loggerUtils.log("info", "Email config: dflmngrEmailAddr={}; incomingMailHost={}; incomingMailPort={}; outgoingMailHost={}; outgoingMailHost={}; mailUsername={}; mailPassword={}",
+						dflmngrEmailAddr, incomingMailHost, incomingMailPort, outgoingMailHost, outgoingMailPort, mailUsername, mailPassword);
 			
 			configureMail();
 
@@ -128,25 +130,32 @@ public class EmailSelectionsHandler {
 		properties.setProperty("mail.smtp.host", this.outgoingMailHost);
 		properties.setProperty("mail.smtp.port", this.outgoingMailPort);
 		properties.setProperty("mail.smtp.auth", "true");
-		//properties.setProperty("mail.imap.ssl.enable", "true");
+		properties.setProperty("mail.imaps.ssl.enable", "true");
 		properties.setProperty("mail.smtp.starttls.enable", "true");
+		properties.setProperty("mail.smtp.ssl.enable", "true");
 		properties.setProperty("mail.store.protocol", "imaps");
 		//properties.setProperty("mail.store.protocol", "pop3s");
+		properties.setProperty("mail.imaps.host", this.incomingMailHost);
+		properties.setProperty("mail.imaps.port", this.incomingMailPort);
 		
-		//this.mailSession = Session.getInstance(properties);
-				
+		
+		this.mailSession = Session.getInstance(properties);
+		/*		
 		this.mailSession = Session.getDefaultInstance(properties, new javax.mail.Authenticator() {
 			protected PasswordAuthentication getPasswordAuthentication() {
 				return new PasswordAuthentication(mailUsername, mailPassword);
 			}
-		});
+		})
+		*/;
 				
 	}
 	
 	private void processSelections() throws Exception {
 		
-		Store store = this.mailSession.getStore("imaps");
-		store.connect(this.incomingMailHost, this.mailUsername, this.mailPassword);
+		//Store store = this.mailSession.getStore("imaps");
+		Store store = this.mailSession.getStore();
+		//store.connect(this.incomingMailHost, this.mailUsername, this.mailPassword);
+		store.connect(this.mailUsername, this.mailPassword);
 		
 		Folder inbox = store.getFolder("Inbox");
 		inbox.open(Folder.READ_WRITE);

@@ -208,6 +208,10 @@ public class GlobalsServiceImpl extends GenericServiceImpl<Globals, GlobalsPK>im
 		emailParam = getValue(code, groupCode);
 		emailConfig.put(code, emailParam);
 		
+		code = "incomingMailPort";
+		emailParam = getValue(code, groupCode);
+		emailConfig.put(code, emailParam);
+		
 		code = "outgoingMailHost";
 		emailParam = getValue(code, groupCode);
 		emailConfig.put(code, emailParam);
