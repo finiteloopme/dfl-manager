@@ -135,18 +135,17 @@ public class EmailSelectionsHandler {
 		properties.setProperty("mail.smtp.ssl.enable", "true");
 		properties.setProperty("mail.store.protocol", "imaps");
 		//properties.setProperty("mail.store.protocol", "pop3s");
-		properties.setProperty("mail.imaps.host", this.incomingMailHost);
-		properties.setProperty("mail.imaps.port", this.incomingMailPort);
+		//properties.setProperty("mail.imaps.host", this.incomingMailHost);
+		//properties.setProperty("mail.imaps.port", this.incomingMailPort);
 		
 		
-		this.mailSession = Session.getInstance(properties);
-		/*		
+		//this.mailSession = Session.getInstance(properties);
+				
 		this.mailSession = Session.getDefaultInstance(properties, new javax.mail.Authenticator() {
 			protected PasswordAuthentication getPasswordAuthentication() {
 				return new PasswordAuthentication(mailUsername, mailPassword);
 			}
-		})
-		*/;
+		});
 				
 	}
 	
