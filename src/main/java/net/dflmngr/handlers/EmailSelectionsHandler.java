@@ -163,7 +163,8 @@ public class EmailSelectionsHandler {
 		//store.connect(this.mailUsername, this.mailPassword);
 		
 		String oauthToken = AccessTokenFromRefreshToken.getAccessToken();
-		Store store = OAuth2Authenticator.connectToImap(incomingMailHost, incomingMailPort, mailUsername, oauthToken, false);
+		System.out.println("***** Access Token: " + oauthToken);
+		Store store = OAuth2Authenticator.connectToImap(incomingMailHost, incomingMailPort, mailUsername, oauthToken, true);
 		
 		Folder inbox = store.getFolder("Inbox");
 		inbox.open(Folder.READ_WRITE);
@@ -450,7 +451,8 @@ public class EmailSelectionsHandler {
 			//Transport.send(message);
 			
 			String oauthToken = AccessTokenFromRefreshToken.getAccessToken();
-			Transport smptTransport = OAuth2Authenticator.connectToSmtp(outgoingMailHost, outgoingMailPort, mailUsername, oauthToken, false);
+			Transport smptTransport = OAuth2Authenticator.connectToSmtp(outgoingMailHost, outgoingMailPort, mailUsername, oauthToken, true);
+			smptTransport.sendMessage(message, message.getAllRecipients());
 		}
 	}
 	
