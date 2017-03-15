@@ -130,9 +130,9 @@ public class EmailSelectionsHandler {
 		properties.setProperty("mail.smtp.host", this.outgoingMailHost);
 		properties.setProperty("mail.smtp.port", this.outgoingMailPort);
 		properties.setProperty("mail.smtp.auth", "true");
-		properties.setProperty("mail.imaps.ssl.enable", "true");
+		//properties.setProperty("mail.imaps.ssl.enable", "true");
 		properties.setProperty("mail.smtp.starttls.enable", "true");
-		properties.setProperty("mail.smtp.ssl.enable", "true");
+		//properties.setProperty("mail.smtp.ssl.enable", "true");
 		properties.setProperty("mail.store.protocol", "imaps");
 		//properties.setProperty("mail.store.protocol", "pop3s");
 		//properties.setProperty("mail.imaps.host", this.incomingMailHost);
