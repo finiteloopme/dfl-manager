@@ -34,6 +34,8 @@ import net.dflmngr.model.service.GlobalsService;
 import net.dflmngr.model.service.impl.DflTeamServiceImpl;
 import net.dflmngr.model.service.impl.GlobalsServiceImpl;
 import net.dflmngr.utils.DflmngrUtils;
+import net.dflmngr.utils.oauth2.AccessTokenFromRefreshToken;
+import net.dflmngr.utils.oauth2.OAuth2Authenticator;
 import net.dflmngr.validation.SelectedTeamValidation;
 import net.freeutils.tnef.Attachment;
 import net.freeutils.tnef.TNEFInputStream;
@@ -53,9 +55,9 @@ public class EmailSelectionsHandler {
 
 	private String dflmngrEmailAddr;
 	private String incomingMailHost;
-	private String incomingMailPort;
+	private int incomingMailPort;
 	private String outgoingMailHost;
-	private String outgoingMailPort;
+	private int outgoingMailPort;
 	private String mailUsername;
 	private String mailPassword;
 	
@@ -102,16 +104,18 @@ public class EmailSelectionsHandler {
 			
 			this.dflmngrEmailAddr = emailConfig.get("dflmngrEmailAddr");
 			this.incomingMailHost = emailConfig.get("incomingMailHost");
-			this.incomingMailPort = emailConfig.get("incomingMailPort");
+			this.incomingMailPort = Integer.parseInt(emailConfig.get("incomingMailPort"));
 			this.outgoingMailHost = emailConfig.get("outgoingMailHost");
-			this.outgoingMailPort = emailConfig.get("outgoingMailPort");
+			this.outgoingMailPort = Integer.parseInt(emailConfig.get("outgoingMailPort"));
 			this.mailUsername = emailConfig.get("mailUsername");
 			this.mailPassword = emailConfig.get("mailPassword");
 						
 			loggerUtils.log("info", "Email config: dflmngrEmailAddr={}; incomingMailHost={}; incomingMailPort={}; outgoingMailHost={}; outgoingMailHost={}; mailUsername={}; mailPassword={}",
 						dflmngrEmailAddr, incomingMailHost, incomingMailPort, outgoingMailHost, outgoingMailPort, mailUsername, mailPassword);
 			
-			configureMail();
+			//configureMail();
+			
+			OAuth2Authenticator.initialize();
 
 			processSelections();
 			
@@ -125,6 +129,7 @@ public class EmailSelectionsHandler {
 		}
 	}
 	
+	/*
 	private void configureMail() {
 		Properties properties = new Properties();
 		properties.setProperty("mail.smtp.host", this.outgoingMailHost);
@@ -148,13 +153,17 @@ public class EmailSelectionsHandler {
 		});
 				
 	}
+	*/
 	
 	private void processSelections() throws Exception {
 		
-		Store store = this.mailSession.getStore("imaps");
+		//Store store = this.mailSession.getStore("imaps");
 		//Store store = this.mailSession.getStore();
-		store.connect(this.incomingMailHost, this.mailUsername, this.mailPassword);
+		//store.connect(this.incomingMailHost, this.mailUsername, this.mailPassword);
 		//store.connect(this.mailUsername, this.mailPassword);
+		
+		String oauthToken = AccessTokenFromRefreshToken.getAccessToken();
+		Store store = OAuth2Authenticator.connectToImap(incomingMailHost, incomingMailPort, mailUsername, oauthToken, false);
 		
 		Folder inbox = store.getFolder("Inbox");
 		inbox.open(Folder.READ_WRITE);
@@ -407,7 +416,9 @@ public class EmailSelectionsHandler {
 			}
 			*/
 			
-			MimeMessage message = new MimeMessage(this.mailSession);
+			//MimeMessage message = new MimeMessage(this.mailSession);
+			Session session = null;
+			MimeMessage message = new MimeMessage(session);
 			message.setFrom(new InternetAddress(this.dflmngrEmailAddr));
 			message.addRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
 			
@@ -436,7 +447,10 @@ public class EmailSelectionsHandler {
 			}
 						
 			loggerUtils.log("info", "Sending message");
-			Transport.send(message);
+			//Transport.send(message);
+			
+			String oauthToken = AccessTokenFromRefreshToken.getAccessToken();
+			Transport smptTransport = OAuth2Authenticator.connectToSmtp(outgoingMailHost, outgoingMailPort, mailUsername, oauthToken, false);
 		}
 	}
 	
