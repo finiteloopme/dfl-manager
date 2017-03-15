@@ -42,7 +42,7 @@ public class OAuth2Authenticator {
 
 		public OAuth2Provider() {
 			super("Google OAuth2 Provider", 1.0, "Provides the XOAUTH2 SASL Mechanism");
-			put("SaslClientFactory.XOAUTH2", "com.google.code.samples.oauth2.OAuth2SaslClientFactory");
+			put("SaslClientFactory.XOAUTH2", "net.dflmngr.utils.oauth2.OAuth2SaslClientFactory");
 		}
 	}
 
