@@ -152,10 +152,10 @@ public class EmailSelectionsHandler {
 	
 	private void processSelections() throws Exception {
 		
-		//Store store = this.mailSession.getStore("imaps");
-		Store store = this.mailSession.getStore();
-		//store.connect(this.incomingMailHost, this.mailUsername, this.mailPassword);
-		store.connect(this.mailUsername, this.mailPassword);
+		Store store = this.mailSession.getStore("imaps");
+		//Store store = this.mailSession.getStore();
+		store.connect(this.incomingMailHost, this.mailUsername, this.mailPassword);
+		//store.connect(this.mailUsername, this.mailPassword);
 		
 		Folder inbox = store.getFolder("Inbox");
 		inbox.open(Folder.READ_WRITE);
