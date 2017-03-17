@@ -381,4 +381,20 @@ public class GlobalsServiceImpl extends GenericServiceImpl<Globals, GlobalsPK>im
 		
 		return fixtureOrder;
 	}
+	
+	public boolean getSendMedalReports(int currentRound) {
+		
+		boolean cutoff = false;
+		int roundCutoff = 0;
+		String code = "medalsRoundCutoff";
+		String groupCode = "dflRef";
+		
+		roundCutoff = Integer.parseInt(getValue(code, groupCode));
+		
+		if(currentRound > roundCutoff) {
+			cutoff = true;
+		}
+		
+		return cutoff;
+	}
 }

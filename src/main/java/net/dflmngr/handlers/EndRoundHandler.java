@@ -102,7 +102,9 @@ public class EndRoundHandler {
 			callumChambersHandler.execute(round);
 			List<DflCallumChambers> callumChambersStandings = callumChambersHandler.getMedalStandings();
 			
-			createAndSendEmail(round, matthewAllenStandings, adamGoodesStandings, topFirstYears, callumChambersStandings);
+			if(!globalsService.getSendMedalReports(round)) {
+				createAndSendEmail(round, matthewAllenStandings, adamGoodesStandings, topFirstYears, callumChambersStandings);
+			}
 			
 			globalsService.setCurrentRound(round+1);
 			

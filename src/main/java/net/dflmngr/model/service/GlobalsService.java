@@ -32,4 +32,5 @@ public interface GlobalsService extends GenericService<Globals, GlobalsPK> {
 	public String getAflTeamMap(String team);
 	public Map<Integer, Map<Integer, String[]>> getDflFixuteTemplate();
 	public Map<String, String> getDflFixtureOrder();
+	public boolean getSendMedalReports(int currentRound);
 }

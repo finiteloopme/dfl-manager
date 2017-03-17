@@ -1,5 +1,6 @@
 package net.dflmngr.reports;
 
+import java.io.File;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,6 +34,7 @@ import net.dflmngr.model.service.impl.DflTeamPredictedScoresServiceImpl;
 import net.dflmngr.model.service.impl.DflTeamServiceImpl;
 import net.dflmngr.model.service.impl.GlobalsServiceImpl;
 import net.dflmngr.model.service.impl.InsAndOutsServiceImpl;
+import net.dflmngr.utils.AmazonS3Utils;
 import net.dflmngr.utils.DflmngrUtils;
 import net.dflmngr.utils.EmailUtils;
 
@@ -149,7 +151,15 @@ public class InsAndOutsReport {
 	private String writeReport(List<DflTeam> teams, int round, Map<String, List<Integer>> ins, Map<String, List<Integer>> outs) throws Exception {
 		
 		String reportName = "InsAndOutsReport_" + this.reportType + "_" + DflmngrUtils.getNowStr() + ".xlsx";
-		Path reportLocation = Paths.get(globalsService.getAppDir(), globalsService.getReportDir(), "insAndOutsReport", reportName);
+		
+		Path reportDir = Paths.get(globalsService.getAppDir(), globalsService.getReportDir(), "insAndOutsReport");
+		
+		File directory = new File(reportDir.toString());
+	    if (!directory.exists()){
+	        directory.mkdirs();
+	    }
+		
+		Path reportLocation = Paths.get(reportDir.toString(), reportName);
 		
 		loggerUtils.log("info", "Writing insAndOuts Report");
 		loggerUtils.log("info", "Report name: {}", reportName);
@@ -169,6 +179,10 @@ public class InsAndOutsReport {
 		workbook.write(out);
 		workbook.close();
 		out.close();
+		
+		String s3key = Paths.get("insAndOutsReport", reportName).toString();
+		
+		AmazonS3Utils.uploadToS3(s3key, reportLocation.toString());
 		
 		return reportLocation.toString();
 	}
