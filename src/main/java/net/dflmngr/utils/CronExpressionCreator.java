@@ -15,11 +15,15 @@ public class CronExpressionCreator implements Serializable {
         if (time2[1].equalsIgnoreCase("PM")) {
             Integer hourInt = Integer.parseInt(time1[0]) + 12;
             if (hourInt == 24) {
-                hourInt = 0;
+                hourInt = 12;
             }
             hour = hourInt.toString();
         } else {
-            hour = time1[0];
+        	Integer hourInt = Integer.parseInt(time1[0]);
+        	if(hourInt == 12) {
+        		hourInt = 0;
+        	}
+        	hour = hourInt.toString();
         }
 
         String minutes = time2[0];
