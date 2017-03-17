@@ -170,6 +170,8 @@ public class ResultsJobGenerator {
 		cronExpression.setTime(timeUtc.format(DateTimeFormatter.ofPattern("hh:mm a")));
 		cronExpression.setStartDate(timeUtc.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 		
+		loggerUtils.log("info", "Cron date={}; time={};", cronExpression.getStartDate(), cronExpression.getTime());
+		
 		Map<String, Object> jobParams = new HashMap<>();
 		jobParams.put("ROUND", round);
 		jobParams.put("IS_FINAL", isFinal);
