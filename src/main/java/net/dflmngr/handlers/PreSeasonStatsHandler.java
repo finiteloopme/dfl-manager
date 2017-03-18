@@ -101,8 +101,10 @@ public class PreSeasonStatsHandler {
 		for(WebElement fixture : fixtures) {
 			String url = fixture.getAttribute("href");
 			
+			loggerUtils.log("info", "Checking URL: {}", url);
+			
 			if(url.contains("match-centre")) {
-				loggerUtils.log("info", "Found URL: {}", url);
+				loggerUtils.log("info", "Found game URL: {}", url);
 				
 				int urlRound = Integer.parseInt(url.split("/")[6]);
 				if(urlRound == round) {
