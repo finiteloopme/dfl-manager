@@ -275,6 +275,17 @@ public class GlobalsServiceImpl extends GenericServiceImpl<Globals, GlobalsPK>im
 		return currentRound;
 	}
 	
+	public String getPreSeasonFixtureUrl() {
+		
+		String preSeasonFixtureUrl = "";
+		String code = "preSeasonFixture";
+		String groupCode = "aflRef";
+		
+		preSeasonFixtureUrl = getValue(code, groupCode);
+		
+		return preSeasonFixtureUrl;
+	}
+	
 	public String getBrowserPath() {
 		
 		String browserPath = "";
