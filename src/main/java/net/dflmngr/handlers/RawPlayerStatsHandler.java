@@ -1,6 +1,6 @@
 package net.dflmngr.handlers;
 
-import java.io.File;
+//import java.io.File;
 //import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,10 +15,12 @@ import java.util.concurrent.TimeUnit;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.firefox.FirefoxBinary;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxProfile;
+//import org.openqa.selenium.firefox.FirefoxBinary;
+//import org.openqa.selenium.firefox.FirefoxDriver;
+//import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.phantomjs.PhantomJSDriver;
 
+import io.github.bonigarcia.wdm.PhantomJsDriverManager;
 import net.dflmngr.logging.LoggingUtils;
 import net.dflmngr.model.entity.AflFixture;
 import net.dflmngr.model.entity.DflRoundInfo;
@@ -52,6 +54,8 @@ public class RawPlayerStatsHandler {
 	String logfile;
 	
 	public RawPlayerStatsHandler() {
+		PhantomJsDriverManager.getInstance().setup();
+		
 		dflRoundInfoService = new DflRoundInfoServiceImpl();
 		aflFixtureService = new AflFixtureServiceImpl();
 		globalsService = new GlobalsServiceImpl();
@@ -178,7 +182,7 @@ public class RawPlayerStatsHandler {
 		String year = globalsService.getCurrentYear();
 		String statsUrl = globalsService.getAflStatsUrl();
 		
-		String browserPath = globalsService.getBrowserPath();
+		//String browserPath = globalsService.getBrowserPath();
 		//int webdriverWait = globalsService.getWebdriverWait();
 		int webdriverTimeout = globalsService.getWebdriverTimeout();
 		
@@ -189,10 +193,14 @@ public class RawPlayerStatsHandler {
 			String fullStatsUrl =  statsUrl + "/" + year + "/" + round + "/" + homeTeam.toLowerCase() + "-v-" + awayTeam.toLowerCase();
 			loggerUtils.log("info", "AFL stats URL: {}", fullStatsUrl);
 
+			/*
 			File browserBinary = new File(browserPath);
 			FirefoxBinary ffBinary = new FirefoxBinary(browserBinary);
 			FirefoxProfile firefoxProfile = new FirefoxProfile();
 			WebDriver driver = new FirefoxDriver(ffBinary, firefoxProfile);
+			*/
+			
+			WebDriver driver = new PhantomJSDriver();
 			
 			//driver.manage().timeouts().implicitlyWait(webdriverWait, TimeUnit.SECONDS);
 			driver.manage().timeouts().pageLoadTimeout(webdriverTimeout, TimeUnit.SECONDS);
