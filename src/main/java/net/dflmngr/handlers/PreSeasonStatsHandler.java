@@ -96,7 +96,7 @@ public class PreSeasonStatsHandler {
 		WebDriver driver = new PhantomJSDriver();
 		driver.get(preSeasonFixtureUrl);
 		
-		List<WebElement> fixtures = driver.findElement(By.className("fixture")).findElement(By.tagName("tbody")).findElements(By.tagName("tr"));
+		List<WebElement> fixtures = driver.findElement(By.className("fixture")).findElements(By.tagName("tr"));
 		
 		for(WebElement fixture : fixtures) {
 			
