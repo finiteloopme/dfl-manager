@@ -107,7 +107,13 @@ public class PreSeasonStatsHandler {
 		for(String url : preSeasonStatsUrls) {
 			driver.get(url);
 			
-			System.out.println(url.split("/"));
+			String[] test = url.split("/");
+			
+			for(int i = 0; i < test.length; i++) {
+				System.out.println(i + ":" + test[i]);
+			}
+			
+			
 			
 			String roundStr = url.split("/")[5];
 			String teams = url.split("/")[6];
