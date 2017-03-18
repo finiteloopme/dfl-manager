@@ -45,4 +45,17 @@ public class DflPlayerDaoImpl extends GenericDaoImpl<DflPlayer, Integer> impleme
 		
 		return entitys;
 	}
+	
+	public List<DflPlayer> findByTeam(String team) {
+		criteriaBuilder = entityManager.getCriteriaBuilder();
+		criteriaQuery = criteriaBuilder.createQuery(entityClass);
+		entity = criteriaQuery.from(entityClass);
+		
+		Predicate equals = criteriaBuilder.equal(entity.get(DflPlayer_.aflClub), team);
+		
+		criteriaQuery.where(criteriaBuilder.and(equals));
+		List<DflPlayer> entitys = entityManager.createQuery(criteriaQuery).getResultList();
+		
+		return entitys;
+	}
 }

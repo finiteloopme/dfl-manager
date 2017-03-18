@@ -20,6 +20,7 @@ import net.dflmngr.model.service.GlobalsService;
 import net.dflmngr.model.service.impl.DflPlayerServiceImpl;
 import net.dflmngr.model.service.impl.DflPreseasonScoresServiceImpl;
 import net.dflmngr.model.service.impl.GlobalsServiceImpl;
+import net.dflmngr.utils.DflmngrUtils;
 
 public class PreSeasonStatsHandler {
 	
@@ -72,7 +73,15 @@ public class PreSeasonStatsHandler {
 		
 		for(String url : preSeasonStatsUrls) {
 			Map<String, Integer> stats = getPreSeasonStats(url);
-			List<DflPreseasonScores> preseasonScores = calculatePreseasonScore(round, stats);
+			
+			String teams = url.split("/")[7];
+			String homeTeam = teams.split("-")[0];
+			String awayTeam = teams.split("-")[2];
+			
+			List<DflPlayer> players = dflPlayerService.getByTeam(DflmngrUtils.aflDflTeamMap.get(homeTeam.toUpperCase()));
+			players.addAll(dflPlayerService.getByTeam(DflmngrUtils.aflDflTeamMap.get(awayTeam.toUpperCase())));
+			
+			List<DflPreseasonScores> preseasonScores = calculatePreseasonScore(round, players, stats);
 			dflPreseasonScoresService.insertAll(preseasonScores, false);
 		}
 		
@@ -180,12 +189,11 @@ public class PreSeasonStatsHandler {
 		
 	}
 	
-	List<DflPreseasonScores> calculatePreseasonScore(int round, Map<String, Integer> stats) {
+	List<DflPreseasonScores> calculatePreseasonScore(int round, List<DflPlayer> players, Map<String, Integer> stats) {
 		
 		List<DflPreseasonScores> preseasonScores = new ArrayList<>();
 		
-		List<DflPlayer> players = dflPlayerService.findAll();
-		
+	
 		for(DflPlayer player : players) {
 			
 			loggerUtils.log("info", "Handling player: player_id={}, afl_player_id={}", player.getPlayerId(), player.getAflPlayerId());

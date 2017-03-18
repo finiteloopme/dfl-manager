@@ -54,4 +54,10 @@ public class DflPlayerServiceImpl extends GenericServiceImpl<DflPlayer, Integer>
 		
 		dao.commit();
 	}
+	
+	public List<DflPlayer> getByTeam(String team) {
+		List<DflPlayer> playersByTeam = null;
+		playersByTeam = dao.findByTeam(team);
+		return playersByTeam;
+	}
 }

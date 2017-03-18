@@ -101,4 +101,28 @@ public class DflmngrUtils {
 		dflAflTeamMap.put("WCE", "WCE");	
 	}
 	
+	public static final Map<String, String> aflDflTeamMap;
+	static
+	{
+		aflDflTeamMap = new HashMap<String, String>();
+		aflDflTeamMap.put("ADEL", "Adel");
+		aflDflTeamMap.put("BL", "Bris");
+		aflDflTeamMap.put("WB", "Bull");
+		aflDflTeamMap.put("CARL", "Carl");
+		aflDflTeamMap.put("COLL", "Coll");
+		aflDflTeamMap.put("ESS", "Ess");
+		aflDflTeamMap.put("FRE", "Freo");
+		aflDflTeamMap.put("GEEL", "Geel");
+		aflDflTeamMap.put("GCFC", "Gold");
+		aflDflTeamMap.put("GWS", "GWS");
+		aflDflTeamMap.put("HAW", "Haw");
+		aflDflTeamMap.put("MELB", "Melb");
+		aflDflTeamMap.put("NMFC", "Nth");
+		aflDflTeamMap.put("PORT", "Port");
+		aflDflTeamMap.put("RICH", "Rich");
+		aflDflTeamMap.put("STK", "StK");
+		aflDflTeamMap.put("SYD", "Syd");
+		aflDflTeamMap.put("WCE", "WCE");	
+	}
+	
 }

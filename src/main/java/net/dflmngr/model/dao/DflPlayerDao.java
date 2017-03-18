@@ -7,4 +7,5 @@ import net.dflmngr.model.entity.DflPlayer;
 public interface DflPlayerDao extends GenericDao<DflPlayer, Integer> {
 	public DflPlayer findByAflPlayerId(String aflPlayerId);
 	public List<DflPlayer> findAdamGoodesEligible();
+	public List<DflPlayer> findByTeam(String team);
 }

@@ -35,6 +35,7 @@
 		<class>net.dflmngr.model.entity.DflPlayerPredictedScores</class>
 		<class>net.dflmngr.model.entity.DflEarlyInsAndOuts</class>
 		<class>net.dflmngr.model.entity.DflUnmatchedPlayer</class>
+		<class>net.dflmngr.model.entity.DflPreseasonScores</class>
 		
 	</persistence-unit>
 </persistence>
