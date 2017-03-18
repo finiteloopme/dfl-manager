@@ -103,10 +103,9 @@ public class PreSeasonStatsHandler {
 			
 			int urlRound = Integer.parseInt(url.split("/")[6]);
 			if(urlRound == round) {
+				loggerUtils.log("info", "Adding URL: {}", url);
 				statsUrls.add(url);
 			}
-			
-			statsUrls.add(url);
 		}
 		
 		driver.quit();
@@ -138,7 +137,7 @@ public class PreSeasonStatsHandler {
 		for(WebElement statsRec : homeStatsRecs) {
 			List<WebElement> stats = statsRec.findElements(By.tagName("td"));
 			
-			String key = homeTeam + stats.get(1).getText() + "-" + roundStr;
+			String key = homeTeam + stats.get(1).getText();
 			
 			String name = stats.get(0).findElements(By.tagName("span")).get(1).getText();
 			
