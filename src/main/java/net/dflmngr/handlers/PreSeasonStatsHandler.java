@@ -101,6 +101,9 @@ public class PreSeasonStatsHandler {
 		for(WebElement fixture : fixtures) {
 			
 			List<WebElement> gameRow = fixture.findElements(By.tagName("td"));
+			
+			System.out.println(gameRow.toString());
+			
 			if(gameRow != null && gameRow.size() > 4) {
 				String url = gameRow.get(3).findElement(By.tagName("a")).getAttribute("href");
 
