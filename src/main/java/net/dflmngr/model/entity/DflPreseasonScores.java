@@ -14,16 +14,10 @@ public class DflPreseasonScores {
 	private int playerId;
 	
 	@Id
-	private int round1;
+	private int round;
 	
 	@Id
-	private int round2;
-	
-	@Id
-	private int round3;
-	
-	@Id
-	private int round4;
+	private int score;
 
 	public int getPlayerId() {
 		return playerId;
@@ -33,42 +27,25 @@ public class DflPreseasonScores {
 		this.playerId = playerId;
 	}
 
-	public int getRound1() {
-		return round1;
+	public int getRound() {
+		return round;
 	}
 
-	public void setRound1(int round1) {
-		this.round1 = round1;
+	public void setRound(int round) {
+		this.round = round;
 	}
 
-	public int getRound2() {
-		return round2;
+	public int getScore() {
+		return score;
 	}
 
-	public void setRound2(int round2) {
-		this.round2 = round2;
-	}
-
-	public int getRound3() {
-		return round3;
-	}
-
-	public void setRound3(int round3) {
-		this.round3 = round3;
-	}
-
-	public int getRound4() {
-		return round4;
-	}
-
-	public void setRound4(int round4) {
-		this.round4 = round4;
+	public void setScore(int score) {
+		this.score = score;
 	}
 
 	@Override
 	public String toString() {
-		return "DflPreseasonScores [playerId=" + playerId + ", round1=" + round1 + ", round2=" + round2 + ", round3="
-				+ round3 + ", round4=" + round4 + "]";
+		return "DflPreseasonScores [playerId=" + playerId + ", round=" + round + ", score=" + score + "]";
 	}
 
 	@Override
@@ -76,10 +53,8 @@ public class DflPreseasonScores {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + playerId;
-		result = prime * result + round1;
-		result = prime * result + round2;
-		result = prime * result + round3;
-		result = prime * result + round4;
+		result = prime * result + round;
+		result = prime * result + score;
 		return result;
 	}
 
@@ -94,13 +69,9 @@ public class DflPreseasonScores {
 		DflPreseasonScores other = (DflPreseasonScores) obj;
 		if (playerId != other.playerId)
 			return false;
-		if (round1 != other.round1)
+		if (round != other.round)
 			return false;
-		if (round2 != other.round2)
-			return false;
-		if (round3 != other.round3)
-			return false;
-		if (round4 != other.round4)
+		if (score != other.score)
 			return false;
 		return true;
 	}
