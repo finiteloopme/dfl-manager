@@ -96,17 +96,19 @@ public class PreSeasonStatsHandler {
 		WebDriver driver = new PhantomJSDriver();
 		driver.get(preSeasonFixtureUrl);
 		
-		List<WebElement> fixtures = driver.findElement(By.className("fixture")).findElement(By.tagName("tbody")).findElements(By.className("broadcast"));
+		List<WebElement> fixtures = driver.findElement(By.className("fixture")).findElement(By.tagName("tbody")).findElements(By.tagName("a"));
 		
 		for(WebElement fixture : fixtures) {
-			String url = fixture.findElement(By.tagName("a")).getAttribute("href");
+			String url = fixture.getAttribute("href");
 			
-			loggerUtils.log("info", "Found URL: {}", url);
-			
-			int urlRound = Integer.parseInt(url.split("/")[6]);
-			if(urlRound == round) {
-				loggerUtils.log("info", "Adding URL: {}", url);
-				statsUrls.add(url);
+			if(url.contains("match-center")) {
+				loggerUtils.log("info", "Found URL: {}", url);
+				
+				int urlRound = Integer.parseInt(url.split("/")[6]);
+				if(urlRound == round) {
+					loggerUtils.log("info", "Adding URL: {}", url);
+					statsUrls.add(url);
+				}
 			}
 		}
 		
