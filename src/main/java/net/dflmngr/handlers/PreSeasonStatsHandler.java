@@ -99,15 +99,18 @@ public class PreSeasonStatsHandler {
 		List<WebElement> fixtures = driver.findElement(By.className("fixture")).findElement(By.tagName("tbody")).findElements(By.tagName("tr"));
 		
 		for(WebElement fixture : fixtures) {
-			String url = fixture.findElements(By.tagName("td")).get(3).findElement(By.tagName("a")).getAttribute("href");
-					
-
-			loggerUtils.log("info", "Found game URL: {}", url);
 			
-			int urlRound = Integer.parseInt(url.split("/")[6]);
-			if(urlRound == round) {
-				loggerUtils.log("info", "Adding URL: {}", url);
-				statsUrls.add(url);
+			List<WebElement> gameRow = fixture.findElements(By.tagName("td"));
+			if(gameRow != null && gameRow.size() > 4) {
+				String url = gameRow.get(3).findElement(By.tagName("a")).getAttribute("href");
+
+				loggerUtils.log("info", "Found game URL: {}", url);
+				
+				int urlRound = Integer.parseInt(url.split("/")[6]);
+				if(urlRound == round) {
+					loggerUtils.log("info", "Adding URL: {}", url);
+					statsUrls.add(url);
+				}
 			}
 		}
 		
