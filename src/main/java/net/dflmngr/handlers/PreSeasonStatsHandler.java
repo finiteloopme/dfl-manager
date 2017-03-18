@@ -133,7 +133,7 @@ public class PreSeasonStatsHandler {
 				int freesFor = Integer.parseInt(stats.get(17).getText());
 				int freesAgainst = Integer.parseInt(stats.get(18).getText());
 				int tackles = Integer.parseInt(stats.get(19).getText());
-				int goals = Integer.parseInt(stats.get(22).getText()) + Integer.parseInt(stats.get(23).getText());
+				int goals = Integer.parseInt(stats.get(23).getText()) + Integer.parseInt(stats.get(24).getText());
 				
 				int total = disposals + marks + hitouts + freesFor + (-freesAgainst) + tackles + (goals * 3);
 				
@@ -157,7 +157,7 @@ public class PreSeasonStatsHandler {
 				int freesFor = Integer.parseInt(stats.get(17).getText());
 				int freesAgainst = Integer.parseInt(stats.get(18).getText());
 				int tackles = Integer.parseInt(stats.get(19).getText());
-				int goals = Integer.parseInt(stats.get(22).getText()) + Integer.parseInt(stats.get(23).getText());
+				int goals = Integer.parseInt(stats.get(23).getText()) + Integer.parseInt(stats.get(24).getText());
 				
 				int total = disposals + marks + hitouts + freesFor + (-freesAgainst) + tackles + (goals * 3);
 				
