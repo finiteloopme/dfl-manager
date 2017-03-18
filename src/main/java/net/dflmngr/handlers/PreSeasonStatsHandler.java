@@ -59,7 +59,7 @@ public class PreSeasonStatsHandler {
 		isExecutable = true;
 	}
 	
-	public void execute() {
+	public void execute(int round) {
 		
 		if(!isExecutable) {
 			configureLogging(defaultMdcKey, defaultLoggerName, defaultLogfile);
@@ -68,7 +68,7 @@ public class PreSeasonStatsHandler {
 		
 		loggerUtils.log("info", "Downloading Pre-season Stats");
 		
-		List<String> preSeasonStatsUrls = getPreSeasonStatsUrls();
+		List<String> preSeasonStatsUrls = getPreSeasonStatsUrls(round);
 		Map<String, Integer> stats = getPreSeasonStats(preSeasonStatsUrls);
 		
 		List<DflPreseasonScores> preseasonScores = calculatePreseasonScore(stats);
@@ -78,7 +78,7 @@ public class PreSeasonStatsHandler {
 		loggerUtils.log("info", "Player Pre-season stats saved");
 	}
 	
-	private List<String> getPreSeasonStatsUrls() {
+	private List<String> getPreSeasonStatsUrls(int round) {
 		List<String> statsUrls = new ArrayList<>();
 		
 		String preSeasonFixtureUrl = globalsService.getPreSeasonFixtureUrl();
@@ -90,6 +90,12 @@ public class PreSeasonStatsHandler {
 		
 		for(WebElement fixture : fixtures) {
 			String url = fixture.findElement(By.tagName("a")).getAttribute("href");
+			
+			int urlRound = Integer.parseInt(url.split("/")[6]);
+			if(urlRound == round) {
+				statsUrls.add(url);
+			}
+			
 			statsUrls.add(url);
 		}
 		
@@ -167,6 +173,8 @@ public class PreSeasonStatsHandler {
 				
 				allStats.put(key, total);
 			}
+			
+			driver.close();
 		}
 		
 		driver.quit();
@@ -218,7 +226,7 @@ public class PreSeasonStatsHandler {
 	public static void main(String[] args) {
 		PreSeasonStatsHandler testing = new PreSeasonStatsHandler();
 		testing.configureLogging("batch.name", "batch-logger", "PreSeasonStats");
-		testing.execute();
+		testing.execute(Integer.parseInt(args[0]));
 	}
 	
 
