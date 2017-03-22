@@ -148,7 +148,7 @@ public class RawPlayerStatsHandler {
 
 			JsonObject postData = new JsonObject();
 			postData.put("attach", "false");
-			postData.put("command", "bin/run_raw_stats_downloader.sh " + round + " " + " " + homeTeam + " " + awayTeam + fullStatsUrl);
+			postData.put("command", "bin/run_raw_stats_downloader.sh " + round + " " + " " + homeTeam + " " + awayTeam + " " + fullStatsUrl);
 			postData.put("size", "hobby");
 			postData.put("type", "run");
 
