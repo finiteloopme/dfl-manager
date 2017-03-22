@@ -64,7 +64,7 @@ public class RawStatsDownloaderHandler {
 				
 				rawPlayerStatsService.removeStatsForRoundAndTeam(round, homeTeam);
 				rawPlayerStatsService.removeStatsForRoundAndTeam(round, awayTeam);
-				rawPlayerStatsService.replaceAllForRound(round, playerStats);
+				rawPlayerStatsService.insertAll(playerStats, false);
 				
 				loggerUtils.log("info", "Player stats saved");
 			} else {
