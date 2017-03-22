@@ -137,10 +137,12 @@ public class RawPlayerStatsHandler {
 			loggerUtils.log("info", "AFL stats URL: {}", fullStatsUrl);
 
 			String herokuApiEndpoint = "https://api.heroku.com/apps/dfl-manager-dev/dynos";
+			String apiToken = System.getenv("HEROKU_API_TOKEN");
 			URL obj = new URL(herokuApiEndpoint);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
 			con.setRequestMethod("POST");
+			con.setRequestProperty("Content-Type", "Authorization: Bearer " + apiToken);
 			con.setRequestProperty("Content-Type", "application/json");
 			con.setRequestProperty("Accept", "application/vnd.heroku+json; version=3");
 
