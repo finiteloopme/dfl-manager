@@ -215,7 +215,7 @@ public class RawPlayerStatsHandler {
 				
 				JsonObject responseData = Jsoner.deserialize(response.toString(), new JsonObject());
 				
-				String state = responseData.getString("name");
+				String state = responseData.getString("state");
 				
 				loggerUtils.log("info", "Dyno State: {}", state);
 				
