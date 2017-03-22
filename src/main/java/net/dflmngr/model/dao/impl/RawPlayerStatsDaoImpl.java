@@ -27,4 +27,17 @@ public class RawPlayerStatsDaoImpl extends GenericDaoImpl<RawPlayerStats, RawPla
 		
 		return entitys;
 	}
+	
+	public void deleteStatsForRoundAndTeam(int round, String team) {
+		criteriaBuilder = entityManager.getCriteriaBuilder();
+		criteriaDelete = criteriaBuilder.createCriteriaDelete(entityClass);
+		entity = criteriaDelete.from(entityClass);
+		
+		Predicate roundEquals = criteriaBuilder.equal(entity.get(RawPlayerStats_.round), round);
+		Predicate teamEquals = criteriaBuilder.equal(entity.get(RawPlayerStats_.team), round);
+		criteriaDelete.where(criteriaBuilder.and(roundEquals, teamEquals));
+		
+		entityManager.createQuery(criteriaDelete).executeUpdate();
+		
+	}
 }

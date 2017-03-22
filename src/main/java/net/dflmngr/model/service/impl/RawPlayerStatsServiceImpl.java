@@ -52,5 +52,10 @@ public class RawPlayerStatsServiceImpl extends GenericServiceImpl<RawPlayerStats
 		
 		dao.commit();
 	}
-
+	
+	public void removeStatsForRoundAndTeam(int round, String team) {
+		dao.beginTransaction();
+		dao.deleteStatsForRoundAndTeam(round, team);
+		dao.commit();
+	}
 }

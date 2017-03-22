@@ -8,5 +8,6 @@ import net.dflmngr.model.entity.keys.RawPlayerStatsPK;
 public interface RawPlayerStatsDao extends GenericDao<RawPlayerStats, RawPlayerStatsPK> {
 	
 	public List<RawPlayerStats> findForRound(int round);
+	public void deleteStatsForRoundAndTeam(int round, String team);
 	
 }

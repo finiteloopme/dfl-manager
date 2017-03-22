@@ -39,7 +39,7 @@ public class ResultsHandler {
 		emailOverride = null;
 	}
 	
-	public void execute(int round, boolean isFinal, String emailOverride, boolean skipStats) {
+	public void execute(int round, boolean isFinal, String emailOverride, boolean skipStats, boolean onHeroku) {
 		
 		try{
 			if(!isExecutable) {
@@ -54,18 +54,19 @@ public class ResultsHandler {
 				this.emailOverride = emailOverride;
 			}
 			
-			boolean statsLoaded = false;
+			//boolean statsLoaded = false;
 			
 			if(!skipStats) {
 				loggerUtils.log("info", "Getting stats");
 				RawPlayerStatsHandler statsHandler = new RawPlayerStatsHandler();
 				statsHandler.configureLogging(mdcKey, loggerName, logfile);
 				
+				/*
 				int tries = 1;
 				
 				while(!statsLoaded) {
 					loggerUtils.log("info", "Attempt: " + tries);
-					statsLoaded = statsHandler.execute(round);
+					statsLoaded = statsHandler.execute(round, onHeroku);
 					if(tries > 5) {
 						break;
 					} else {
@@ -75,11 +76,13 @@ public class ResultsHandler {
 				if(statsLoaded) {
 					loggerUtils.log("info", "Stats Loaded");
 				}
-			} else {
-				statsLoaded = true;
-			}
+				*/
+				statsHandler.execute(round, onHeroku);
+			} //else {
+			//	statsLoaded = true;
+			//}
 			
-			if(statsLoaded) {
+			//if(statsLoaded) {
 				loggerUtils.log("info", "Calculating scores");
 				ScoresCalculatorHandler scoresCalculator = new ScoresCalculatorHandler();
 				scoresCalculator.configureLogging(mdcKey, loggerName, logfile);
@@ -96,9 +99,9 @@ public class ResultsHandler {
 				resultsReport.execute(round, isFinal, emailOverride);
 				
 				loggerUtils.log("info", "ResultsHandler complete");
-			} else {
-				loggerUtils.log("info", "No stats loaded nothing to do.");
-			}
+			//} else {
+			//	loggerUtils.log("info", "No stats loaded nothing to do.");
+			//}
 		} catch (Exception ex) {
 			loggerUtils.log("error", "Error in ... ", ex);
 		}
@@ -112,17 +115,20 @@ public class ResultsHandler {
 		Option emailOPt = Option.builder("e").argName("email").hasArg().desc("override email distribution").build();
 		Option finalOpt = new Option("f", "final run");
 		Option skipStatsOpt = new Option("ss", "skip stats download");
+		Option onHerokuOpt = new Option("h", "running on Heroku");
 		
 		options.addOption(roundOpt);
 		options.addOption(emailOPt);
 		options.addOption(finalOpt);
 		options.addOption(skipStatsOpt);
+		options.addOption(onHerokuOpt);
 		
 		try {
 			String email = null;
 			int round = 0;
 			boolean isFinal = false;
 			boolean skipStats = false;
+			boolean onHeroku = false;
 						
 			CommandLineParser parser = new DefaultParser();
 			CommandLine cli = parser.parse(options, args);
@@ -138,12 +144,15 @@ public class ResultsHandler {
 			if(cli.hasOption("ss")) {
 				skipStats=true;
 			}
+			if(cli.hasOption("h")) {
+				onHeroku = true;
+			}
 
 			//JndiProvider.bind();
 			
 			ResultsHandler resultsHandler = new ResultsHandler();
 			resultsHandler.configureLogging("batch.name", "batch-logger", ("ResultsHandler_R" + round));
-			resultsHandler.execute(round, isFinal, email, skipStats);
+			resultsHandler.execute(round, isFinal, email, skipStats, onHeroku);
 
 		} catch (ParseException ex) {
 			HelpFormatter formatter = new HelpFormatter();
@@ -152,5 +161,4 @@ public class ResultsHandler {
 			ex.printStackTrace();
 		}
 	}
-
 }

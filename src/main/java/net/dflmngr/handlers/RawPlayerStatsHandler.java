@@ -1,31 +1,22 @@
 package net.dflmngr.handlers;
 
-//import java.io.File;
-//import java.net.URL;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
-//import org.jsoup.Jsoup;
-//import org.jsoup.nodes.Document;
-//import org.jsoup.nodes.Element;
-//import org.jsoup.select.Elements;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-//import org.openqa.selenium.firefox.FirefoxBinary;
-//import org.openqa.selenium.firefox.FirefoxDriver;
-//import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.json.simple.JsonObject;
+import org.json.simple.Jsoner;
 
-import io.github.bonigarcia.wdm.PhantomJsDriverManager;
 import net.dflmngr.logging.LoggingUtils;
 import net.dflmngr.model.entity.AflFixture;
 import net.dflmngr.model.entity.DflRoundInfo;
 import net.dflmngr.model.entity.DflRoundMapping;
-import net.dflmngr.model.entity.RawPlayerStats;
 import net.dflmngr.model.service.AflFixtureService;
 import net.dflmngr.model.service.DflRoundInfoService;
 import net.dflmngr.model.service.GlobalsService;
@@ -53,9 +44,7 @@ public class RawPlayerStatsHandler {
 	String loggerName;
 	String logfile;
 	
-	public RawPlayerStatsHandler() {
-		PhantomJsDriverManager.getInstance().setup();
-		
+	public RawPlayerStatsHandler() {		
 		dflRoundInfoService = new DflRoundInfoServiceImpl();
 		aflFixtureService = new AflFixtureServiceImpl();
 		globalsService = new GlobalsServiceImpl();
@@ -73,10 +62,8 @@ public class RawPlayerStatsHandler {
 		isExecutable = true;
 	}
 	
-	public boolean execute(int round) {
-		
-		boolean success = false;
-		
+	public void execute(int round, boolean onHeroku) {
+				
 		try {
 			if(!isExecutable) {
 				configureLogging(defaultMdcKey, defaultLoggerName, defaultLogfile);
@@ -120,217 +107,127 @@ public class RawPlayerStatsHandler {
 			loggerUtils.log("info", "AFL games to download stats from: {}", fixturesToProcess);
 			loggerUtils.log("info", "Team to take stats from: {}", teamsToProcess);
 			
-			//List<RawPlayerStats> playerStats = processFixtures(round, fixturesToProcess, teamsToProcess);
-			List<RawPlayerStats> playerStats = altProcessFixtures(round, fixturesToProcess, teamsToProcess);
-			
-			loggerUtils.log("info", "Saving player stats to database");
-			
-			rawPlayerStatsService.replaceAllForRound(round, playerStats);
-			
-			loggerUtils.log("info", "Player stats saved");
+			processFixtures(round, fixturesToProcess, teamsToProcess, onHeroku);
 			
 			dflRoundInfoService.close();
 			aflFixtureService.close();
 			globalsService.close();
 			rawPlayerStatsService.close();
 			
-			success = true;
-			
+			loggerUtils.log("info", "Player stats downaloded");
+						
 		} catch (Exception ex) {
 			loggerUtils.log("error", "Error in ... ", ex);
 		}
-		
-		return success;
 	}
-	
-	/*
-	private List<RawPlayerStats> processFixtures(int round, List<AflFixture> fixturesToProcess, Set<String> teamsToProcess) throws Exception {
 		
-		List<RawPlayerStats> playerStats = new ArrayList<>();
-		
+	private void processFixtures(int round, List<AflFixture> fixturesToProcess, Set<String> teamsToProcess, boolean onHeroku) throws Exception {
+
 		String year = globalsService.getCurrentYear();
 		String statsUrl = globalsService.getAflStatsUrl();
 		
-		for(AflFixture fixture : fixturesToProcess) {
+		List<String> dynoNames = new ArrayList<>();
+
+		for (AflFixture fixture : fixturesToProcess) {
 			String homeTeam = fixture.getHomeTeam();
 			String awayTeam = fixture.getAwayTeam();
-			
-			String fullStatsUrl =  statsUrl + "/" + year + "/" + round + "/" + homeTeam.toLowerCase() + "-v-" + awayTeam.toLowerCase();
-			loggerUtils.log("info", "AFL stats URL: {}", fullStatsUrl);
-			
-					
-			//		MessageFormat.format(statsUrl, String.valueOf(year), round, homeTeam, awayTeam);
-			
-			Document doc = Jsoup.parse(new URL(fullStatsUrl).openStream(), "UTF-8", fullStatsUrl);
-			
-			if(teamsToProcess.contains(homeTeam)) {
-				playerStats.addAll(getStats(round, homeTeam, "h", doc));
-			}
-			if(teamsToProcess.contains(awayTeam)) {
-				playerStats.addAll(getStats(round, awayTeam, "a", doc));
-			}
-		}
-		
-		return playerStats;
-	}
-	*/
-	
-	private List<RawPlayerStats> altProcessFixtures(int round, List<AflFixture> fixturesToProcess, Set<String> teamsToProcess) throws Exception {
-		
-		List<RawPlayerStats> playerStats = new ArrayList<>();
-		
-		String year = globalsService.getCurrentYear();
-		String statsUrl = globalsService.getAflStatsUrl();
-		
-		//String browserPath = globalsService.getBrowserPath();
-		//int webdriverWait = globalsService.getWebdriverWait();
-		int webdriverTimeout = globalsService.getWebdriverTimeout();
-		
-		for(AflFixture fixture : fixturesToProcess) {
-			String homeTeam = fixture.getHomeTeam();
-			String awayTeam = fixture.getAwayTeam();
-			
-			String fullStatsUrl =  statsUrl + "/" + year + "/" + round + "/" + homeTeam.toLowerCase() + "-v-" + awayTeam.toLowerCase();
+
+			String fullStatsUrl = statsUrl + "/" + year + "/" + round + "/" + homeTeam.toLowerCase() + "-v-"
+					+ awayTeam.toLowerCase();
 			loggerUtils.log("info", "AFL stats URL: {}", fullStatsUrl);
 
-			/*
-			File browserBinary = new File(browserPath);
-			FirefoxBinary ffBinary = new FirefoxBinary(browserBinary);
-			FirefoxProfile firefoxProfile = new FirefoxProfile();
-			WebDriver driver = new FirefoxDriver(ffBinary, firefoxProfile);
-			*/
+			String herokuApiEndpoint = "https://api.heroku.com/apps/dfl-manager-dev/dynos";
+			URL obj = new URL(herokuApiEndpoint);
+			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+			con.setRequestMethod("POST");
+			con.setRequestProperty("Content-Type", "application/json");
+			con.setRequestProperty("Accept", "application/vnd.heroku+json; version=3");
+
+			JsonObject postData = new JsonObject();
+			postData.put("attach", "false");
+			postData.put("command", "bin/run_raw_stats_downloader.sh " + round + " " + " " + homeTeam + " " + awayTeam + fullStatsUrl);
+			postData.put("size", "hobby");
+			postData.put("type", "run");
+
+			con.setDoOutput(true);
+
+			DataOutputStream out = new DataOutputStream(con.getOutputStream());
+			out.writeBytes(postData.toJson());
+			out.flush();
+			out.close();
+
+			int responseCode = con.getResponseCode();
+
+			loggerUtils.log("info", "Spawning Dyno to process fixture: {}", postData.toJson());
+			loggerUtils.log("info", "Response Code: {}", responseCode);
+
+			BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+			String output;
+			StringBuffer response = new StringBuffer();
+
+			while ((output = in.readLine()) != null) {
+				response.append(output);
+			}
+			in.close();
 			
-			WebDriver driver = new PhantomJSDriver();
+			loggerUtils.log("info", "Response data: {}", response.toString());
 			
-			//driver.manage().timeouts().implicitlyWait(webdriverWait, TimeUnit.SECONDS);
-			driver.manage().timeouts().pageLoadTimeout(webdriverTimeout, TimeUnit.SECONDS);
-			//driver.manage().window().setSize(new Dimension(1024, 768));
+			JsonObject responseData = Jsoner.deserialize(response.toString(), new JsonObject());
 			
-			try {
-				driver.get(fullStatsUrl);
-			} catch (Exception ex) {
-				if(driver.findElements(By.cssSelector("a[href='#full-time-stats']")).isEmpty()) {
-					driver.quit();
-					throw new Exception("Error Loading page, URL:"+webdriverTimeout, ex);
+			String dynoName = responseData.getString("name");
+			
+			loggerUtils.log("info", "Dyno: {}", dynoName);
+			
+			dynoNames.add(dynoName);
+		}
+		
+		while(dynoNames.size() > 0) {
+			List<String> completedDynos = new ArrayList<>();
+			for(String dynoName: dynoNames) {
+				String herokuApiEndpoint = "https://api.heroku.com/apps/dfl-manager-dev/dynos/" + dynoName;
+				URL obj = new URL(herokuApiEndpoint);
+				HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+				con.setRequestMethod("GET");
+				con.setRequestProperty("Content-Type", "application/json");
+				con.setRequestProperty("Accept", "application/vnd.heroku+json; version=3");
+
+				int responseCode = con.getResponseCode();
+
+				loggerUtils.log("info", "Checking Dyno: {}", dynoName);
+				loggerUtils.log("info", "Response Code: {}", responseCode);
+
+				BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+				String output;
+				StringBuffer response = new StringBuffer();
+
+				while ((output = in.readLine()) != null) {
+					response.append(output);
+				}
+				in.close();
+				
+				loggerUtils.log("info", "Response data: {}", response.toString());
+				
+				JsonObject responseData = Jsoner.deserialize(response.toString(), new JsonObject());
+				
+				String state = responseData.getString("name");
+				
+				loggerUtils.log("info", "Dyno State: {}", state);
+				
+				if(state == null || !state.equalsIgnoreCase("up")) {
+					completedDynos.add(dynoName);
 				}
 			}
-						
-			//if(driver.findElement(By.id("homeTeam-advanced")).isDisplayed()) {
-			//	System.out.println("Displayed");
-			//}		
-			
-			if(teamsToProcess.contains(homeTeam)) {
-				playerStats.addAll(altGetStats(round, homeTeam, "h", driver));
-			}
-			if(teamsToProcess.contains(awayTeam)) {
-				playerStats.addAll(altGetStats(round, awayTeam, "a", driver));
-			}
-			
-			driver.quit();
+			dynoNames.removeAll(completedDynos);
 		}
-		
-		return playerStats;
-	}
-	
-	/*
-	private List<RawPlayerStats> getStats(int round, String aflTeam, String homeORaway, Document doc) throws Exception {
-		
-		Element teamStatsTable;
-		List<RawPlayerStats> teamStats = new ArrayList<>();
-		
-		if(homeORaway.equals("h")) {
-			teamStatsTable = doc.getElementById("homeTeam-advanced").getElementsByTag("tbody").get(0);
-			loggerUtils.log("info", "Found home team stats for: round={}; aflTeam={}; ", round, aflTeam);
-		} else {
-			teamStatsTable = doc.getElementById("awayTeam-advanced").getElementsByTag("tbody").get(0);
-			loggerUtils.log("info", "Found away team stats for: round={}; aflTeam={}; ", round, aflTeam);
-		}
-		
-		Elements teamStatsRecs = teamStatsTable.getElementsByTag("tr");
-		for(Element pStatRec : teamStatsRecs) {
-			RawPlayerStats playerStats = new RawPlayerStats();
-			Elements stats = pStatRec.getElementsByTag("td");
-			String utfName = stats.get(0).getElementsByClass("full-name").get(0).text();
-			String name = new String(utfName.getBytes("UTF-8")).replaceAll("\\s+", " ").trim().replaceAll("[^\\u0000-\\u007f]+", " ").trim();
 			
-			playerStats.setRound(round);
-			playerStats.setName(name);
-			
-			playerStats.setTeam(aflTeam);
-
-			playerStats.setJumperNo(Integer.parseInt(stats.get(1).text()));
-			playerStats.setKicks(Integer.parseInt(stats.get(2).text()));
-			playerStats.setHandballs(Integer.parseInt(stats.get(3).text()));
-			playerStats.setDisposals(Integer.parseInt(stats.get(4).text()));
-			playerStats.setMarks(Integer.parseInt(stats.get(9).text()));
-			playerStats.setHitouts(Integer.parseInt(stats.get(12).text()));
-			playerStats.setFreesFor(Integer.parseInt(stats.get(17).text()));
-			playerStats.setFreesAgainst(Integer.parseInt(stats.get(18).text()));
-			playerStats.setTackles(Integer.parseInt(stats.get(19).text()));
-			playerStats.setGoals(Integer.parseInt(stats.get(23).text()));
-			playerStats.setBehinds(Integer.parseInt(stats.get(24).text()));
-			
-			loggerUtils.log("info", "Player stats: {}", playerStats);
-			
-			teamStats.add(playerStats);
-		}
-		
-		return teamStats;
-	}
-	*/
-	
-	private List<RawPlayerStats> altGetStats(int round, String aflTeam, String homeORaway, WebDriver driver) throws Exception {
-		
-		driver.findElement(By.cssSelector("a[href='#full-time-stats']")).click();
-		driver.findElement(By.cssSelector("a[href='#advanced-stats']")).click();
-		
-		List<WebElement> statsRecs;
-		List<RawPlayerStats> teamStats = new ArrayList<>();
-		
-		if(homeORaway.equals("h")) {
-			statsRecs = driver.findElement(By.id("homeTeam-advanced")).findElement(By.tagName("tbody")).findElements(By.tagName("tr"));
-			loggerUtils.log("info", "Found home team stats for: round={}; aflTeam={}; ", round, aflTeam);
-		} else {
-			statsRecs = driver.findElement(By.id("awayTeam-advanced")).findElement(By.tagName("tbody")).findElements(By.tagName("tr"));
-			loggerUtils.log("info", "Found away team stats for: round={}; aflTeam={}; ", round, aflTeam);
-		}
-		
-
-		
-		for(WebElement statsRec : statsRecs) {
-			List<WebElement> stats = statsRec.findElements(By.tagName("td"));
-			
-			RawPlayerStats playerStats = new RawPlayerStats();
-			playerStats.setRound(round);
-						
-			playerStats.setName(stats.get(0).findElements(By.tagName("span")).get(1).getText());
-			
-			playerStats.setTeam(aflTeam);
-			
-			playerStats.setJumperNo(Integer.parseInt(stats.get(1).getText()));
-			playerStats.setKicks(Integer.parseInt(stats.get(2).getText()));
-			playerStats.setHandballs(Integer.parseInt(stats.get(3).getText()));
-			playerStats.setDisposals(Integer.parseInt(stats.get(4).getText()));
-			playerStats.setMarks(Integer.parseInt(stats.get(9).getText()));
-			playerStats.setHitouts(Integer.parseInt(stats.get(12).getText()));
-			playerStats.setFreesFor(Integer.parseInt(stats.get(17).getText()));
-			playerStats.setFreesAgainst(Integer.parseInt(stats.get(18).getText()));
-			playerStats.setTackles(Integer.parseInt(stats.get(19).getText()));
-			playerStats.setGoals(Integer.parseInt(stats.get(23).getText()));
-			playerStats.setBehinds(Integer.parseInt(stats.get(24).getText()));
-			
-			loggerUtils.log("info", "Player stats: {}", playerStats);
-			
-			teamStats.add(playerStats);
-		}
-		
-		return teamStats;
 	}
 	
 	// For internal testing
 	public static void main(String[] args) {
 		RawPlayerStatsHandler testing = new RawPlayerStatsHandler();
 		testing.configureLogging("batch.name", "batch-logger", "RawPlayerStatsHandlerTesting");
-		testing.execute(1);
+		testing.execute(1, true);
 	}
 }

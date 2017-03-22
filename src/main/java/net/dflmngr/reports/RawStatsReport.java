@@ -78,7 +78,7 @@ public class RawStatsReport {
 			
 			RawPlayerStatsHandler rawPlayerStatsHandler = new RawPlayerStatsHandler();
 			rawPlayerStatsHandler.configureLogging(this.mdcKey, this.loggerName, this.logfile);
-			rawPlayerStatsHandler.execute(round);
+			rawPlayerStatsHandler.execute(round, true);
 			
 			List<RawPlayerStats> playerStats = rawPlayerStatsService.getForRound(round);
 			

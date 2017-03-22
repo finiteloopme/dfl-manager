@@ -11,4 +11,5 @@ public interface RawPlayerStatsService extends GenericService<RawPlayerStats, Ra
 	public List<RawPlayerStats> getForRound(int round);
 	public void replaceAllForRound(int round, List<RawPlayerStats> playerStats);
 	public Map<String, RawPlayerStats> getForRoundWithKey(int round);
+	public void removeStatsForRoundAndTeam(int round, String team);
 }
