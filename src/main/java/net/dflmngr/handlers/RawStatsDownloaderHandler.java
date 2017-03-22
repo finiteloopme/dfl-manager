@@ -53,6 +53,7 @@ public class RawStatsDownloaderHandler {
 			for(int i = 0; i < 5; i++) {
 				loggerUtils.log("info", "Attempt {}", i);
 				playerStats = downloadStats(round, homeTeam, awayTeam, statsUrl);
+				loggerUtils.log("info", "Player stats count: {}", playerStats.size());
 				if(playerStats.size() >= 44) {
 					statsDownloaded = true;
 				}
@@ -89,15 +90,15 @@ public class RawStatsDownloaderHandler {
 			}
 		}
 						
-		playerStats.addAll(altGetStats(round, homeTeam, "h", driver));
-		playerStats.addAll(altGetStats(round, awayTeam, "a", driver));
+		playerStats.addAll(getStats(round, homeTeam, "h", driver));
+		playerStats.addAll(getStats(round, awayTeam, "a", driver));
 			
 		driver.quit();
 				
 		return playerStats;
 	}
 	
-	private List<RawPlayerStats> altGetStats(int round, String aflTeam, String homeORaway, WebDriver driver) throws Exception {
+	private List<RawPlayerStats> getStats(int round, String aflTeam, String homeORaway, WebDriver driver) throws Exception {
 		
 		driver.findElement(By.cssSelector("a[href='#full-time-stats']")).click();
 		driver.findElement(By.cssSelector("a[href='#advanced-stats']")).click();
