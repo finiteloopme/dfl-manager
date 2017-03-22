@@ -142,7 +142,7 @@ public class RawPlayerStatsHandler {
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
 			con.setRequestMethod("POST");
-			con.setRequestProperty("Content-Type", "Authorization: Bearer " + apiToken);
+			con.setRequestProperty("Authorization", "Bearer " + apiToken);
 			con.setRequestProperty("Content-Type", "application/json");
 			con.setRequestProperty("Accept", "application/vnd.heroku+json; version=3");
 
