@@ -219,7 +219,7 @@ public class RawPlayerStatsHandler {
 				
 				loggerUtils.log("info", "Dyno State: {}", state);
 				
-				if(state == null || !state.equalsIgnoreCase("up")) {
+				if(state == null || !state.equalsIgnoreCase("up") || !state.equalsIgnoreCase("starting")) {
 					completedDynos.add(dynoName);
 				}
 			}
