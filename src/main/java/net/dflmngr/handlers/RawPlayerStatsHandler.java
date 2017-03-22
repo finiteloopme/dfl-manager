@@ -188,10 +188,12 @@ public class RawPlayerStatsHandler {
 			List<String> completedDynos = new ArrayList<>();
 			for(String dynoName: dynoNames) {
 				String herokuApiEndpoint = "https://api.heroku.com/apps/dfl-manager-dev/dynos/" + dynoName;
+				String apiToken = System.getenv("HEROKU_API_TOKEN");
 				URL obj = new URL(herokuApiEndpoint);
 				HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
 				con.setRequestMethod("GET");
+				con.setRequestProperty("Authorization", "Bearer " + apiToken);
 				con.setRequestProperty("Content-Type", "application/json");
 				con.setRequestProperty("Accept", "application/vnd.heroku+json; version=3");
 
