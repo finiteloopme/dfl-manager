@@ -228,6 +228,6 @@ public class RawPlayerStatsHandler {
 	public static void main(String[] args) {
 		RawPlayerStatsHandler testing = new RawPlayerStatsHandler();
 		testing.configureLogging("batch.name", "batch-logger", "RawPlayerStatsHandlerTesting");
-		testing.execute(1, true);
+		testing.execute(Integer.parseInt(args[0]), true);
 	}
 }
