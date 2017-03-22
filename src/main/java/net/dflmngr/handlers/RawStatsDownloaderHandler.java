@@ -56,6 +56,7 @@ public class RawStatsDownloaderHandler {
 				loggerUtils.log("info", "Player stats count: {}", playerStats.size());
 				if(playerStats.size() >= 44) {
 					statsDownloaded = true;
+					break;
 				}
 			}
 			if(statsDownloaded) {
