@@ -2,6 +2,7 @@ package net.dflmngr.model.entity;
 
 import java.time.ZonedDateTime;
 
+import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -11,6 +12,7 @@ import javax.persistence.Table;
 import net.dflmngr.model.entity.keys.ProcessPK;
 
 @Entity
+@Cacheable(false)
 @Table(name="process")
 @IdClass(ProcessPK.class)
 public class Process {
