@@ -16,6 +16,11 @@ public class ProcessServiceImpl extends GenericServiceImpl<Process, ProcessPK> i
 		dao = new ProcessDaoImpl();
 		setDao(dao);
 	}
+
+	public List<Process> getProcessById(String processId) {
+		List<Process> process = dao.findProcessById(processId);
+		return process;
+	}
 	
 	public List<Process> getProcess(String processId, ZonedDateTime time) {
 		List<Process> process = dao.findProcess(processId, time);

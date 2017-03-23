@@ -7,5 +7,6 @@ import net.dflmngr.model.entity.Process;
 import net.dflmngr.model.entity.keys.ProcessPK;
 
 public interface ProcessDao extends GenericDao<Process, ProcessPK> {
+	public List<Process> findProcessById(String processId);
 	public List<Process> findProcess(String processId, ZonedDateTime time);
 }

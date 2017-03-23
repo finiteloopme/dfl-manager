@@ -205,7 +205,7 @@ public class RawPlayerStatsHandler {
 				URL obj = new URL(herokuApiEndpoint);
 				HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
-				con.setRequestMethod("GET");
+				con.setRequestMethrasingod("GET");
 				con.setRequestProperty("Authorization", "Bearer " + apiToken);
 				con.setRequestProperty("Content-Type", "application/json");
 				con.setRequestProperty("Accept", "application/vnd.heroku+json; version=3");
@@ -237,6 +237,12 @@ public class RawPlayerStatsHandler {
 				}
 				*/
 				Process process = processService.getProcess(dynoName, now).get(0);
+				//String stauts = "";
+				//for(Process process : processes) {
+				//	if(now.isBefore(process.getStartTime())) {
+				//		status = 
+				//	}
+				//}
 				if(!process.getStatus().equals("Running")) {
 					loggerUtils.log("info", "Completed: {} {}", dynoName, process.getParams());
 					completedDynos.add(dynoName);

@@ -14,6 +14,19 @@ public class ProcessDaoImpl extends GenericDaoImpl<Process, ProcessPK> implement
 	public ProcessDaoImpl() {
 		super(Process.class);
 	}
+
+	public List<Process> findProcessById(String processId) {
+		criteriaBuilder = entityManager.getCriteriaBuilder();
+		criteriaQuery = criteriaBuilder.createQuery(entityClass);
+		entity = criteriaQuery.from(entityClass);
+		
+		Predicate processIdEquals = criteriaBuilder.equal(entity.get(Process_.processId), processId);
+		
+		criteriaQuery.where(processIdEquals);
+		List<Process> entitys = entityManager.createQuery(criteriaQuery).getResultList();
+		
+		return entitys;
+	}
 	
 	public List<Process> findProcess(String processId, ZonedDateTime time) {
 		criteriaBuilder = entityManager.getCriteriaBuilder();
@@ -21,9 +34,9 @@ public class ProcessDaoImpl extends GenericDaoImpl<Process, ProcessPK> implement
 		entity = criteriaQuery.from(entityClass);
 		
 		Predicate processIdEquals = criteriaBuilder.equal(entity.get(Process_.processId), processId);
-		Predicate timeGreater = criteriaBuilder.greaterThan(entity.get(Process_.startTime), time);
+		Predicate timeLess = criteriaBuilder.lessThan(entity.get(Process_.startTime), time);
 		
-		criteriaQuery.where(criteriaBuilder.and(processIdEquals, timeGreater));
+		criteriaQuery.where(criteriaBuilder.and(processIdEquals, timeLess));
 		List<Process> entitys = entityManager.createQuery(criteriaQuery).getResultList();
 		
 		return entitys;
