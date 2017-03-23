@@ -3,6 +3,7 @@ package net.dflmngr.handlers;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -196,8 +197,10 @@ public class EmailSelectionsHandler {
 		
 						if (disposition != null && (disposition.equalsIgnoreCase(Part.ATTACHMENT) || disposition.equalsIgnoreCase(Part.INLINE))) {
 							String attachementName = part.getFileName();
-							ZonedDateTime receivedDate = ZonedDateTime.from(messages[i].getReceivedDate().toInstant())
-															.withZoneSameInstant(ZoneId.of(DflmngrUtils.defaultTimezone));
+							Instant instant = messages[i].getReceivedDate().toInstant();
+							ZonedDateTime receivedDate = ZonedDateTime.ofInstant(instant, ZoneId.of(DflmngrUtils.defaultTimezone));
+							//ZonedDateTime receivedDate = ZonedDateTime.from(messages[i].getReceivedDate().toInstant())
+							//								.withZoneSameInstant(ZoneId.of(DflmngrUtils.defaultTimezone));
 							loggerUtils.log("info", "Attachement found, name={}", attachementName);
 							if(attachementName.equals("selections.txt")) {
 								loggerUtils.log("info", "Message from {}, has selection attachment", from);
