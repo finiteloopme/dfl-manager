@@ -19,6 +19,7 @@ public class ProcessDaoImpl extends GenericDaoImpl<Process, ProcessPK> implement
 	}
 
 	public List<Process> findProcessById(String processId) {
+		entityManager.clear();
 		criteriaBuilder = entityManager.getCriteriaBuilder();
 		criteriaQuery = criteriaBuilder.createQuery(entityClass);
 		entity = criteriaQuery.from(entityClass);
