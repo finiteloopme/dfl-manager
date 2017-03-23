@@ -66,6 +66,8 @@ public class RawStatsDownloaderHandler {
 			process.setParams(round + " " + homeTeam + " " + awayTeam + " " + statsUrl);
 			process.setStatus("Running");
 			
+			loggerUtils.log("info", "Creating process record: {}", process);
+			
 			processService.insert(process);
 			
 			loggerUtils.log("info", "Downloading AFL stats: round={}, homeTeam={} awayTeam={} ur={}", round, homeTeam, awayTeam, statsUrl);
