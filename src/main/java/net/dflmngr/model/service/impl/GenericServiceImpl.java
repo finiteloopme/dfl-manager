@@ -23,7 +23,9 @@ public class GenericServiceImpl<E, K> implements GenericService<E, K>  {
 	}
 	
 	public void insert(E entity) {
+		dao.beginTransaction();
 		dao.persist(entity);
+		dao.commit();
 	}
 	
 	public void update(E entity) {
