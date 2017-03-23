@@ -1,5 +1,7 @@
 package net.dflmngr.handlers;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,8 +13,13 @@ import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import io.github.bonigarcia.wdm.PhantomJsDriverManager;
 import net.dflmngr.logging.LoggingUtils;
 import net.dflmngr.model.entity.RawPlayerStats;
+import net.dflmngr.model.entity.keys.ProcessPK;
+import net.dflmngr.model.entity.Process;
+import net.dflmngr.model.service.ProcessService;
 import net.dflmngr.model.service.RawPlayerStatsService;
+import net.dflmngr.model.service.impl.ProcessServiceImpl;
 import net.dflmngr.model.service.impl.RawPlayerStatsServiceImpl;
+import net.dflmngr.utils.DflmngrUtils;
 
 public class RawStatsDownloaderHandler {
 	private LoggingUtils loggerUtils;
@@ -23,11 +30,13 @@ public class RawStatsDownloaderHandler {
 	String logfile;
 	
 	RawPlayerStatsService rawPlayerStatsService;
+	ProcessService processService;
 	
 	public RawStatsDownloaderHandler() {
 		PhantomJsDriverManager.getInstance().setup();
 		
 		rawPlayerStatsService = new RawPlayerStatsServiceImpl();
+		processService = new ProcessServiceImpl();
 		
 		isExecutable = false;
 	}
@@ -40,11 +49,24 @@ public class RawStatsDownloaderHandler {
 	
 	public void execute(int round, String homeTeam, String awayTeam, String statsUrl) {
 		
+		Process process = new Process();
+		ProcessPK processPK = new ProcessPK();
+		ZonedDateTime now = ZonedDateTime.now(ZoneId.of(DflmngrUtils.defaultTimezone));
+		
 		try {
 			if(!isExecutable) {
 				configureLogging(defaultLogfile);
 				loggerUtils.log("info", "Default logging configured");
 			}
+			
+			processPK.setProcessId(System.getenv("DYNO"));
+			processPK.setStartTime(now);
+			process.setProcessId(processPK.getProcessId());
+			process.setStartTime(processPK.getStartTime());
+			process.setParams(round + " " + homeTeam + " " + awayTeam + " " + statsUrl);
+			process.setStatus("Running");
+			
+			processService.insert(process);
 			
 			loggerUtils.log("info", "Downloading AFL stats: round={}, homeTeam={} awayTeam={} ur={}", round, homeTeam, awayTeam, statsUrl);
 			
@@ -71,8 +93,19 @@ public class RawStatsDownloaderHandler {
 				loggerUtils.log("info", "Player stats were not downloaded");
 			}
 			
+			now = ZonedDateTime.now(ZoneId.of(DflmngrUtils.defaultTimezone));
+			process.setEndTime(now);
+			process.setStatus("Completed");
+			
+			processService.insert(process);
+			
 		} catch (Exception ex) {
 			loggerUtils.log("error", "Error in ... ", ex);
+			now = ZonedDateTime.now(ZoneId.of(DflmngrUtils.defaultTimezone));
+			process.setEndTime(now);
+			process.setStatus("Failed");
+			
+			processService.insert(process);
 		}
 	}
 

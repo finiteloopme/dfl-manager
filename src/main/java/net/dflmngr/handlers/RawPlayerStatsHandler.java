@@ -5,6 +5,8 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -17,14 +19,18 @@ import net.dflmngr.logging.LoggingUtils;
 import net.dflmngr.model.entity.AflFixture;
 import net.dflmngr.model.entity.DflRoundInfo;
 import net.dflmngr.model.entity.DflRoundMapping;
+import net.dflmngr.model.entity.Process;
 import net.dflmngr.model.service.AflFixtureService;
 import net.dflmngr.model.service.DflRoundInfoService;
 import net.dflmngr.model.service.GlobalsService;
+import net.dflmngr.model.service.ProcessService;
 import net.dflmngr.model.service.RawPlayerStatsService;
 import net.dflmngr.model.service.impl.AflFixtureServiceImpl;
 import net.dflmngr.model.service.impl.DflRoundInfoServiceImpl;
 import net.dflmngr.model.service.impl.GlobalsServiceImpl;
+import net.dflmngr.model.service.impl.ProcessServiceImpl;
 import net.dflmngr.model.service.impl.RawPlayerStatsServiceImpl;
+import net.dflmngr.utils.DflmngrUtils;
 
 public class RawPlayerStatsHandler {
 	private LoggingUtils loggerUtils;
@@ -33,6 +39,7 @@ public class RawPlayerStatsHandler {
 	AflFixtureService aflFixtureService;
 	GlobalsService globalsService;
 	RawPlayerStatsService rawPlayerStatsService;
+	ProcessService processService;
 	
 	boolean isExecutable;
 		
@@ -49,6 +56,7 @@ public class RawPlayerStatsHandler {
 		aflFixtureService = new AflFixtureServiceImpl();
 		globalsService = new GlobalsServiceImpl();
 		rawPlayerStatsService = new RawPlayerStatsServiceImpl();
+		processService = new ProcessServiceImpl();
 		
 		isExecutable = false;
 	}
@@ -127,6 +135,8 @@ public class RawPlayerStatsHandler {
 		String statsUrl = globalsService.getAflStatsUrl();
 		
 		List<String> dynoNames = new ArrayList<>();
+		
+		ZonedDateTime now = ZonedDateTime.now(ZoneId.of(DflmngrUtils.defaultTimezone));
 
 		for (AflFixture fixture : fixturesToProcess) {
 			String homeTeam = fixture.getHomeTeam();
@@ -185,8 +195,11 @@ public class RawPlayerStatsHandler {
 		}
 		
 		while(dynoNames.size() > 0) {
+			loggerUtils.log("info", "Wait for stats to download....");
+			Thread.sleep(30000);
 			List<String> completedDynos = new ArrayList<>();
 			for(String dynoName: dynoNames) {
+				/*
 				String herokuApiEndpoint = "https://api.heroku.com/apps/dfl-manager-dev/dynos/" + dynoName;
 				String apiToken = System.getenv("HEROKU_API_TOKEN");
 				URL obj = new URL(herokuApiEndpoint);
@@ -220,6 +233,12 @@ public class RawPlayerStatsHandler {
 				loggerUtils.log("info", "Dyno State: {}", state);
 				
 				if(state == null || !(state.equalsIgnoreCase("up") || state.equalsIgnoreCase("starting"))) {
+					completedDynos.add(dynoName);
+				}
+				*/
+				Process process = processService.getProcess(dynoName, now).get(0);
+				if(!process.getStatus().equals("Running")) {
+					loggerUtils.log("info", "Completed: {} {}", dynoName, process.getParams());
 					completedDynos.add(dynoName);
 				}
 			}
