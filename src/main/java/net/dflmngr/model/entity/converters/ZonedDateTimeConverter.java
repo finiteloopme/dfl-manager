@@ -15,15 +15,23 @@ import java.util.Date;
 public class ZonedDateTimeConverter implements AttributeConverter<ZonedDateTime, Date>{
     @Override
     public Date convertToDatabaseColumn(ZonedDateTime date) {
-        Instant instant = Instant.from(date);
-        return Date.from(instant);
+    	if(date != null) {
+    		Instant instant = Instant.from(date);
+    		return Date.from(instant);
+    	} else {
+    		return null;
+    	}
     }
 
     @Override
     public ZonedDateTime convertToEntityAttribute(Date value) {
-        Instant instant = value.toInstant();
-        //LocalDateTime localTime = LocalDateTime.from(instant);
-        return ZonedDateTime.ofInstant(instant, ZoneId.of(DflmngrUtils.defaultTimezone));
-        //return localTime.atZone(ZoneId.of("UTC"));
+    	if (value != null) {
+    		Instant instant = value.toInstant();
+    		//LocalDateTime localTime = LocalDateTime.from(instant);
+    		return ZonedDateTime.ofInstant(instant, ZoneId.of(DflmngrUtils.defaultTimezone));
+    		//return localTime.atZone(ZoneId.of("UTC"));
+    	} else {
+    		return null;
+    	}
     }
 }
