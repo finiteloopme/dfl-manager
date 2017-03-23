@@ -3,7 +3,10 @@ package net.dflmngr.model.dao.impl;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import javax.persistence.TypedQuery;
 import javax.persistence.criteria.Predicate;
+
+import org.eclipse.persistence.config.QueryHints;
 
 import net.dflmngr.model.dao.ProcessDao;
 import net.dflmngr.model.entity.Process;
@@ -23,7 +26,10 @@ public class ProcessDaoImpl extends GenericDaoImpl<Process, ProcessPK> implement
 		Predicate processIdEquals = criteriaBuilder.equal(entity.get(Process_.processId), processId);
 		
 		criteriaQuery.where(processIdEquals);
-		List<Process> entitys = entityManager.createQuery(criteriaQuery).getResultList();
+		TypedQuery<Process> query = entityManager.createQuery(criteriaQuery);
+		query.setHint(QueryHints.QUERY_RESULTS_CACHE, "FALSE");
+		//List<Process> entitys = entityManager.createQuery(criteriaQuery).getResultList();
+		List<Process> entitys = query.getResultList();
 		
 		return entitys;
 	}
