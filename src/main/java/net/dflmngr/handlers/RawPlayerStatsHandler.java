@@ -241,6 +241,8 @@ public class RawPlayerStatsHandler {
 				String status = "";
 				String params = "";
 				for(Process process : processes) {
+					status = process.getStatus();
+					loggerUtils.log("info", "Dyno stauts: {} is {}", dynoName, status);
 					if(now.isBefore(process.getStartTime())) {
 						status = process.getStatus();
 						params = process.getParams();
