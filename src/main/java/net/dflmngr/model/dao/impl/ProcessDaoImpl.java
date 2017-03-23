@@ -34,9 +34,9 @@ public class ProcessDaoImpl extends GenericDaoImpl<Process, ProcessPK> implement
 		entity = criteriaQuery.from(entityClass);
 		
 		Predicate processIdEquals = criteriaBuilder.equal(entity.get(Process_.processId), processId);
-		Predicate timeLess = criteriaBuilder.lessThan(entity.get(Process_.startTime), time);
+		Predicate timeGreater = criteriaBuilder.lessThan(entity.get(Process_.startTime), time);
 		
-		criteriaQuery.where(criteriaBuilder.and(processIdEquals, timeLess));
+		criteriaQuery.where(criteriaBuilder.and(processIdEquals, timeGreater));
 		List<Process> entitys = entityManager.createQuery(criteriaQuery).getResultList();
 		
 		return entitys;

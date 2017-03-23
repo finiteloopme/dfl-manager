@@ -236,15 +236,20 @@ public class RawPlayerStatsHandler {
 					completedDynos.add(dynoName);
 				}
 				*/
-				Process process = processService.getProcess(dynoName, now).get(0);
-				//String stauts = "";
-				//for(Process process : processes) {
-				//	if(now.isBefore(process.getStartTime())) {
-				//		status = 
-				//	}
-				//}
-				if(!process.getStatus().equals("Running")) {
-					loggerUtils.log("info", "Completed: {} {}", dynoName, process.getParams());
+				//Process process = processService.getProcess(dynoName, now).get(0);
+				List<Process> processes = processService.getProcessById(dynoName);
+				String status = "";
+				String params = "";
+				for(Process process : processes) {
+					if(now.isBefore(process.getStartTime())) {
+						status = process.getStatus();
+						params = process.getParams();
+						break;
+					}
+				}
+				//if(!process.getStatus().equals("Running")) {
+				if(!status.equals("Running")) {
+					loggerUtils.log("info", "Completed: {} {}", dynoName, params);
 					completedDynos.add(dynoName);
 				}
 			}
