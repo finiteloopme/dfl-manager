@@ -19,19 +19,23 @@ import javax.mail.internet.MimeMultipart;
 
 import net.dflmngr.model.service.GlobalsService;
 import net.dflmngr.model.service.impl.GlobalsServiceImpl;
+import net.dflmngr.utils.oauth2.AccessTokenFromRefreshToken;
+import net.dflmngr.utils.oauth2.OAuth2Authenticator;
 
 public class EmailUtils {
 	
 	private static GlobalsService globalsService = new GlobalsServiceImpl();
 	//private static String incomingMailHost = globalsService.getEmailConfig().get("incomingMailHost");
 	private static String outgoingMailHost = globalsService.getEmailConfig().get("outgoingMailHost");
-	private static String outgoingMailPort = globalsService.getEmailConfig().get("outgoingMailPort");
+	private static int outgoingMailPort = Integer.parseInt(globalsService.getEmailConfig().get("outgoingMailPort"));
 	private static String mailUsername = globalsService.getEmailConfig().get("mailUsername");;
 	private static String mailPassword = globalsService.getEmailConfig().get("mailPassword");;
 	
 	public static void sendTextEmail(List<String> to, String from, String subject, String body, List<String> attachments) throws Exception {
 	
-		MimeMessage message = new MimeMessage(getMailSession());
+		//MimeMessage message = new MimeMessage(getMailSession());
+		Session session = null;
+		MimeMessage message = new MimeMessage(session);
 		message.setFrom(new InternetAddress(from));
 		
 		InternetAddress[] toAddresses = new InternetAddress[to.size()]; 
@@ -65,12 +69,17 @@ public class EmailUtils {
 			message.setContent(body, "text/plain");
 		}
 
-		Transport.send(message);
+		//Transport.send(message);
+		String oauthToken = AccessTokenFromRefreshToken.getAccessToken();
+		Transport smptTransport = OAuth2Authenticator.connectToSmtp(outgoingMailHost, outgoingMailPort, mailUsername, oauthToken, false);
+		smptTransport.sendMessage(message, message.getAllRecipients());
 	}
 	
 	public static void sendHtmlEmail(List<String> to, String from, String subject, String body, List<String> attachments) throws Exception {
 		
-		MimeMessage message = new MimeMessage(getMailSession());
+		//MimeMessage message = new MimeMessage(getMailSession());
+		Session session = null;
+		MimeMessage message = new MimeMessage(session);
 		message.setFrom(new InternetAddress(from));
 		
 		InternetAddress[] toAddresses = new InternetAddress[to.size()]; 
@@ -104,10 +113,15 @@ public class EmailUtils {
 			message.setContent(body, "text/html");
 		}
 
-		Transport.send(message);
+		//Transport.send(message);
+		String oauthToken = AccessTokenFromRefreshToken.getAccessToken();
+		Transport smptTransport = OAuth2Authenticator.connectToSmtp(outgoingMailHost, outgoingMailPort, mailUsername, oauthToken, false);
+		smptTransport.sendMessage(message, message.getAllRecipients());
 	}
 	
-	private static Session getMailSession() {
+	/*
+	//private static Session getMailSession() {
+	private static void getMailSession() {
 	
 		Properties properties = new Properties();
 		properties.setProperty("mail.smtp.host", outgoingMailHost);
@@ -117,13 +131,14 @@ public class EmailUtils {
 		properties.setProperty("mail.smtp.starttls.enable", "true");
 		properties.setProperty("mail.store.protocol", "imaps");
 				
-		Session mailSession = Session.getDefaultInstance(properties, new javax.mail.Authenticator() {
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(mailUsername, mailPassword);
-			}
-		});
+		//Session mailSession = Session.getDefaultInstance(properties, new javax.mail.Authenticator() {
+		//	protected PasswordAuthentication getPasswordAuthentication() {
+		//		return new PasswordAuthentication(mailUsername, mailPassword);
+		//	}
+		//});
 		
-		return mailSession;
+		//return mailSession;
 	}
+	*/
 
 }
