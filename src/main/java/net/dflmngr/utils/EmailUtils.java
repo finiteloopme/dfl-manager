@@ -31,7 +31,13 @@ public class EmailUtils {
 	private static String mailUsername = globalsService.getEmailConfig().get("mailUsername");;
 	private static String mailPassword = globalsService.getEmailConfig().get("mailPassword");;
 	
+	static {
+		OAuth2Authenticator.initialize();
+	}
+	
 	public static void sendTextEmail(List<String> to, String from, String subject, String body, List<String> attachments) throws Exception {
+		
+		
 	
 		//MimeMessage message = new MimeMessage(getMailSession());
 		Session session = null;
@@ -71,12 +77,13 @@ public class EmailUtils {
 
 		//Transport.send(message);
 		String oauthToken = AccessTokenFromRefreshToken.getAccessToken();
-		System.out.println("1:" + outgoingMailHost + " 2:"  + outgoingMailPort + " 3:" +mailUsername + " 4: " + oauthToken);
 		Transport smptTransport = OAuth2Authenticator.connectToSmtp(outgoingMailHost, outgoingMailPort, mailUsername, oauthToken, true);
 		smptTransport.sendMessage(message, message.getAllRecipients());
 	}
 	
 	public static void sendHtmlEmail(List<String> to, String from, String subject, String body, List<String> attachments) throws Exception {
+		
+		//OAuth2Authenticator.initialize();
 		
 		//MimeMessage message = new MimeMessage(getMailSession());
 		Session session = null;
@@ -116,7 +123,6 @@ public class EmailUtils {
 
 		//Transport.send(message);
 		String oauthToken = AccessTokenFromRefreshToken.getAccessToken();
-		System.out.println("1:" + outgoingMailHost + " 2:"  + outgoingMailPort + " 3:" +mailUsername + " 4: " + oauthToken);
 		Transport smptTransport = OAuth2Authenticator.connectToSmtp(outgoingMailHost, outgoingMailPort, mailUsername, oauthToken, true);
 		smptTransport.sendMessage(message, message.getAllRecipients());
 	}
