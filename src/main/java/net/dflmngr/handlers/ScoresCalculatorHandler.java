@@ -307,7 +307,7 @@ public class ScoresCalculatorHandler {
 			DflPlayer dflPlayer = dflPlayerService.getByAflPlayerId(aflPlayerId);
 			
 			if(dflPlayer == null) {
-				loggerUtils.log("Missing afl dfl player mapping: aflPlayerId={};", aflPlayerId);
+				loggerUtils.log("info", "Missing afl dfl player mapping: aflPlayerId={};", aflPlayerId);
 			} else {
 				DflTeamPlayer dflTeamPlayer = dflTeamPlayerService.get(dflPlayer.getPlayerId());
 					

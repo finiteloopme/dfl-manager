@@ -250,7 +250,7 @@ public class RawPlayerStatsHandler {
 					}
 				}
 				//if(!process.getStatus().equals("Running")) {
-				if(!status.equals("Running")) {
+				if(status.equals("Completed") || status.equals("Failed")) {
 					loggerUtils.log("info", "Completed: {} {}", dynoName, params);
 					completedDynos.add(dynoName);
 				}
