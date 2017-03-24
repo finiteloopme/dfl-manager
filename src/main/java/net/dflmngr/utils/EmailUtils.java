@@ -71,6 +71,7 @@ public class EmailUtils {
 
 		//Transport.send(message);
 		String oauthToken = AccessTokenFromRefreshToken.getAccessToken();
+		System.out.println("1:" + outgoingMailHost + " 2:"  + outgoingMailPort + " 3:" +mailUsername + " 4: " + oauthToken);
 		Transport smptTransport = OAuth2Authenticator.connectToSmtp(outgoingMailHost, outgoingMailPort, mailUsername, oauthToken, true);
 		smptTransport.sendMessage(message, message.getAllRecipients());
 	}
@@ -115,6 +116,7 @@ public class EmailUtils {
 
 		//Transport.send(message);
 		String oauthToken = AccessTokenFromRefreshToken.getAccessToken();
+		System.out.println("1:" + outgoingMailHost + " 2:"  + outgoingMailPort + " 3:" +mailUsername + " 4: " + oauthToken);
 		Transport smptTransport = OAuth2Authenticator.connectToSmtp(outgoingMailHost, outgoingMailPort, mailUsername, oauthToken, true);
 		smptTransport.sendMessage(message, message.getAllRecipients());
 	}
