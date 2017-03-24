@@ -194,7 +194,7 @@ public class ResultsReport {
 	        directory.mkdirs();
 	    }
 		
-		Path reportLocation = Paths.get(reportDir.toString(), "resultsReport", reportName);
+		Path reportLocation = Paths.get(reportDir.toString(), reportName);
 		
 		loggerUtils.log("info", "Writing Results Report");
 		loggerUtils.log("info", "Report name: {}", reportName);

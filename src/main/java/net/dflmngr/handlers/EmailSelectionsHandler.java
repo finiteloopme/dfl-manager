@@ -454,7 +454,7 @@ public class EmailSelectionsHandler {
 			//Transport.send(message);
 			
 			String oauthToken = AccessTokenFromRefreshToken.getAccessToken();
-			Transport smptTransport = OAuth2Authenticator.connectToSmtp(outgoingMailHost, outgoingMailPort, mailUsername, oauthToken, true);
+			Transport smptTransport = OAuth2Authenticator.connectToSmtp(outgoingMailHost, outgoingMailPort, mailUsername, oauthToken, false);
 			smptTransport.sendMessage(message, message.getAllRecipients());
 		}
 	}
