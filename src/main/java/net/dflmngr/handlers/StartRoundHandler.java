@@ -269,7 +269,7 @@ public class StartRoundHandler {
 		
 			List<DflSelectedPlayer> selectedTeam = new ArrayList<>();
 			
-			if(round > 1) {
+			//if(round > 1) {
 				for(DflSelectedPlayer tmpSelectedPlayer : tmpSelectedTeam) {
 					DflSelectedPlayer selectedPlayer = new DflSelectedPlayer();
 					selectedPlayer.setPlayerId(tmpSelectedPlayer.getPlayerId());
@@ -279,7 +279,7 @@ public class StartRoundHandler {
 					
 					selectedTeam.add(selectedPlayer);
 				}
-			}
+			//}
 									
 			loggerUtils.log("info", "Saving selected to DB: selected tema={}", selectedTeam);
 			dflSelectedTeamService.replaceTeamForRound(round, team.getTeamCode(), selectedTeam);
