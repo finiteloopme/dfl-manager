@@ -287,16 +287,20 @@ public class ScoresCalculatorHandler {
 	
 	private void handlePlayerScores(int round) {
 		
-		System.out.println("Here");
+		System.out.println("Here:" + round);
 		
 		Map<String, RawPlayerStats> stats = rawPlayerStatsService.getForRoundWithKey(round);
 		List<DflPlayerScores> scores = new ArrayList<>();
+		
+		System.out.println("Size:" + stats.size());
 		
 		for (Map.Entry<String, RawPlayerStats> entry : stats.entrySet()) {
 
 			DflPlayerScores playerScores = new DflPlayerScores();
 			String aflPlayerId = entry.getKey();
 			RawPlayerStats playerStats = entry.getValue();
+			
+			System.out.println("Id:" + aflPlayerId);
 			
 			int score = calculatePlayerScore(playerStats);
 			
