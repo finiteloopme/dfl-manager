@@ -287,6 +287,8 @@ public class ScoresCalculatorHandler {
 	
 	private void handlePlayerScores(int round) {
 		
+		System.out.println("Here");
+		
 		Map<String, RawPlayerStats> stats = rawPlayerStatsService.getForRoundWithKey(round);
 		List<DflPlayerScores> scores = new ArrayList<>();
 		
@@ -315,6 +317,8 @@ public class ScoresCalculatorHandler {
 				}
 				
 				playerScores.setScore(score);
+				
+				System.out.println("Here; " + score);
 				
 				loggerUtils.log("info", "Player score={}", playerScores);
 				scores.add(playerScores);
