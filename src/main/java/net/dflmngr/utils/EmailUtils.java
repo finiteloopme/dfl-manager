@@ -28,16 +28,21 @@ public class EmailUtils {
 	//private static String incomingMailHost = globalsService.getEmailConfig().get("incomingMailHost");
 	private static String outgoingMailHost = globalsService.getEmailConfig().get("outgoingMailHost");
 	private static int outgoingMailPort = Integer.parseInt(globalsService.getEmailConfig().get("outgoingMailPort"));
-	private static String mailUsername = globalsService.getEmailConfig().get("mailUsername");;
-	private static String mailPassword = globalsService.getEmailConfig().get("mailPassword");;
+	//private static String mailUsername = globalsService.getEmailConfig().get("mailUsername");;
+	//private static String mailPassword = globalsService.getEmailConfig().get("mailPassword");;
+
+	private static String mailUsername;
 	
 	static {
+		mailUsername = globalsService.getEmailConfig().get("mailUsername");
+		if(!System.getenv("ENV").equals("production")) {
+			mailUsername = System.getenv("DFL_MNGR_EMAIL");
+		}
+		
 		OAuth2Authenticator.initialize();
 	}
 	
 	public static void sendTextEmail(List<String> to, String from, String subject, String body, List<String> attachments) throws Exception {
-		
-		
 	
 		//MimeMessage message = new MimeMessage(getMailSession());
 		Session session = null;

@@ -78,7 +78,7 @@ public class RawPlayerStatsHandler {
 				loggerUtils.log("info", "Default logging configured");
 			}
 			
-			loggerUtils.log("info", "Downloading player stats for DFL round: ", round);
+			loggerUtils.log("info", "Downloading player stats for DFL round: {}", round);
 			
 			DflRoundInfo dflRoundInfo = dflRoundInfoService.get(round);
 			

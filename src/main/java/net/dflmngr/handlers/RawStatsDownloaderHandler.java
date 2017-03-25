@@ -160,7 +160,7 @@ public class RawStatsDownloaderHandler {
 						
 			playerStats.setName(stats.get(0).findElements(By.tagName("span")).get(1).getText());
 			
-			playerStats.setTeam(aflTeam.toLowerCase());
+			playerStats.setTeam(aflTeam);
 			
 			playerStats.setJumperNo(Integer.parseInt(stats.get(1).getText()));
 			playerStats.setKicks(Integer.parseInt(stats.get(2).getText()));
