@@ -48,9 +48,8 @@ public class EndRoundJobGenerator {
 			for(DflRoundInfo dflRound : dflRounds) {
 				loggerUtils.log("info", "Creating job entry for round={}, lockout={}", dflRound.getRound(), dflRound.getHardLockoutTime());
 				createReportJobEntry(dflRound.getRound(), dflRound.getHardLockoutTime());
-								
-				loggerUtils.log("info", "EndRoundJobGenerator completed");
 			}
+			loggerUtils.log("info", "EndRoundJobGenerator completed");
 		} catch (Exception ex) {
 			loggerUtils.log("error", "Error in ... ", ex);
 		}
