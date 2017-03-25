@@ -77,7 +77,7 @@ public class EndRoundJobGenerator {
 	}
 	
 	public static void main(String[] args) {		
-		StartRoundJobGenerator testing = new StartRoundJobGenerator();
+		EndRoundJobGenerator testing = new EndRoundJobGenerator();
 		testing.execute();
 	}
 }
