@@ -165,10 +165,13 @@ public class ResultsJobGenerator {
 		//cronExpression.setTime(timeFormat.format(time.getTime()));
 		//cronExpression.setStartDate(dateFormat.format(time.getTime()));
 		
-		ZonedDateTime timeUtc = time.withZoneSameInstant(ZoneId.of("UTC"));
+		//ZonedDateTime timeUtc = time.withZoneSameInstant(ZoneId.of("UTC"));
 		
-		cronExpression.setTime(timeUtc.format(DateTimeFormatter.ofPattern("hh:mm a")));
-		cronExpression.setStartDate(timeUtc.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+		//cronExpression.setTime(timeUtc.format(DateTimeFormatter.ofPattern("hh:mm a")));
+		//cronExpression.setStartDate(timeUtc.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+		
+		cronExpression.setTime(time.format(DateTimeFormatter.ofPattern("hh:mm a")));
+		cronExpression.setStartDate(time.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
 		
 		loggerUtils.log("info", "Cron date={}; time={};", cronExpression.getStartDate(), cronExpression.getTime());
 		

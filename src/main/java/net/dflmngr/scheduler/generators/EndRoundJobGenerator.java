@@ -63,7 +63,8 @@ public class EndRoundJobGenerator {
 		
 		CronExpressionCreator cronExpression = new CronExpressionCreator();
 		
-		ZonedDateTime runTime = time.withZoneSameInstant(ZoneId.of("UTC")).with(TemporalAdjusters.nextOrSame(DayOfWeek.WEDNESDAY));
+		//ZonedDateTime runTime = time.withZoneSameInstant(ZoneId.of("UTC")).with(TemporalAdjusters.nextOrSame(DayOfWeek.WEDNESDAY));
+		ZonedDateTime runTime = time.with(TemporalAdjusters.nextOrSame(DayOfWeek.WEDNESDAY));
 		runTime = runTime.withHour(16).withMinute(0);
 		
 		cronExpression.setTime(runTime.format(DateTimeFormatter.ofPattern("hh:mm a")));

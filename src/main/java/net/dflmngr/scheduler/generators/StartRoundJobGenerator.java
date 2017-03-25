@@ -76,7 +76,7 @@ public class StartRoundJobGenerator {
 		//Calendar timeCal = Calendar.getInstance();
 		//timeCal.setTime(time);
 		//Calendar timeCal = GregorianCalendar.from(time);
-		ZonedDateTime runTime = time.withZoneSameInstant(ZoneId.of("UTC")).plusMinutes(10);
+		//ZonedDateTime runTime = time.withZoneSameInstant(ZoneId.of("UTC")).plusMinutes(10);
 		
 		
 		/*
@@ -95,8 +95,10 @@ public class StartRoundJobGenerator {
 		
 		//cronExpression.setTime(timeFormat.format(timeCal.getTime()));
 		//cronExpression.setStartDate(dateFormat.format(timeCal.getTime()));
-		cronExpression.setTime(runTime.format(DateTimeFormatter.ofPattern("hh:mm a")));
-		cronExpression.setStartDate(runTime.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+		//cronExpression.setTime(runTime.format(DateTimeFormatter.ofPattern("hh:mm a")));
+		//cronExpression.setStartDate(runTime.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+		cronExpression.setTime(time.format(DateTimeFormatter.ofPattern("hh:mm a")));
+		cronExpression.setStartDate(time.format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
         
 		Map<String, Object> jobParams = new HashMap<>();
 		jobParams.put("ROUND", round);

@@ -7,6 +7,7 @@ import static org.quartz.CronScheduleBuilder.*;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TimeZone;
 
 //import javax.servlet.ServletContext;
 
@@ -130,7 +131,7 @@ public class JobScheduler {
 			if(isImmediate) {
 				trigger = newTrigger().withIdentity(jobTriggerKey, group).startNow().forJob(job).build();
 			} else {
-				trigger = newTrigger().withIdentity(jobTriggerKey, group).withSchedule(cronSchedule(cronStr)).forJob(job).build();
+				trigger = newTrigger().withIdentity(jobTriggerKey, group).withSchedule(cronSchedule(cronStr).inTimeZone(TimeZone.getTimeZone(DflmngrUtils.defaultTimezone))).forJob(job).build();
 			}
 			
 			Properties schedulerProperties = getSchedulerConfig();
