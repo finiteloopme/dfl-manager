@@ -81,11 +81,15 @@ public class RawStatsDownloaderHandler {
 			boolean statsDownloaded = false;
 			for(int i = 0; i < 5; i++) {
 				loggerUtils.log("info", "Attempt {}", i);
-				playerStats = downloadStats(round, homeTeam, awayTeam, statsUrl);
-				loggerUtils.log("info", "Player stats count: {}", playerStats.size());
-				if(playerStats.size() >= 44) {
-					statsDownloaded = true;
-					break;
+				try {
+					playerStats = downloadStats(round, homeTeam, awayTeam, statsUrl);
+					loggerUtils.log("info", "Player stats count: {}", playerStats.size());
+					if(playerStats.size() >= 44) {
+						statsDownloaded = true;
+						break;
+					}
+				} catch (Exception ex) {
+					loggerUtils.log("info", "Exception caught downloading stats will try again");
 				}
 			}
 			if(statsDownloaded) {
@@ -124,12 +128,12 @@ public class RawStatsDownloaderHandler {
 		
 		List<RawPlayerStats> playerStats = new ArrayList<>();
 		
-		int webdriverTimeout = globalsService.getWebdriverTimeout();
-		int webdriverWait = globalsService.getWebdriverWait();
+		//int webdriverTimeout = globalsService.getWebdriverTimeout();
+		//int webdriverWait = globalsService.getWebdriverWait();
 		
 		WebDriver driver = new PhantomJSDriver();
-		driver.manage().timeouts().implicitlyWait(webdriverWait, TimeUnit.SECONDS);
-		driver.manage().timeouts().pageLoadTimeout(webdriverTimeout, TimeUnit.SECONDS);
+		//driver.manage().timeouts().implicitlyWait(webdriverWait, TimeUnit.SECONDS);
+		//driver.manage().timeouts().pageLoadTimeout(webdriverTimeout, TimeUnit.SECONDS);
 		
 		try {
 			driver.get(statsUrl);
