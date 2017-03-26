@@ -4,6 +4,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -15,8 +16,10 @@ import net.dflmngr.logging.LoggingUtils;
 import net.dflmngr.model.entity.RawPlayerStats;
 import net.dflmngr.model.entity.keys.ProcessPK;
 import net.dflmngr.model.entity.Process;
+import net.dflmngr.model.service.GlobalsService;
 import net.dflmngr.model.service.ProcessService;
 import net.dflmngr.model.service.RawPlayerStatsService;
+import net.dflmngr.model.service.impl.GlobalsServiceImpl;
 import net.dflmngr.model.service.impl.ProcessServiceImpl;
 import net.dflmngr.model.service.impl.RawPlayerStatsServiceImpl;
 import net.dflmngr.utils.DflmngrUtils;
@@ -31,12 +34,14 @@ public class RawStatsDownloaderHandler {
 	
 	RawPlayerStatsService rawPlayerStatsService;
 	ProcessService processService;
+	GlobalsService globalsService;
 	
 	public RawStatsDownloaderHandler() {
 		PhantomJsDriverManager.getInstance().setup();
 		
 		rawPlayerStatsService = new RawPlayerStatsServiceImpl();
 		processService = new ProcessServiceImpl();
+		globalsService = new GlobalsServiceImpl();
 		
 		isExecutable = false;
 	}
@@ -108,6 +113,10 @@ public class RawStatsDownloaderHandler {
 			process.setStatus("Failed");
 			
 			processService.insert(process);
+		} finally {
+			rawPlayerStatsService.close();;
+			processService.close();;
+			globalsService.close();;
 		}
 	}
 
@@ -115,8 +124,13 @@ public class RawStatsDownloaderHandler {
 		
 		List<RawPlayerStats> playerStats = new ArrayList<>();
 		
+		int webdriverTimeout = globalsService.getWebdriverTimeout();
+		int webdriverWait = globalsService.getWebdriverWait();
+		
 		WebDriver driver = new PhantomJSDriver();
-						
+		driver.manage().timeouts().implicitlyWait(webdriverWait, TimeUnit.SECONDS);
+		driver.manage().timeouts().pageLoadTimeout(webdriverTimeout, TimeUnit.SECONDS);
+		
 		try {
 			driver.get(statsUrl);
 		} catch (Exception ex) {

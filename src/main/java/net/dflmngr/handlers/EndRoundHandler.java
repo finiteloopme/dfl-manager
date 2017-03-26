@@ -15,16 +15,19 @@ import org.apache.commons.cli.ParseException;
 //import net.dflmngr.jndi.JndiProvider;
 import net.dflmngr.logging.LoggingUtils;
 import net.dflmngr.model.entity.DflAdamGoodes;
+import net.dflmngr.model.entity.DflBest22;
 import net.dflmngr.model.entity.DflCallumChambers;
 import net.dflmngr.model.entity.DflMatthewAllen;
 import net.dflmngr.model.entity.DflPlayer;
 import net.dflmngr.model.entity.DflTeam;
 import net.dflmngr.model.entity.DflTeamPlayer;
+import net.dflmngr.model.service.DflBest22Service;
 import net.dflmngr.model.service.DflMatthewAllenService;
 import net.dflmngr.model.service.DflPlayerService;
 import net.dflmngr.model.service.DflTeamPlayerService;
 import net.dflmngr.model.service.DflTeamService;
 import net.dflmngr.model.service.GlobalsService;
+import net.dflmngr.model.service.impl.DflBest22ServiceImpl;
 import net.dflmngr.model.service.impl.DflMatthewAllenServiceImpl;
 import net.dflmngr.model.service.impl.DflPlayerServiceImpl;
 import net.dflmngr.model.service.impl.DflTeamPlayerServiceImpl;
@@ -50,6 +53,7 @@ public class EndRoundHandler {
 	DflPlayerService dflPlayerService;
 	DflTeamPlayerService dflTeamPlayerService;
 	DflTeamService dflTeamService;
+	DflBest22Service dflBest22Service;
 	
 	String emailOverride;
 
@@ -58,7 +62,8 @@ public class EndRoundHandler {
 		globalsService = new GlobalsServiceImpl();
 		dflPlayerService = new DflPlayerServiceImpl();
 		dflTeamPlayerService = new DflTeamPlayerServiceImpl();
-		dflTeamService = new DflTeamServiceImpl();		
+		dflTeamService = new DflTeamServiceImpl();
+		dflBest22Service = new DflBest22ServiceImpl();
 	}
 	
 	public void configureLogging(String mdcKey, String loggerName, String logfile) {
@@ -102,8 +107,18 @@ public class EndRoundHandler {
 			callumChambersHandler.execute(round);
 			List<DflCallumChambers> callumChambersStandings = callumChambersHandler.getMedalStandings();
 			
+			Best22Handler best22Handler = new Best22Handler();
+			best22Handler.configureLogging(mdcKey, loggerName, logfile);
+			best22Handler.execute(round);
+			List<DflBest22> best22 = dflBest22Service.getForRound(round);
+			
+			boolean sendBest22 = false;
+			if(round == 6 || round == 12 || round == 18) {
+				sendBest22 = true;
+			}
+			
 			if(!globalsService.getSendMedalReports(round)) {
-				createAndSendEmail(round, matthewAllenStandings, adamGoodesStandings, topFirstYears, callumChambersStandings);
+				createAndSendEmail(round, matthewAllenStandings, adamGoodesStandings, topFirstYears, callumChambersStandings, best22, sendBest22);
 			}
 			
 			globalsService.setCurrentRound(round+1);
@@ -122,7 +137,8 @@ public class EndRoundHandler {
 		
 	}
 	
-	private void createAndSendEmail(int round, List<DflMatthewAllen> matthewAllenStandings, List<DflAdamGoodes> adamGoodesStandings, List<DflAdamGoodes> topFirstYears, List<DflCallumChambers> callumChambersStandings) throws Exception {
+	private void createAndSendEmail(int round, List<DflMatthewAllen> matthewAllenStandings, List<DflAdamGoodes> adamGoodesStandings,
+			List<DflAdamGoodes> topFirstYears, List<DflCallumChambers> callumChambersStandings, List<DflBest22> best22, boolean sendBest22) throws Exception {
 		
 		String dflMngrEmail = globalsService.getEmailConfig().get("dflmngrEmailAddr");
 		
@@ -178,6 +194,66 @@ public class EndRoundHandler {
 			DflTeam team = dflTeamService.get(teamPlayer.getTeamCode());
 			
 			body = body + (i+1) + ". " + standing.getPlayerId() + " " + player.getFirstName() + " " + player.getLastName() + ", " + team.getName() + " - " + standing.getTotalScore() + "\n";
+		}
+		
+		if(sendBest22) {
+			body = body + "\nDFL Best 22 after Round " + round + "\n";
+			
+			List<String> ff = new  ArrayList<>();
+			List<String> fwd = new  ArrayList<>();
+			List<String> rck = new  ArrayList<>();
+			List<String> mid = new  ArrayList<>();
+			List<String> fb = new  ArrayList<>();
+			List<String> def = new  ArrayList<>();
+			List<String> bench = new  ArrayList<>();
+			
+			for(DflBest22 best22Player : best22) {
+				DflPlayer player = dflPlayerService.get(best22Player.getPlayerId());
+				DflTeamPlayer teamPlayer = dflTeamPlayerService.get(best22Player.getPlayerId());
+				DflTeam team = dflTeamService.get(teamPlayer.getTeamCode());
+				if(best22Player.isBench()) {
+					bench.add(player.getPlayerId() + " " + player.getFirstName() + " " + player.getLastName() + " " + team.getName() + " - " + best22Player.getScore());
+				} else {
+					String displayString = player.getPlayerId() + " " + player.getFirstName() + " " + player.getLastName() + " " + team.getName() + " - " + best22Player.getScore();
+					switch(player.getPosition()) {
+						case "FF": ff.add(displayString);
+						case "Fwd": fwd.add(displayString);
+						case "Rck": rck.add(displayString);
+						case "Mid": mid.add(displayString);
+						case "FB": fb.add(displayString);
+						case "Def": def.add(displayString);
+					}
+				}
+			}
+			
+			body = body + "FB:\n";
+			for(String displayString : fb) {
+				body = body + displayString + "\n";
+			}
+			body = body + "Def:\n";
+			for(String displayString : def) {
+				body = body + displayString + "\n";
+			}
+			body = body + "Rck:\n";
+			for(String displayString : rck) {
+				body = body + displayString + "\n";
+			}
+			body = body + "Mid:\n";
+			for(String displayString : mid) {
+				body = body + displayString + "\n";
+			}
+			body = body + "Fwd:\n";
+			for(String displayString : fwd) {
+				body = body + displayString + "\n";
+			}
+			body = body + "FB:\n";
+			for(String displayString : fb) {
+				body = body + displayString + "\n";
+			}
+			body = body + "Bench:\n";
+			for(String displayString : bench) {
+				body = body + displayString + "\n";
+			}
 		}
 				
 		body = body + "\nDFL Manager Admin";

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
+//import java.util.Properties;
 
 import javax.mail.Flags;
 import javax.mail.Folder;
@@ -19,7 +19,7 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
-import javax.mail.PasswordAuthentication;
+//import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.Transport;
@@ -61,6 +61,8 @@ public class EmailSelectionsHandler {
 	private int outgoingMailPort;
 	private String mailUsername;
 	private String mailPassword;
+	
+	private String emailOveride;
 	
 	GlobalsService globalsService;
 	DflTeamService dflTeamService;
@@ -110,6 +112,14 @@ public class EmailSelectionsHandler {
 			this.outgoingMailPort = Integer.parseInt(emailConfig.get("outgoingMailPort"));
 			this.mailUsername = emailConfig.get("mailUsername");
 			this.mailPassword = emailConfig.get("mailPassword");
+			
+			this.emailOveride = "";
+			
+			if(!System.getenv("ENV").equals("production")) {
+				this.dflmngrEmailAddr = System.getenv("DFL_MNGR_EMAIL");
+				this.mailUsername = System.getenv("DFL_MNGR_EMAIL");
+				this.emailOveride = System.getenv("EMAIL_OVERIDE");
+			}
 						
 			loggerUtils.log("info", "Email config: dflmngrEmailAddr={}; incomingMailHost={}; incomingMailPort={}; outgoingMailHost={}; outgoingMailHost={}; mailUsername={}; mailPassword={}",
 						dflmngrEmailAddr, incomingMailHost, incomingMailPort, outgoingMailHost, outgoingMailPort, mailUsername, mailPassword);
@@ -408,7 +418,15 @@ public class EmailSelectionsHandler {
 			
 			//String key = response.getKey();
 			
-			String to = validationResult.getFrom();
+			//String to = validationResult.getFrom();
+			String to = "";
+			
+			if(!System.getenv("ENV").equals("production")) {
+				to = this.emailOveride;
+			} else {
+				to = validationResult.getFrom();
+			}
+			
 			String teamCode = validationResult.getTeamCode();
 			
 			/*

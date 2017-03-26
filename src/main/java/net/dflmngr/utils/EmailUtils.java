@@ -1,7 +1,7 @@
 package net.dflmngr.utils;
 
 import java.util.List;
-import java.util.Properties;
+//import java.util.Properties;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -9,7 +9,7 @@ import javax.activation.FileDataSource;
 import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.Multipart;
-import javax.mail.PasswordAuthentication;
+//import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -32,11 +32,13 @@ public class EmailUtils {
 	//private static String mailPassword = globalsService.getEmailConfig().get("mailPassword");;
 
 	private static String mailUsername;
+	private static String emailOveride;
 	
 	static {
 		mailUsername = globalsService.getEmailConfig().get("mailUsername");
 		if(!System.getenv("ENV").equals("production")) {
 			mailUsername = System.getenv("DFL_MNGR_EMAIL");
+			emailOveride = System.getenv("EMAIL_OVERIDE");
 		}
 		
 		OAuth2Authenticator.initialize();
@@ -47,12 +49,25 @@ public class EmailUtils {
 		//MimeMessage message = new MimeMessage(getMailSession());
 		Session session = null;
 		MimeMessage message = new MimeMessage(session);
-		message.setFrom(new InternetAddress(from));
+		//message.setFrom(new InternetAddress(from));
 		
-		InternetAddress[] toAddresses = new InternetAddress[to.size()]; 
+		//InternetAddress[] toAddresses = new InternetAddress[to.size()]; 
+		InternetAddress[] toAddresses = null;
 		
-		for(int i = 0; i < to.size(); i++) {
-			toAddresses[i] = new InternetAddress(to.get(i));
+		//for(int i = 0; i < to.size(); i++) {
+		//	toAddresses[i] = new InternetAddress(to.get(i));
+		//}
+		
+		if(!System.getenv("ENV").equals("production")) {
+			message.setFrom(new InternetAddress(mailUsername));
+			toAddresses = new InternetAddress[1];
+			toAddresses[0] = new InternetAddress(emailOveride);
+		} else {
+			message.setFrom(new InternetAddress(from));
+			toAddresses = new InternetAddress[to.size()];
+			for(int i = 0; i < to.size(); i++) {
+				toAddresses[i] = new InternetAddress(to.get(i));
+			}
 		}
 		
 		message.setRecipients(Message.RecipientType.TO, toAddresses);

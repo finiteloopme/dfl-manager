@@ -9,7 +9,13 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 
 public class AmazonS3Utils {
+	
 	private static String bucketName = "dfl-mngr-reports";
+	static {
+		if(!System.getenv("ENV").equals("production")) {
+			bucketName = "dfl-mngr-reports/" + System.getenv("ENV"); 
+		}
+	}
 	
 	public static void uploadToS3(String keyName, String uploadFile) throws Exception {
 		AmazonS3 s3Client = AmazonS3ClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
