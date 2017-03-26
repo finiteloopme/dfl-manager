@@ -128,12 +128,12 @@ public class RawStatsDownloaderHandler {
 		
 		List<RawPlayerStats> playerStats = new ArrayList<>();
 		
-		//int webdriverTimeout = globalsService.getWebdriverTimeout();
-		//int webdriverWait = globalsService.getWebdriverWait();
+		int webdriverTimeout = globalsService.getWebdriverTimeout();
+		int webdriverWait = globalsService.getWebdriverWait();
 		
 		WebDriver driver = new PhantomJSDriver();
-		//driver.manage().timeouts().implicitlyWait(webdriverWait, TimeUnit.SECONDS);
-		//driver.manage().timeouts().pageLoadTimeout(webdriverTimeout, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(webdriverWait, TimeUnit.SECONDS);
+		driver.manage().timeouts().pageLoadTimeout(webdriverTimeout, TimeUnit.SECONDS);
 		
 		try {
 			driver.get(statsUrl);
@@ -143,11 +143,15 @@ public class RawStatsDownloaderHandler {
 				throw new Exception("Error Loading page, URL:" + statsUrl, ex);
 			}
 		}
-						
-		playerStats.addAll(getStats(round, homeTeam, "h", driver));
-		playerStats.addAll(getStats(round, awayTeam, "a", driver));
-			
-		driver.quit();
+		
+		try {
+			playerStats.addAll(getStats(round, homeTeam, "h", driver));
+			playerStats.addAll(getStats(round, awayTeam, "a", driver));
+		} catch (Exception ex) {
+			throw ex;
+		} finally {
+			driver.quit();
+		}
 				
 		return playerStats;
 	}
