@@ -5,7 +5,7 @@ import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
-import net.dflmngr.handlers.StartRoundHandler;
+import net.dflmngr.handlers.EndRoundHandler;
 import net.dflmngr.logging.LoggingUtils;
 
 public class EndRoundJob implements Job {
@@ -24,11 +24,11 @@ public class EndRoundJob implements Job {
 			
 			int round = data.getInt(ROUND);
 			
-			StartRoundHandler startRound = new StartRoundHandler();
-			startRound.configureLogging("online.name", "online-logger", ("EndRound_R"+round));
+			EndRoundHandler endRound = new EndRoundHandler();
+			endRound.configureLogging("online.name", "online-logger", ("EndRound_R"+round));
 
 			loggerUtils.log("info", "Running EndRound: round={};", round);
-			startRound.execute(round, null);
+			endRound.execute(round, null);
 			loggerUtils.log("info", "EndRoundJob completed");
 		} catch (Exception ex) {
 			loggerUtils.log("error", "Error in ... ", ex);
