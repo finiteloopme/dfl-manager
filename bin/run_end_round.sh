@@ -1,3 +1,3 @@
 #!/bin/bash
 export CLASSPATH=/app/target/dflmngr.jar:/app/target/dependency/*
-java -classpath $CLASSPATH net.dflmngr.handlers.StartRoundHandler $@
+java -classpath $CLASSPATH net.dflmngr.handlers.EndRoundHandler $@
