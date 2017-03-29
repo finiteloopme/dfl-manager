@@ -117,15 +117,15 @@ public class Best22Handler {
 		loggerUtils.log("info", "Selecting Full Forward");
 		best22selections.putAll(selectPlayers(ffScores, "FF"));
 		loggerUtils.log("info", "Selecting Fowards");
-		best22selections.putAll(selectPlayers(ffScores, "Fwd"));
+		best22selections.putAll(selectPlayers(fwdScores, "Fwd"));
 		loggerUtils.log("info", "Selecting Ruck");
-		best22selections.putAll(selectPlayers(ffScores, "Rck"));
+		best22selections.putAll(selectPlayers(rckScores, "Rck"));
 		loggerUtils.log("info", "Selecting Midfielders");
-		best22selections.putAll(selectPlayers(ffScores, "Mid"));
+		best22selections.putAll(selectPlayers(defScores, "Mid"));
 		loggerUtils.log("info", "Selecting Full Back");
-		best22selections.putAll(selectPlayers(ffScores, "FB"));
+		best22selections.putAll(selectPlayers(fbScores, "FB"));
 		loggerUtils.log("info", "Selecting Defenders");
-		best22selections.putAll(selectPlayers(ffScores, "Def"));
+		best22selections.putAll(selectPlayers(defScores, "Def"));
 		
 		Map<Integer, Integer> benchScores = new HashMap<>();
 		Map.Entry<Integer, Integer> benchSelection = ffScores.entrySet().iterator().next();
@@ -194,8 +194,10 @@ public class Best22Handler {
 			case "Def": selectionCount = 5;
 			case "Bench": selectionCount = 4;
 		}
+		
+		loggerUtils.log("info", "Selecting {} players for {}", selectionCount, position);
 
-		for(int i = 1; i < selectionCount; i++) {
+		for(int i = 1; i <= selectionCount; i++) {
 			Map.Entry<Integer, Integer> selection = players.entrySet().iterator().next();
 			loggerUtils.log("info", "Selecting: {}", selection);
 			selectedPlayers.put(selection.getKey(), selection.getValue());
