@@ -154,6 +154,7 @@ public class ScoresCalculatorHandler {
 				}
 				
 				if(completedCount == earlyGames.size()) {
+					loggerUtils.log("info", "All early games completed");
 					earlyGamesCompleted = true;
 				}
 			}
@@ -360,7 +361,7 @@ public class ScoresCalculatorHandler {
 			loggerUtils.log("info", "Team score={}", teamScore);
 			scores.add(teamScore);
 		}
-		
+
 		dflTeamScoresService.replaceAllForRound(round, scores);
 	}
 	
