@@ -146,7 +146,7 @@ public class RawPlayerStatsHandler {
 					+ awayTeam.toLowerCase();
 			loggerUtils.log("info", "AFL stats URL: {}", fullStatsUrl);
 
-			String herokuApiEndpoint = "https://api.heroku.com/apps/dfl-manager-dev/dynos";
+			String herokuApiEndpoint = "https://api.heroku.com/apps/" + System.getenv("APP_NAME") + "/dynos";
 			String apiToken = System.getenv("HEROKU_API_TOKEN");
 			URL obj = new URL(herokuApiEndpoint);
 			HttpURLConnection con = (HttpURLConnection) obj.openConnection();
