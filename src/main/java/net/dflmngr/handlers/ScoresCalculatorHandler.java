@@ -122,15 +122,15 @@ public class ScoresCalculatorHandler {
 			DflRoundInfo dflRoundInfo = dflRoundInfoService.get(round);
 			
 			ZonedDateTime now = ZonedDateTime.now(ZoneId.of(globalsService.getGroundTimeZone("default")));
-			//Calendar nowCal = Calendar.getInstance();
-			//nowCal.setTime(now);
 			
-			boolean earlyGamesCompleted = false;
+			
+			//boolean earlyGamesCompleted = false;
 			
 			List<DflRoundEarlyGames> earlyGames = dflRoundInfo.getEarlyGames();
 			List<String> earlyGameTeams = new ArrayList<>();
 			
-			if(earlyGames != null && dflRoundInfo.getEarlyGames().size() > 0) {
+			//if(earlyGames != null && dflRoundInfo.getEarlyGames().size() > 0) {
+			if(now.isBefore(dflRoundInfo.getHardLockoutTime())) {
 				loggerUtils.log("info", "Early Games exist, checking if completed");
 				int completedCount = 0;
 				for(DflRoundEarlyGames earlyGame : earlyGames) {
@@ -153,12 +153,20 @@ public class ScoresCalculatorHandler {
 					earlyGameTeams.add(aflFixture.getAwayTeam());
 				}
 				
-				if(completedCount == earlyGames.size()) {
-					loggerUtils.log("info", "All early games completed");
-					earlyGamesCompleted = true;
+				if(completedCount != earlyGames.size()) {
+					//loggerUtils.log("info", "All early games completed");
+					//earlyGamesCompleted = true;
+					loggerUtils.log("info", "Early games still in progress, handling team selections");
+					handleEarlyGameSelections(round, earlyGameTeams);
+					StartRoundHandler startRound = new StartRoundHandler();
+					startRound.configureLogging(mdcKey, loggerName, logfile);
+					startRound.execute(round, null);
+					
+					insAndOutsService.removeForRound(round);
 				}
 			}
 			
+			/*
 			if(!earlyGamesCompleted) {
 				loggerUtils.log("info", "Early games still in progress, handling team selections");
 				handleEarlyGameSelections(round, earlyGameTeams);
@@ -168,6 +176,7 @@ public class ScoresCalculatorHandler {
 				
 				insAndOutsService.removeForRound(round);
 			}
+			*/
 			 		
 			loggerUtils.log("info", "Handling team scores");
 			handleTeamScores(round);

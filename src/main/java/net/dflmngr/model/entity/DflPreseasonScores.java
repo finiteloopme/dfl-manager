@@ -3,10 +3,14 @@ package net.dflmngr.model.entity;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
+
+import net.dflmngr.model.entity.keys.DflPreseasonScoresPK;
 
 @Entity
 @Table(name="dfl_preseason_scores")
+@IdClass(DflPreseasonScoresPK.class)
 public class DflPreseasonScores {
 	
 	@Id
