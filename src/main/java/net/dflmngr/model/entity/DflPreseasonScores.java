@@ -20,7 +20,6 @@ public class DflPreseasonScores {
 	@Id
 	private int round;
 	
-	@Id
 	private int score;
 
 	public int getPlayerId() {
