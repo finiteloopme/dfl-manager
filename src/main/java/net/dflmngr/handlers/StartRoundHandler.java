@@ -100,25 +100,27 @@ public class StartRoundHandler {
 			
 			List<DflRoundEarlyGames> earlyGames = dflRoundInfo.getEarlyGames();
 			
-			//if(earlyGames != null && dflRoundInfo.getEarlyGames().size() > 0) {
-			if(now.isBefore(dflRoundInfo.getHardLockoutTime())) {
-				loggerUtils.log("info", "Running before hard lockout checking early games");
-				earlyGamesExist = true;
-				int completedCount = 0;
-				for(DflRoundEarlyGames earlyGame : earlyGames) {
+			if(earlyGames != null && dflRoundInfo.getEarlyGames().size() > 0) {
+			//if(now.isBefore(dflRoundInfo.getHardLockoutTime())) {
+				//loggerUtils.log("info", "Running before hard lockout checking early games");
+				loggerUtils.log("info", "Early games exist");
+				//earlyGamesExist = true;
+				//int completedCount = 0;
+				//for(DflRoundEarlyGames earlyGame : earlyGames) {
 					//Calendar startCal = Calendar.getInstance();
 					//startCal.setTime(earlyGame.getStartTime());
 					//startCal.add(Calendar.HOUR_OF_DAY, 3);
-					ZonedDateTime gameEndTime = earlyGame.getStartTime().minusHours(3);
+					//ZonedDateTime gameEndTime = earlyGame.getStartTime().minusHours(3);
 					
 					//if(nowCal.after(startCal)) {
-					if(now.isAfter(gameEndTime)) {
-						completedCount++;
-					}
+					//if(now.isAfter(gameEndTime)) {
+					//	completedCount++;
+					//}
 					
-				}
+				//}
 				
-				if(completedCount == earlyGames.size()) {
+				//if(completedCount == earlyGames.size()) {
+				if(now.isAfter(dflRoundInfo.getHardLockoutTime())) {
 					earlyGamesCompleted = true;
 				}
 			}
