@@ -187,7 +187,8 @@ public class StartRoundHandler {
 						
 			List<InsAndOuts> insAndOuts = insAndOutsService.getByTeamAndRound(round, team.getTeamCode());
 			
-			if((earlyGamesExist && earlyGamesCompleted) && (insAndOuts == null || insAndOuts.size() == 0)) {
+			//if((earlyGamesExist && earlyGamesCompleted) && (insAndOuts == null || insAndOuts.size() == 0)) {
+			if(earlyGamesExist && (insAndOuts == null || insAndOuts.size() == 0)) {
 				List<DflEarlyInsAndOuts> earlyInsAndOuts = dflEarlyInsAndOutsService.getByTeamAndRound(round, team.getTeamCode());
 				if(earlyInsAndOuts != null && earlyInsAndOuts.size() > 0) {
 					loggerUtils.log("info", "Early Ins and Outs, starting to validate");
@@ -211,7 +212,7 @@ public class StartRoundHandler {
 					
 					if(validationResult.isValid()) {
 						loggerUtils.log("info", "Early Ins and Outs are valid and are being used");
-						
+												
 						for(DflEarlyInsAndOuts inOrOut : earlyInsAndOuts) {
 							if(inOrOut.getInOrOut().equals(DomainDecodes.INS_AND_OUTS.IN_OR_OUT.IN)) {
 								DflTeamPlayer teamPlayer = dflTeamPlayerService.getTeamPlayerForTeam(team.getTeamCode(), inOrOut.getTeamPlayerId());
@@ -236,6 +237,14 @@ public class StartRoundHandler {
 								tmpSelectedTeam.remove(droppedPlayer);
 							}
 						}
+						
+						if(earlyGamesCompleted) {
+							TeamSelectionLoaderHandler selectionsLoader = new TeamSelectionLoaderHandler();
+							selectionsLoader.configureLogging(mdcKey, loggerName, logfile);
+							
+							selectionsLoader.execute(validationResult.getTeamCode(), validationResult.getRound(), validationResult.getInsAndOuts().get("in"), validationResult.getInsAndOuts().get("out"), false);	
+						}
+						
 					} else {
 						loggerUtils.log("info", "Early Ins and Outs are invalid");
 						emailValidationError(round, team, validationResult);
