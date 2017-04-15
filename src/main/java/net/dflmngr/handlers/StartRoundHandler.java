@@ -104,7 +104,7 @@ public class StartRoundHandler {
 			//if(now.isBefore(dflRoundInfo.getHardLockoutTime())) {
 				//loggerUtils.log("info", "Running before hard lockout checking early games");
 				loggerUtils.log("info", "Early games exist");
-				//earlyGamesExist = true;
+				earlyGamesExist = true;
 				//int completedCount = 0;
 				//for(DflRoundEarlyGames earlyGame : earlyGames) {
 					//Calendar startCal = Calendar.getInstance();
