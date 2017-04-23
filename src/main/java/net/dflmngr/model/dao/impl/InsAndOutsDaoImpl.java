@@ -16,6 +16,9 @@ public class InsAndOutsDaoImpl extends GenericDaoImpl<InsAndOuts, InsAndOutsPK>i
 	}
 	
 	public List<InsAndOuts> findByTeamAndRound(int round, String teamCode) {
+		
+		System.out.println("### Properties: " + entityManager.getProperties() + " ###");
+		
 		criteriaBuilder = entityManager.getCriteriaBuilder();
 		criteriaQuery = criteriaBuilder.createQuery(entityClass);
 		entity = criteriaQuery.from(entityClass);
