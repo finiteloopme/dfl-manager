@@ -186,10 +186,14 @@ public class StartRoundHandler {
 			}
 						
 			List<InsAndOuts> insAndOuts = insAndOutsService.getByTeamAndRound(round, team.getTeamCode());
+			loggerUtils.log("info", "Final ins and outs: {}", insAndOuts);
 			
 			//if((earlyGamesExist && earlyGamesCompleted) && (insAndOuts == null || insAndOuts.size() == 0)) {
 			if(earlyGamesExist && (insAndOuts == null || insAndOuts.size() == 0)) {
 				List<DflEarlyInsAndOuts> earlyInsAndOuts = dflEarlyInsAndOutsService.getByTeamAndRound(round, team.getTeamCode());
+				
+				loggerUtils.log("info", "Early ins and outs: {}", earlyInsAndOuts);
+				
 				if(earlyInsAndOuts != null && earlyInsAndOuts.size() > 0) {
 					loggerUtils.log("info", "Early Ins and Outs, starting to validate");
 					
