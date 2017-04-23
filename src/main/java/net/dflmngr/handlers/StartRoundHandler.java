@@ -91,7 +91,8 @@ public class StartRoundHandler {
 			
 			DflRoundInfo dflRoundInfo = dflRoundInfoService.get(round);
 			//Date dummyReceivedDate = new Date(dflRoundInfo.getHardLockoutTime().getTime() - 600000);
-			ZonedDateTime dummyReceivedDate = ZonedDateTime.now(ZoneId.of(DflmngrUtils.defaultTimezone)).minusMinutes(10);
+			//ZonedDateTime dummyReceivedDate = ZonedDateTime.now(ZoneId.of(DflmngrUtils.defaultTimezone)).minusMinutes(10);
+			ZonedDateTime dummyReceivedDate = dflRoundInfo.getHardLockoutTime().minusMinutes(10);
 			
 			//Date now = new Date();
 			//Calendar nowCal = Calendar.getInstance();
