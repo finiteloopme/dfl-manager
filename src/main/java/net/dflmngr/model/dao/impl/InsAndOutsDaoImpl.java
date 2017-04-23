@@ -21,10 +21,14 @@ public class InsAndOutsDaoImpl extends GenericDaoImpl<InsAndOuts, InsAndOutsPK>i
 		entity = criteriaQuery.from(entityClass);
 		
 		Predicate roundEquals = criteriaBuilder.equal(entity.get(InsAndOuts_.round), round);
-		Predicate temaCodeEquals = criteriaBuilder.equal(entity.get(InsAndOuts_.teamCode), teamCode);
+		Predicate teamCodeEquals = criteriaBuilder.equal(entity.get(InsAndOuts_.teamCode), teamCode);
 		
-		criteriaQuery.where(criteriaBuilder.and(roundEquals, temaCodeEquals));
+		criteriaQuery.where(criteriaBuilder.and(roundEquals, teamCodeEquals));
 		List<InsAndOuts> entitys = entityManager.createQuery(criteriaQuery).getResultList();
+		
+		System.out.println("### Team: " + teamCode + " ###");
+		System.out.println("### Round: " + round + " ###");
+		System.out.println("### Entitys: " + entitys + " ###");
 		
 		return entitys;
 	}
