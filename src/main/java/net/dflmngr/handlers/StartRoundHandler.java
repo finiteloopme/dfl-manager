@@ -59,6 +59,8 @@ public class StartRoundHandler {
 	DflRoundInfoService dflRoundInfoService;
 	GlobalsService globalsService;
 	
+	String emailOverride;
+	
 	public StartRoundHandler() {
 		dflTeamService = new DflTeamServiceImpl();
 		dflSelectedTeamService = new DflSelectedTeamServiceImpl();
@@ -84,6 +86,10 @@ public class StartRoundHandler {
 			if(!isExecutable) {
 				configureLogging(defaultMdcKey, defaultLoggerName, defaultLogfile);
 				loggerUtils.log("info", "Default logging configured");
+			}
+			
+			if(emailOveride != null && !emailOveride.equals("")) {
+				this.emailOverride = emailOveride;
 			}
 
 			boolean earlyGamesExist = false;
@@ -525,7 +531,12 @@ public class StartRoundHandler {
 				      "DFL Manager Admin";
 		
 		List<String> to = new ArrayList<>();
-		to.add(team.getCoachEmail());
+		
+		if(this.emailOverride != null && !this.emailOverride.equals("")) {
+			to.add(this.emailOverride);
+		} else {
+			to.add(team.getCoachEmail());
+		}
 				
 		loggerUtils.log("info", "Emailing validation errors to={}; validationResult={}", to, validationResult);
 		EmailUtils.sendTextEmail(to, dflMngrEmail, subject, messageBody, null);
