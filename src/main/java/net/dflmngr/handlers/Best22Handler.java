@@ -129,7 +129,7 @@ public class Best22Handler {
 		loggerUtils.log("info", "Selecting Ruck");
 		best22selections.putAll(selectPlayers(rckScores, "Rck"));
 		loggerUtils.log("info", "Selecting Midfielders");
-		best22selections.putAll(selectPlayers(defScores, "Mid"));
+		best22selections.putAll(selectPlayers(midScores, "Mid"));
 		loggerUtils.log("info", "Selecting Full Back");
 		best22selections.putAll(selectPlayers(fbScores, "FB"));
 		loggerUtils.log("info", "Selecting Defenders");
