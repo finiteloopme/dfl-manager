@@ -12,7 +12,7 @@ import net.dflmngr.model.service.InsAndOutsService;
 import net.dflmngr.model.service.impl.DflEarlyInsAndOutsServiceImpl;
 import net.dflmngr.model.service.impl.InsAndOutsServiceImpl;
 
-public class TeamSelectionLoaderHandler {
+public class TeamInsOutsLoaderHandler {
 	private LoggingUtils loggerUtils;
 	
 	boolean isExecutable;
@@ -25,7 +25,7 @@ public class TeamSelectionLoaderHandler {
 	String loggerName;
 	String logfile;
 		
-	public TeamSelectionLoaderHandler() throws Exception {		
+	public TeamInsOutsLoaderHandler() throws Exception {		
 		
 		isExecutable = false;
 	}

@@ -88,10 +88,12 @@ public class ResultsHandler {
 				scoresCalculator.configureLogging(mdcKey, loggerName, logfile);
 				scoresCalculator.execute(round);
 				
-				loggerUtils.log("info", "Calculating Ladder");
-				LadderCalculatorHandler ladderCalculator = new LadderCalculatorHandler();
-				ladderCalculator.configureLogging(mdcKey, loggerName, logfile);
-				ladderCalculator.execute(round);
+				if(isFinal) {
+					loggerUtils.log("info", "Calculating Ladder");
+					LadderCalculatorHandler ladderCalculator = new LadderCalculatorHandler();
+					ladderCalculator.configureLogging(mdcKey, loggerName, logfile);
+					ladderCalculator.execute(round, false, 0, 0);
+				}
 				
 				loggerUtils.log("info", "Writing report");
 				ResultsReport resultsReport = new ResultsReport();

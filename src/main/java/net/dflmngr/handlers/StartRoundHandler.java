@@ -96,20 +96,13 @@ public class StartRoundHandler {
 			boolean earlyGamesCompleted = false;
 			
 			DflRoundInfo dflRoundInfo = dflRoundInfoService.get(round);
-			//Date dummyReceivedDate = new Date(dflRoundInfo.getHardLockoutTime().getTime() - 600000);
-			//ZonedDateTime dummyReceivedDate = ZonedDateTime.now(ZoneId.of(DflmngrUtils.defaultTimezone)).minusMinutes(10);
 			ZonedDateTime dummyReceivedDate = dflRoundInfo.getHardLockoutTime().minusMinutes(10);
 			
-			//Date now = new Date();
-			//Calendar nowCal = Calendar.getInstance();
-			//nowCal.setTime(now);
 			ZonedDateTime now = ZonedDateTime.now(ZoneId.of(DflmngrUtils.defaultTimezone));
 			
 			List<DflRoundEarlyGames> earlyGames = dflRoundInfo.getEarlyGames();
 			
 			if(earlyGames != null && dflRoundInfo.getEarlyGames().size() > 0) {
-			//if(now.isBefore(dflRoundInfo.getHardLockoutTime())) {
-				//loggerUtils.log("info", "Running before hard lockout checking early games");
 				loggerUtils.log("info", "Early games exist");
 				earlyGamesExist = true;
 				//int completedCount = 0;
@@ -250,7 +243,7 @@ public class StartRoundHandler {
 						}
 						
 						if(earlyGamesCompleted) {
-							TeamSelectionLoaderHandler selectionsLoader = new TeamSelectionLoaderHandler();
+							TeamInsOutsLoaderHandler selectionsLoader = new TeamInsOutsLoaderHandler();
 							selectionsLoader.configureLogging(mdcKey, loggerName, logfile);
 							
 							selectionsLoader.execute(validationResult.getTeamCode(), validationResult.getRound(), validationResult.getInsAndOuts().get("in"), validationResult.getInsAndOuts().get("out"), false);	
@@ -292,197 +285,20 @@ public class StartRoundHandler {
 		
 			List<DflSelectedPlayer> selectedTeam = new ArrayList<>();
 			
-			//if(round > 1) {
-				for(DflSelectedPlayer tmpSelectedPlayer : tmpSelectedTeam) {
-					DflSelectedPlayer selectedPlayer = new DflSelectedPlayer();
-					selectedPlayer.setPlayerId(tmpSelectedPlayer.getPlayerId());
-					selectedPlayer.setRound(round);
-					selectedPlayer.setTeamCode(team.getTeamCode());
-					selectedPlayer.setTeamPlayerId(tmpSelectedPlayer.getTeamPlayerId());
-					
-					selectedTeam.add(selectedPlayer);
-				}
-			//}
-									
-			loggerUtils.log("info", "Saving selected to DB: selected tema={}", selectedTeam);
+			for(DflSelectedPlayer tmpSelectedPlayer : tmpSelectedTeam) {
+				DflSelectedPlayer selectedPlayer = new DflSelectedPlayer();
+				selectedPlayer.setPlayerId(tmpSelectedPlayer.getPlayerId());
+				selectedPlayer.setRound(round);
+				selectedPlayer.setTeamCode(team.getTeamCode());
+				selectedPlayer.setTeamPlayerId(tmpSelectedPlayer.getTeamPlayerId());
+				
+				selectedTeam.add(selectedPlayer);
+			}
+			
+			loggerUtils.log("info", "Saving selected to DB: selected team={}", selectedTeam);
 			dflSelectedTeamService.replaceTeamForRound(round, team.getTeamCode(), selectedTeam);
 		}
 	}
-	
-	/*
-	private void createTeamSelections(int round, boolean earlyGameStart) throws Exception {
-		
-		loggerUtils.log("info", "Creating team selections");
-		
-		List<DflTeam> teams = dflTeamService.findAll();
-		DflRoundInfo roundInfo = dflRoundInfoService.get(round);
-		
-		for(DflTeam team : teams) {
-			loggerUtils.log("info", "Working with team={}", team.getTeamCode());
-			
-			List<DflSelectedPlayer> selectedTeam = new ArrayList<>();
-			
-			List<InsAndOuts> insAndOuts = insAndOutsService.getByTeamAndRound(round, team.getTeamCode());
-			
-			if(round == 1) {
-				loggerUtils.log("info", "Round 1, only ins");
-				
-				if(insAndOuts != null && insAndOuts.size() > 0) {
-					for(InsAndOuts in : insAndOuts) {
-						
-						DflTeamPlayer teamPlayer = dflTeamPlayerService.getTeamPlayerForTeam(team.getTeamCode(), in.getTeamPlayerId());
-						
-						DflSelectedPlayer selectedPlayer = new DflSelectedPlayer();
-						selectedPlayer.setPlayerId(teamPlayer.getPlayerId());
-						selectedPlayer.setRound(round);
-						selectedPlayer.setTeamCode(team.getTeamCode());
-						selectedPlayer.setTeamPlayerId(in.getTeamPlayerId());
-						
-						loggerUtils.log("info", "Adding player to selected team: player={}", selectedPlayer);
-						selectedTeam.add(selectedPlayer);
-					}
-				} else {
-					if(!earlyGameStart) {
-						List<DflEarlyInsAndOuts> earlyInsAndOuts = dflEarlyInsAndOutsService.getByTeamAndRound(round, team.getTeamCode());
-						if(earlyInsAndOuts != null && earlyInsAndOuts.size() > 0) {
-							loggerUtils.log("info", "Early Ins and Outs, starting to validate");
-							
-							Map<String, List<Integer>> validationInsAndOuts = new HashMap<>();
-							List<Integer> ins = new ArrayList<>();
-							List<Integer> outs = new ArrayList<>();
-							for(DflEarlyInsAndOuts inOrOut : earlyInsAndOuts) {
-								if(inOrOut.getInOrOut().equals("I")) {
-									ins.add(inOrOut.getTeamPlayerId());
-								} else {
-									outs.add(inOrOut.getTeamPlayerId());
-								}
-							}
-							validationInsAndOuts.put("in",ins);
-							validationInsAndOuts.put("out",outs);
-							
-							Date dummyReceivedDate = new Date(roundInfo.getHardLockoutTime().getTime() - 600000);
-							
-							SelectedTeamValidationHandler validationHandler = new SelectedTeamValidationHandler();
-							validationHandler.configureLogging(mdcKey, loggerName, logfile);
-							SelectedTeamValidation validationResult = validationHandler.execute(round, team.getTeamCode(), validationInsAndOuts, dummyReceivedDate, true);
-							
-							if(validationResult.isValid()) {
-								loggerUtils.log("info", "Early Ins and Outs are valid and are being used");
-								
-								for(DflEarlyInsAndOuts in : earlyInsAndOuts) {
-									
-									DflTeamPlayer teamPlayer = dflTeamPlayerService.getTeamPlayerForTeam(team.getTeamCode(), in.getTeamPlayerId());
-									
-									DflSelectedPlayer selectedPlayer = new DflSelectedPlayer();
-									selectedPlayer.setPlayerId(teamPlayer.getPlayerId());
-									selectedPlayer.setRound(round);
-									selectedPlayer.setTeamCode(team.getTeamCode());
-									selectedPlayer.setTeamPlayerId(in.getTeamPlayerId());
-									
-									loggerUtils.log("info", "Adding player to selected team: player={}", selectedPlayer);
-									selectedTeam.add(selectedPlayer);
-								}
-							} else {
-								loggerUtils.log("info", "Early Ins and Outs are invalid");
-								emailValidationError(round, team, validationResult);
-							}
-						}
-					}
-				}
-			} else {
-				List<DflSelectedPlayer> prevSelectedTeam = dflSelectedTeamService.getSelectedTeamForRound(round-1, team.getTeamCode());
-				loggerUtils.log("info", "Not round 1: previous team: {}", prevSelectedTeam);
-				
-				if(insAndOuts != null && insAndOuts.size() > 0) {
-					for(InsAndOuts inOrOut : insAndOuts) {
-						if(inOrOut.getInOrOut().equals(DomainDecodes.INS_AND_OUTS.IN_OR_OUT.IN)) {
-							DflTeamPlayer teamPlayer = dflTeamPlayerService.getTeamPlayerForTeam(team.getTeamCode(), inOrOut.getTeamPlayerId());
-							
-							DflSelectedPlayer selectedPlayer = new DflSelectedPlayer();
-							selectedPlayer.setPlayerId(teamPlayer.getPlayerId());
-							selectedPlayer.setRound(round);
-							selectedPlayer.setTeamCode(team.getTeamCode());
-							selectedPlayer.setTeamPlayerId(inOrOut.getTeamPlayerId());
-							
-							loggerUtils.log("info", "Adding player to selected team: player={}", selectedPlayer);
-							prevSelectedTeam.add(selectedPlayer);
-						} else {
-							DflSelectedPlayer droppedPlayer = null;
-							for(DflSelectedPlayer selectedPlayer : prevSelectedTeam) {
-								if(inOrOut.getTeamPlayerId() == selectedPlayer.getTeamPlayerId()) {
-									droppedPlayer = selectedPlayer;
-									loggerUtils.log("info", "Dropping player from selected team: player={}", droppedPlayer);
-									break;
-								}
-							}
-							prevSelectedTeam.remove(droppedPlayer);
-						}
-					}
-					
-					for(DflSelectedPlayer prevSelectedPlayer : prevSelectedTeam) {
-						DflSelectedPlayer selectedPlayer = new DflSelectedPlayer();
-						selectedPlayer.setPlayerId(prevSelectedPlayer.getPlayerId());
-						selectedPlayer.setRound(round);
-						selectedPlayer.setTeamCode(team.getTeamCode());
-						selectedPlayer.setTeamPlayerId(prevSelectedPlayer.getTeamPlayerId());
-						
-						selectedTeam.add(selectedPlayer);
-					}
-				} else {
-					if(!earlyGameStart) {
-						List<DflEarlyInsAndOuts> earlyInsAndOuts = dflEarlyInsAndOutsService.getByTeamAndRound(round, team.getTeamCode());
-						if(earlyInsAndOuts != null && earlyInsAndOuts.size() > 0) {
-							loggerUtils.log("info", "Early Ins and Outs, starting to validate");
-							
-							Map<String, List<Integer>> validationInsAndOuts = new HashMap<>();
-							List<Integer> ins = new ArrayList<>();
-							List<Integer> outs = new ArrayList<>();
-							for(DflEarlyInsAndOuts inOrOut : earlyInsAndOuts) {
-								if(inOrOut.getInOrOut().equals("I")) {
-									ins.add(inOrOut.getTeamPlayerId());
-								} else {
-									outs.add(inOrOut.getTeamPlayerId());
-								}
-							}
-							validationInsAndOuts.put("in",ins);
-							validationInsAndOuts.put("out",outs);
-							
-							Date dummyReceivedDate = new Date(roundInfo.getHardLockoutTime().getTime() - 600000);
-							
-							SelectedTeamValidationHandler validationHandler = new SelectedTeamValidationHandler();
-							validationHandler.configureLogging(mdcKey, loggerName, logfile);
-							SelectedTeamValidation validationResult = validationHandler.execute(round, team.getTeamCode(), validationInsAndOuts, dummyReceivedDate, true);
-							
-							if(validationResult.isValid()) {
-								loggerUtils.log("info", "Early Ins and Outs are valid and are being used");
-								
-								for(DflEarlyInsAndOuts in : earlyInsAndOuts) {
-									
-									DflTeamPlayer teamPlayer = dflTeamPlayerService.getTeamPlayerForTeam(team.getTeamCode(), in.getTeamPlayerId());
-									
-									DflSelectedPlayer selectedPlayer = new DflSelectedPlayer();
-									selectedPlayer.setPlayerId(teamPlayer.getPlayerId());
-									selectedPlayer.setRound(round);
-									selectedPlayer.setTeamCode(team.getTeamCode());
-									selectedPlayer.setTeamPlayerId(in.getTeamPlayerId());
-									
-									loggerUtils.log("info", "Adding player to selected team: player={}", selectedPlayer);
-									selectedTeam.add(selectedPlayer);
-								}
-							} else {
-								loggerUtils.log("info", "Early Ins and Outs are invalid");
-								emailValidationError(round, team, validationResult);
-							}
-						}
-					}
-				}
-			}
-		
-			loggerUtils.log("info", "Saving selected to DB: selected tema={}", selectedTeam);
-			dflSelectedTeamService.replaceTeamForRound(round, team.getTeamCode(), selectedTeam);			
-		}	
-	}
-	*/
 	
 	private void emailValidationError(int round, DflTeam team, SelectedTeamValidation validationResult) throws Exception {
 		

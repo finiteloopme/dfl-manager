@@ -139,42 +139,10 @@ public class EmailSelectionsHandler {
 			loggerUtils.log("error", "Error in ... ", ex);
 		}
 	}
-	
-	/*
-	private void configureMail() {
-		Properties properties = new Properties();
-		properties.setProperty("mail.smtp.host", this.outgoingMailHost);
-		properties.setProperty("mail.smtp.port", this.outgoingMailPort);
-		properties.setProperty("mail.smtp.auth", "true");
-		//properties.setProperty("mail.imaps.ssl.enable", "true");
-		properties.setProperty("mail.smtp.starttls.enable", "true");
-		//properties.setProperty("mail.smtp.ssl.enable", "true");
-		properties.setProperty("mail.store.protocol", "imaps");
-		//properties.setProperty("mail.store.protocol", "pop3s");
-		//properties.setProperty("mail.imaps.host", this.incomingMailHost);
-		//properties.setProperty("mail.imaps.port", this.incomingMailPort);
 		
-		
-		//this.mailSession = Session.getInstance(properties);
-				
-		this.mailSession = Session.getDefaultInstance(properties, new javax.mail.Authenticator() {
-			protected PasswordAuthentication getPasswordAuthentication() {
-				return new PasswordAuthentication(mailUsername, mailPassword);
-			}
-		});
-				
-	}
-	*/
-	
 	private void processSelections() throws Exception {
-		
-		//Store store = this.mailSession.getStore("imaps");
-		//Store store = this.mailSession.getStore();
-		//store.connect(this.incomingMailHost, this.mailUsername, this.mailPassword);
-		//store.connect(this.mailUsername, this.mailPassword);
-		
+				
 		String oauthToken = AccessTokenFromRefreshToken.getAccessToken();
-		//System.out.println("***** Access Token: " + oauthToken);
 		Store store = OAuth2Authenticator.connectToImap(incomingMailHost, incomingMailPort, mailUsername, oauthToken, false);
 		
 		Folder inbox = store.getFolder("Inbox");
@@ -208,26 +176,18 @@ public class EmailSelectionsHandler {
 						if (disposition != null && (disposition.equalsIgnoreCase(Part.ATTACHMENT) || disposition.equalsIgnoreCase(Part.INLINE))) {
 							String attachementName = part.getFileName();
 							Instant instant = messages[i].getReceivedDate().toInstant();
-							ZonedDateTime receivedDate = ZonedDateTime.ofInstant(instant, ZoneId.of(DflmngrUtils.defaultTimezone));
-							//ZonedDateTime receivedDate = ZonedDateTime.from(messages[i].getReceivedDate().toInstant())
-							//								.withZoneSameInstant(ZoneId.of(DflmngrUtils.defaultTimezone));
+							ZonedDateTime receivedDate = ZonedDateTime.ofInstant(instant, ZoneId.of(DflmngrUtils.defaultTimezone));;
 							loggerUtils.log("info", "Attachement found, name={}", attachementName);
 							if(attachementName.equals("selections.txt")) {
 								loggerUtils.log("info", "Message from {}, has selection attachment", from);
 								selectionsFileAttached = true;
-								//validationResult = handleSelectionFile(part.getInputStream(), messages[i].getReceivedDate());
 								validationResult = handleSelectionFile(part.getInputStream(), receivedDate);
-								//String key = from + ";" + teamCode;
-								//this.responses.put(key, true);
 								validationResult.setFrom(from);
 								validationResults.add(validationResult);
 								loggerUtils.log("info", "Message from {} handled with ... SUCCESS!", from);
 							} else if (attachementName.equalsIgnoreCase("WINMAIL.DAT") || attachementName.equalsIgnoreCase("ATT00001.DAT")) {
 								loggerUtils.log("info", "Message from {}, is a TNEF message", from);
-								//validationResult = handleTNEFMessage(part.getInputStream(), from, messages[i].getReceivedDate());
 								validationResult = handleTNEFMessage(part.getInputStream(), from, receivedDate);
-								//String key = from + ";" + teamCode;
-								//this.responses.put(key, true);
 								validationResult.setFrom(from);
 								validationResults.add(validationResult);
 								loggerUtils.log("info", "Message from {} handled with ... SUCCESS!", from);
@@ -237,7 +197,6 @@ public class EmailSelectionsHandler {
 					}
 				}
 				if(validationResult == null) {
-					//this.responses.put(from, false);
 					loggerUtils.log("info", "Validation is still NULL");
 					validationResult = new SelectedTeamValidation();
 					if(selectionsFileAttached) {
@@ -255,7 +214,7 @@ public class EmailSelectionsHandler {
 					loggerUtils.log("info", "Message from {} ... FAILURE!", from);
 				} else {
 					if(validationResult.isValid()) {
-						TeamSelectionLoaderHandler selectionsLoader = new TeamSelectionLoaderHandler();
+						TeamInsOutsLoaderHandler selectionsLoader = new TeamInsOutsLoaderHandler();
 						selectionsLoader.configureLogging(mdcKey, loggerName, logfile);
 						
 						if(validationResult.earlyGames) {
@@ -415,10 +374,7 @@ public class EmailSelectionsHandler {
 		
 		//for (Map.Entry<String, Boolean> response : this.responses.entrySet()) {
 		for(SelectedTeamValidation validationResult : validationResults) {
-			
-			//String key = response.getKey();
-			
-			//String to = validationResult.getFrom();
+
 			String to = "";
 			
 			if(!System.getenv("ENV").equals("production")) {
@@ -429,16 +385,6 @@ public class EmailSelectionsHandler {
 			
 			String teamCode = validationResult.getTeamCode();
 			
-			/*
-			if(key.contains(";")) {
-				to = key.split(";")[0];
-				teamCode = key.split(";")[1];
-			} else {
-				to = key;
-			}
-			*/
-			
-			//MimeMessage message = new MimeMessage(this.mailSession);
 			Session session = null;
 			MimeMessage message = new MimeMessage(session);
 			message.setFrom(new InternetAddress(this.dflmngrEmailAddr));

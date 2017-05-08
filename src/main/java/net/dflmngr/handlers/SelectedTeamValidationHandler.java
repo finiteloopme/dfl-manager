@@ -61,7 +61,6 @@ public class SelectedTeamValidationHandler {
 	}
 	
 	public void configureLogging(String mdcKey, String loggerName, String logfile) {
-		//loggerUtils = new LoggingUtils(loggerName, mdcKey, logfile);
 		loggerUtils = new LoggingUtils(logfile);
 		isExecutable = true;
 	}

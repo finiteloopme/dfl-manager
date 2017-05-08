@@ -19,6 +19,7 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import net.dflmngr.handlers.LadderCalculatorHandler;
 //import net.dflmngr.jndi.JndiProvider;
 import net.dflmngr.logging.LoggingUtils;
 import net.dflmngr.model.entity.DflFixture;
@@ -295,7 +296,7 @@ public class ResultsReport {
 		cell.setCellStyle(teamNameStyle);
 		
 		team = dflTeamService.get(fixture.getAwayTeam());
-		cell = row.createCell(15);
+		cell = row.createCell(fixtureSheetHeader.length + 1);
 		cell.setCellValue(team.getName());
 		cell.setCellStyle(teamNameStyle);
 		
@@ -784,6 +785,9 @@ public class ResultsReport {
 	
 	private String createEmailBody(int round) {
 		
+		int awayTeamPredictedScore = 0;
+		int homeTeamPredictedScore = 0;
+		
 		String body = "<html>";
 		body = body + "<body>\n";
 		body = "<p>Current scores for round " + round + ":</p>\n";
@@ -793,7 +797,6 @@ public class ResultsReport {
 			DflTeam homeTeam = dflTeamService.get(fixture.getHomeTeam());
 			int homeTeamScore = teamScores.get(fixture.getHomeTeam()).getScore();
 						
-			int homeTeamPredictedScore = 0;
 			if(playersPlayedCount.get(fixture.getHomeTeam()) == selectedPlayersCount.get(fixture.getHomeTeam())) {
 				homeTeamPredictedScore = teamPredictedScores.get(fixture.getHomeTeam()).getPredictedScore();
 			} else {
@@ -805,8 +808,7 @@ public class ResultsReport {
 			
 			DflTeam awayTeam = dflTeamService.get(fixture.getAwayTeam());
 			int awayTeamScore = teamScores.get(fixture.getAwayTeam()).getScore();
-			
-			int awayTeamPredictedScore = 0;
+				
 			if(playersPlayedCount.get(fixture.getAwayTeam()) == selectedPlayersCount.get(fixture.getAwayTeam())) {
 				awayTeamPredictedScore = teamPredictedScores.get(fixture.getAwayTeam()).getPredictedScore();
 			} else {
@@ -817,20 +819,34 @@ public class ResultsReport {
 			int awaySelectedSize = selectedPlayersCount.get(fixture.getAwayTeam());
 			
 			String resultString = "";
-			if(homeTeamScore > awayTeamScore) {
+			//if(homeTeamScore > awayTeamScore) {
+			if(homeTeamPredictedScore > awayTeamPredictedScore) {
 				resultString = " leading ";
 			} else {
 				resultString = " lead by ";
 			}
 			
+			/*
 			body = body + "<li>" 
 				   + homeTeam.getName() + " " + homeTeamScore + " (" + homeTeamPredictedScore + " - " + homePlayersPlayed + "/" + homeSelectedSize + " played)"
 				   + resultString 
 				   + awayTeam.getName() + " " + awayTeamScore + " (" + awayTeamPredictedScore + " - " + awayPlayersPlayed + "/" + awaySelectedSize + " played)"
 				   + "</li>\n";
+			*/
+			body = body + "<li>" 
+					   + homeTeam.getName() + " " + homeTeamPredictedScore + " (" + homeTeamScore + " - " + homePlayersPlayed + "/" + homeSelectedSize + " played)"
+					   + resultString 
+					   + awayTeam.getName() + " " + awayTeamPredictedScore + " (" + awayTeamScore + " - " + awayPlayersPlayed + "/" + awaySelectedSize + " played)"
+					   + "</li>\n";
 		}
 		
 		body = body + "</ul></p>\n";
+		
+		
+		loggerUtils.log("info", "Calculating Live Ladder");
+		LadderCalculatorHandler ladderCalculator = new LadderCalculatorHandler();
+		ladderCalculator.configureLogging(mdcKey, loggerName, logfile);
+		ladderCalculator.execute(round, true, homeTeamPredictedScore, awayTeamPredictedScore);
 		
 		List<DflLadder> ladder = dflLadderService.getLadderForRound(round);
 		Collections.sort(ladder, Collections.reverseOrder());

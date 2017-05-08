@@ -47,7 +47,7 @@ public class LadderCalculatorHandler {
 		isExecutable = true;
 	}
 	
-	public void execute(int round) {
+	public void execute(int round, boolean liveLadderOveride, int homeTeamScore, int awayTeamScore) {
 		
 		try{
 			if(!isExecutable) {
@@ -57,7 +57,7 @@ public class LadderCalculatorHandler {
 			
 			loggerUtils.log("info", "LadderCalculatorHandler executing round={} ...", round);
 			
-			handleLadder(round);
+			handleLadder(round, liveLadderOveride, homeTeamScore, awayTeamScore);
 			
 			dflLadderService.close();;
 			dflFixtureService.close();;
@@ -70,7 +70,7 @@ public class LadderCalculatorHandler {
 		}
 	}
 	
-	private void handleLadder(int round) {
+	private void handleLadder(int round, boolean liveLadderOveride, int homeTeamScore, int awayTeamScore) {
 		
 		List<DflFixture> roundFixtures = dflFixtureService.getFixturesForRound(round);
 		Map<String, DflTeamScores> roundTeamScores = dflTeamScoresService.getForRoundWithKey(round);
@@ -83,8 +83,10 @@ public class LadderCalculatorHandler {
 			String homeTeamCode = fixture.getHomeTeam();
 			String awayTeamCode = fixture.getAwayTeam();
 			
-			int homeTeamScore = roundTeamScores.get(homeTeamCode).getScore();
-			int awayTeamScore = roundTeamScores.get(awayTeamCode).getScore();
+			if(!liveLadderOveride) {
+				homeTeamScore = roundTeamScores.get(homeTeamCode).getScore();
+				awayTeamScore = roundTeamScores.get(awayTeamCode).getScore();
+			}
 			
 			DflLadder homeTeamLadder = calculateLadder(round, homeTeamCode, previousLadder.get(homeTeamCode), homeTeamScore, awayTeamScore);
 			DflLadder awayTeamLadder = calculateLadder(round, awayTeamCode, previousLadder.get(awayTeamCode), awayTeamScore, homeTeamScore);
