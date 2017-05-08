@@ -7,6 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+
 import net.dflmngr.logging.LoggingUtils;
 import net.dflmngr.model.entity.DflBest22;
 import net.dflmngr.model.entity.DflPlayer;
@@ -186,13 +194,13 @@ public class Best22Handler {
 		int selectionCount = 0;
 		
 		switch(position) {
-			case "FF": selectionCount = 1;
-			case "Fwd": selectionCount = 5;
-			case "Rck": selectionCount = 1;
-			case "Mid": selectionCount = 5;
-			case "FB": selectionCount = 1;
-			case "Def": selectionCount = 5;
-			case "Bench": selectionCount = 4;
+			case "FF": selectionCount = 1; break;
+			case "Fwd": selectionCount = 5; break;
+			case "Rck": selectionCount = 1; break;
+			case "Mid": selectionCount = 5; break;
+			case "FB": selectionCount = 1; break;
+			case "Def": selectionCount = 5; break;
+			case "Bench": selectionCount = 4; break;
 		}
 		
 		loggerUtils.log("info", "Selecting {} players for {}", selectionCount, position);
@@ -212,6 +220,31 @@ public class Best22Handler {
 		TreeMap<Integer, Integer> sortedMap = new TreeMap<Integer, Integer>(comparator);
 		sortedMap.putAll(unsortedMap);
 		return sortedMap;
+	}
+	
+	// internal testing
+	public static void main(String[] args) {
+		Options options = new Options();
+		Option roundOpt  = Option.builder("r").argName("round").hasArg().desc("round to run on").type(Number.class).required().build();
+		options.addOption(roundOpt);
+		
+		try {
+			int round = 0;
+						
+			CommandLineParser parser = new DefaultParser();
+			CommandLine cli = parser.parse(options, args);
+			
+			round = ((Number)cli.getParsedOptionValue("r")).intValue();
+			
+			Best22Handler best22Handler = new Best22Handler();
+			best22Handler.configureLogging("batch.name", "batch-logger", ("Best22_R" + round));
+			best22Handler.execute(round);
+		} catch (ParseException ex) {
+			HelpFormatter formatter = new HelpFormatter();
+			formatter.printHelp( "Best22Handler", options );
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 }
 
