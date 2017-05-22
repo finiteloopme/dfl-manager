@@ -66,7 +66,7 @@ public class Best22Handler {
 				loggerUtils.log("info", "Default logging configured");
 			}
 			
-			loggerUtils.log("info", "Best22Handler excuting, rount={} ....", round);
+			loggerUtils.log("info", "Best22Handler excuting, round={} ....", round);
 			
 			calculateBest22(round);
 			

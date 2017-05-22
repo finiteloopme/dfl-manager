@@ -138,12 +138,7 @@ public class ScoresCalculatorHandler {
 					//startCal.setTime(earlyGame.getStartTime());
 					//startCal.add(Calendar.HOUR_OF_DAY, 3);
 					ZonedDateTime gameEndTime = earlyGame.getStartTime().plusHours(3);
-					
-					//if(nowCal.after(startCal)) {
-					if(now.isAfter(gameEndTime)) {
-						completedCount++;
-					}
-					
+										
 					AflFixturePK aflFixturePK = new AflFixturePK();
 					aflFixturePK.setRound(earlyGame.getAflRound());
 					aflFixturePK.setGame(earlyGame.getAflGame());
@@ -151,9 +146,17 @@ public class ScoresCalculatorHandler {
 					AflFixture aflFixture = aflFixtureService.get(aflFixturePK);
 					earlyGameTeams.add(aflFixture.getHomeTeam());
 					earlyGameTeams.add(aflFixture.getAwayTeam());
+					
+					//if(nowCal.after(startCal)) {
+					if(now.isAfter(gameEndTime)) {
+						loggerUtils.log("info", "{} vs {} is completed", aflFixture.getHomeTeam(), aflFixture.getAwayTeam());
+						completedCount++;
+					} else {
+						loggerUtils.log("info", "{} vs {} isn't completed", aflFixture.getHomeTeam(), aflFixture.getAwayTeam());
+					}
 				}
 				
-				if(completedCount != earlyGames.size()) {
+				//if(completedCount != earlyGames.size()) {
 					//loggerUtils.log("info", "All early games completed");
 					//earlyGamesCompleted = true;
 					loggerUtils.log("info", "Early games still in progress, handling team selections");
@@ -163,7 +166,7 @@ public class ScoresCalculatorHandler {
 					startRound.execute(round, null);
 					
 					insAndOutsService.removeForRound(round);
-				}
+				//}
 			}
 			
 			/*
