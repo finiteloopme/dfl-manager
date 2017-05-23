@@ -85,6 +85,8 @@ public class RawPlayerStatsHandler {
 			List<AflFixture> fixturesToProcess = new ArrayList<>();
 			Set<String> teamsToProcess = new HashSet<>();
 			
+			Set<Integer> aflGames = new HashSet<>();
+			
 			loggerUtils.log("info", "Checking for AFL rounds to download");
 			for(DflRoundMapping roundMapping : dflRoundInfo.getRoundMapping()) {
 				int aflRound = roundMapping.getAflRound();
@@ -102,7 +104,10 @@ public class RawPlayerStatsHandler {
 					AflFixture fixture = aflFixtureService.getPlayedGame(aflRound, aflGame);
 					
 					if(fixture != null) {
-						fixturesToProcess.add(fixture);
+						if(!aflGames.contains(aflGame)) {
+							aflGames.add(aflGame);
+							fixturesToProcess.add(fixture);
+						}
 						if(roundMapping.getAflTeam() == null || roundMapping.getAflTeam().equals("")) {
 							teamsToProcess.add(fixture.getHomeTeam());
 							teamsToProcess.add(fixture.getAwayTeam());
