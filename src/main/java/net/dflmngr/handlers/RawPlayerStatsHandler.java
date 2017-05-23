@@ -102,6 +102,7 @@ public class RawPlayerStatsHandler {
 					AflFixture fixture = aflFixtureService.getPlayedGame(aflRound, aflGame);
 					
 					if(fixture != null) {
+						fixturesToProcess.add(fixture);
 						if(roundMapping.getAflTeam() == null || roundMapping.getAflTeam().equals("")) {
 							teamsToProcess.add(fixture.getHomeTeam());
 							teamsToProcess.add(fixture.getAwayTeam());

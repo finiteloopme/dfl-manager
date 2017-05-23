@@ -97,7 +97,7 @@ public class DflRoundInfoCalculatorHandler {
 			int aflRoundsMax = Integer.parseInt(globalsService.getAflRoundsMax());
 			
 			loggerUtils.log("info", "Executing DflRoundInfoCalculator, max AFL rounds: {}", aflRoundsMax);
-			loggerUtils.log("info", "Stnadard round lockout time: {}", standardLockout);
+			loggerUtils.log("info", "Standard round lockout time: {}", standardLockout);
 			
 			List<DflRoundInfo> allRoundInfo = new ArrayList<>();
 			
@@ -280,6 +280,10 @@ public class DflRoundInfoCalculatorHandler {
 							loggerUtils.log("info", "Calculating hard lockout time");
 							ZonedDateTime hardLockout = calculateHardLockout(dflRound, gameStartTimes);
 							dflRoundInfo.setHardLockoutTime(hardLockout);
+							
+							//loggerUtils.log("info", "Calculating early games");
+							//List<DflRoundEarlyGames> earlyGames = calculateEarlyGames(hardLockout, gamesInSplitRound, dflRound);
+							//dflRoundInfo.setEarlyGames(earlyGames);
 							
 							splitRoundInfo.add(dflRoundInfo);
 							
