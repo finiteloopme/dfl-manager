@@ -147,8 +147,9 @@ public class RawPlayerStatsHandler {
 		for (AflFixture fixture : fixturesToProcess) {
 			String homeTeam = fixture.getHomeTeam();
 			String awayTeam = fixture.getAwayTeam();
+			String aflRound = Integer.toString(fixture.getRound());
 
-			String fullStatsUrl = statsUrl + "/" + year + "/" + round + "/" + homeTeam.toLowerCase() + "-v-"
+			String fullStatsUrl = statsUrl + "/" + year + "/" + aflRound + "/" + homeTeam.toLowerCase() + "-v-"
 					+ awayTeam.toLowerCase();
 			loggerUtils.log("info", "AFL stats URL: {}", fullStatsUrl);
 
