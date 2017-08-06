@@ -796,24 +796,30 @@ public class ResultsReport {
 		for(DflFixture fixture : roundFixtures) {
 			DflTeam homeTeam = dflTeamService.get(fixture.getHomeTeam());
 			int homeTeamScore = teamScores.get(fixture.getHomeTeam()).getScore();
-						
+			
+			/*
 			if(playersPlayedCount.get(fixture.getHomeTeam()) == selectedPlayersCount.get(fixture.getHomeTeam())) {
 				homeTeamPredictedScore = teamPredictedScores.get(fixture.getHomeTeam()).getPredictedScore();
 			} else {
 				homeTeamPredictedScore = currentPredictedTeamScores.get(fixture.getHomeTeam());
 			}
+			*/
+			homeTeamPredictedScore = currentPredictedTeamScores.get(fixture.getHomeTeam());
 			
 			int homePlayersPlayed = playersPlayedCount.get(fixture.getHomeTeam());
 			int homeSelectedSize = selectedPlayersCount.get(fixture.getHomeTeam());
 			
 			DflTeam awayTeam = dflTeamService.get(fixture.getAwayTeam());
 			int awayTeamScore = teamScores.get(fixture.getAwayTeam()).getScore();
-				
+			
+			/*
 			if(playersPlayedCount.get(fixture.getAwayTeam()) == selectedPlayersCount.get(fixture.getAwayTeam())) {
 				awayTeamPredictedScore = teamPredictedScores.get(fixture.getAwayTeam()).getPredictedScore();
 			} else {
 				awayTeamPredictedScore = currentPredictedTeamScores.get(fixture.getAwayTeam());
 			}
+			*/
+			awayTeamPredictedScore = currentPredictedTeamScores.get(fixture.getAwayTeam());
 			
 			int awayPlayersPlayed = playersPlayedCount.get(fixture.getAwayTeam());
 			int awaySelectedSize = selectedPlayersCount.get(fixture.getAwayTeam());
@@ -842,35 +848,36 @@ public class ResultsReport {
 		
 		body = body + "</ul></p>\n";
 		
-		
-		loggerUtils.log("info", "Calculating Live Ladder");
-		LadderCalculatorHandler ladderCalculator = new LadderCalculatorHandler();
-		ladderCalculator.configureLogging(mdcKey, loggerName, logfile);
-		ladderCalculator.execute(round, true, homeTeamPredictedScore, awayTeamPredictedScore);
-		
-		List<DflLadder> ladder = dflLadderService.getLadderForRound(round);
-		Collections.sort(ladder, Collections.reverseOrder());
-								
-		body = body + "<p>Live Ladder:</p>\n";
-		body = body + "<p><table border=1 style=\"border-collapse: collapse; border: 1px solid black;\">\n";
-		body = body + "<tr>\n";
-		body = body + "<th align=left style=\"border: 1px solid black; padding: 1px 5px 1px 5px;\">Team</th>"
-				    + "<th style=\"border: 1px solid black; padding: 1px 5px 1px 5px;\">Pts</th><th style=\"border: 1px solid black; padding: 1px 5px 1px 5px;\">%</th>";
-		body = body + "</tr>\n";
-		
-		String tableFormat = "<td style=\"border: 1px solid black; padding: 1px 5px 1px 5px;\">%s</td>"
-				           + "<td align=right style=\"border: 1px solid black; padding: 1px 5px 1px 5px;\">%d</td><td align=right style=\"border: 1px solid black; padding: 1px 5px 1px 5px;\">%.2f</td>"
-				           + "%n";
-		
-		for(DflLadder team : ladder) {
-			String teamName = dflTeamService.get(team.getTeamCode()).getName();
+		if(round <= 18) {
+			loggerUtils.log("info", "Calculating Live Ladder");
+			LadderCalculatorHandler ladderCalculator = new LadderCalculatorHandler();
+			ladderCalculator.configureLogging(mdcKey, loggerName, logfile);
+			ladderCalculator.execute(round, true, homeTeamPredictedScore, awayTeamPredictedScore);
 			
+			List<DflLadder> ladder = dflLadderService.getLadderForRound(round);
+			Collections.sort(ladder, Collections.reverseOrder());
+									
+			body = body + "<p>Live Ladder:</p>\n";
+			body = body + "<p><table border=1 style=\"border-collapse: collapse; border: 1px solid black;\">\n";
 			body = body + "<tr>\n";
-			body = body + String.format(tableFormat, teamName, team.getPts(), team.getPercentage());
+			body = body + "<th align=left style=\"border: 1px solid black; padding: 1px 5px 1px 5px;\">Team</th>"
+					    + "<th style=\"border: 1px solid black; padding: 1px 5px 1px 5px;\">Pts</th><th style=\"border: 1px solid black; padding: 1px 5px 1px 5px;\">%</th>";
 			body = body + "</tr>\n";
+			
+			String tableFormat = "<td style=\"border: 1px solid black; padding: 1px 5px 1px 5px;\">%s</td>"
+					           + "<td align=right style=\"border: 1px solid black; padding: 1px 5px 1px 5px;\">%d</td><td align=right style=\"border: 1px solid black; padding: 1px 5px 1px 5px;\">%.2f</td>"
+					           + "%n";
+			
+			for(DflLadder team : ladder) {
+				String teamName = dflTeamService.get(team.getTeamCode()).getName();
+				
+				body = body + "<tr>\n";
+				body = body + String.format(tableFormat, teamName, team.getPts(), team.getPercentage());
+				body = body + "</tr>\n";
+			}
+			
+			body = body + "</table></p>\n";
 		}
-		
-		body = body + "</table></p>\n";
 		body = body + "<p>Results attached.</p>\n";
 		body = body + "<p>DFL Manager Admin</p>\n";
 		body = body + "</div></body></html>";
