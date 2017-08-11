@@ -27,6 +27,8 @@ import net.dflmngr.model.entity.DflLadder;
 import net.dflmngr.model.entity.DflPlayer;
 import net.dflmngr.model.entity.DflPlayerPredictedScores;
 import net.dflmngr.model.entity.DflPlayerScores;
+import net.dflmngr.model.entity.DflRoundInfo;
+import net.dflmngr.model.entity.DflRoundMapping;
 import net.dflmngr.model.entity.DflSelectedPlayer;
 import net.dflmngr.model.entity.DflTeam;
 import net.dflmngr.model.entity.DflTeamPredictedScores;
@@ -38,6 +40,7 @@ import net.dflmngr.model.service.DflLadderService;
 import net.dflmngr.model.service.DflPlayerPredictedScoresService;
 import net.dflmngr.model.service.DflPlayerScoresService;
 import net.dflmngr.model.service.DflPlayerService;
+import net.dflmngr.model.service.DflRoundInfoService;
 import net.dflmngr.model.service.DflSelectedTeamService;
 import net.dflmngr.model.service.DflTeamPredictedScoresService;
 import net.dflmngr.model.service.DflTeamScoresService;
@@ -50,6 +53,7 @@ import net.dflmngr.model.service.impl.DflLadderServiceImpl;
 import net.dflmngr.model.service.impl.DflPlayerPredictedScoresServiceImpl;
 import net.dflmngr.model.service.impl.DflPlayerScoresServiceImpl;
 import net.dflmngr.model.service.impl.DflPlayerServiceImpl;
+import net.dflmngr.model.service.impl.DflRoundInfoServiceImpl;
 import net.dflmngr.model.service.impl.DflSelectedTeamServiceImpl;
 import net.dflmngr.model.service.impl.DflTeamPredictedScoresServiceImpl;
 import net.dflmngr.model.service.impl.DflTeamScoresServiceImpl;
@@ -86,6 +90,7 @@ public class ResultsReport {
 	DflLadderService dflLadderService;
 	DflPlayerPredictedScoresService dflPlayerPredictedScoresService;
 	DflTeamPredictedScoresService dflTeamPredictedScoresService;
+	DflRoundInfoService dflRoundInfoService;
 	
 	String emailOverride;
 	
@@ -118,6 +123,7 @@ public class ResultsReport {
 		dflLadderService = new DflLadderServiceImpl();
 		dflPlayerPredictedScoresService = new DflPlayerPredictedScoresServiceImpl();
 		dflTeamPredictedScoresService = new DflTeamPredictedScoresServiceImpl();
+		dflRoundInfoService = new DflRoundInfoServiceImpl();
 		
 		playersPlayedCount = new HashMap<>();
 		selectedPlayersCount = new HashMap<>();
@@ -336,7 +342,16 @@ public class ResultsReport {
 		List<DflSelectedPlayer> selectedHomeTeam = dflSelectedTeamService.getSelectedTeamForRound(fixture.getRound(), fixture.getHomeTeam());
 		List<DflSelectedPlayer> selectedAwayTeam = dflSelectedTeamService.getSelectedTeamForRound(fixture.getRound(), fixture.getAwayTeam());
 		
-		List<String> playedTeams = aflFixtureService.getAflTeamsPlayedForRound(fixture.getRound());
+		DflRoundInfo dflRoundInfo = dflRoundInfoService.get(fixture.getRound());
+		List<String> playedTeams = new ArrayList<>();
+		int aflRound = 0;
+		for(DflRoundMapping roundMapping : dflRoundInfo.getRoundMapping()) {
+			int currentAflRound = roundMapping.getAflRound();
+			if(aflRound != currentAflRound) {
+				playedTeams.addAll(aflFixtureService.getAflTeamsPlayedForRound(currentAflRound));
+				aflRound = currentAflRound;
+			}
+		}
 		
 		int playersPlayed = 0;
 		int currentPredictedScore = 0;
