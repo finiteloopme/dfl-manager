@@ -65,7 +65,7 @@ public class SelectedTeamValidationHandler {
 		isExecutable = true;
 	}
 	
-	public SelectedTeamValidation execute(int round, String teamCode, Map<String, List<Integer>> insAndOuts, ZonedDateTime receivedDate, boolean skipEarlyGames) {
+	public SelectedTeamValidation execute(int round, String teamCode, Map<String, List<Integer>> insAndOuts, List<Double> emergencies, ZonedDateTime receivedDate, boolean skipEarlyGames) {
 		
 		SelectedTeamValidation validationResult = null;
 		
@@ -99,7 +99,7 @@ public class SelectedTeamValidationHandler {
 				
 				List<DflEarlyInsAndOuts> earlyInsAndOuts = dflEarlyInsAndOutsService.getByTeamAndRound(round, teamCode);
 				
-				playedSelections = checkForPlayedSelections(teamCode, receivedDate, roundInfo, insAndOuts, earlyInsAndOuts);
+				playedSelections = checkForPlayedSelections(teamCode, receivedDate, roundInfo, insAndOuts, emergencies, earlyInsAndOuts);
 				
 				if(playedSelections) {
 					loggerUtils.log("info", "Early game validation failed");
@@ -107,7 +107,7 @@ public class SelectedTeamValidationHandler {
 					validationResult.earlyGames = true;
 					validationResult.playedSelections = true;
 				} else {
-					validationResult = standardValidation(round, currentRound, teamCode, insAndOuts, receivedDate, lockoutTime);
+					validationResult = standardValidation(round, currentRound, teamCode, insAndOuts, emergencies, receivedDate, lockoutTime);
 					
 					if(!earlyGamesCompleted) {
 						loggerUtils.log("info", "Early games not completed, all validation errors will only be warnings.");
@@ -116,12 +116,13 @@ public class SelectedTeamValidationHandler {
 					}
 				}
 			} else {
-				validationResult = standardValidation(round, currentRound, teamCode, insAndOuts, receivedDate, lockoutTime);
+				validationResult = standardValidation(round, currentRound, teamCode, insAndOuts, emergencies, receivedDate, lockoutTime);
 			}
 						
 			validationResult.setRound(round);
 			validationResult.setTeamCode(teamCode);
 			validationResult.setInsAndOuts(insAndOuts);
+			validationResult.setEmergencies(emergencies);
 			
 			loggerUtils.log("info", "Validation result={}", validationResult);
 			
@@ -140,7 +141,7 @@ public class SelectedTeamValidationHandler {
 		return validationResult;
 	}
 	
-	private boolean checkForPlayedSelections(String teamCode, ZonedDateTime receivedDate, DflRoundInfo roundInfo, Map<String, List<Integer>> insAndOuts, List<DflEarlyInsAndOuts> earlyInsAndOuts) {
+	private boolean checkForPlayedSelections(String teamCode, ZonedDateTime receivedDate, DflRoundInfo roundInfo, Map<String, List<Integer>> insAndOuts, List<Double> emergencies, List<DflEarlyInsAndOuts> earlyInsAndOuts) {
 		boolean playedSelections = false;
 		
 		List<DflRoundEarlyGames> earlyGames = roundInfo.getEarlyGames();
@@ -180,6 +181,29 @@ public class SelectedTeamValidationHandler {
 					}
 				}
 				
+				for(double emg : emergencies) {
+					int emergency = (int) emg;
+					DflTeamPlayer teamPlayer = dflTeamPlayerService.getTeamPlayerForTeam(teamCode, emergency);
+					DflPlayer player = dflPlayerService.get(teamPlayer.getPlayerId());
+					
+					String mappedTeam = DflmngrUtils.dflAflTeamMap.get(player.getAflClub());
+					
+					if(mappedTeam.equals(aflFixture.getHomeTeam()) || mappedTeam.equals(aflFixture.getAwayTeam())) {
+						boolean found = false;
+						for(DflEarlyInsAndOuts earlyInOrOut : earlyInsAndOuts) {
+							if(earlyInOrOut.getTeamPlayerId() == emg && earlyInOrOut.getInOrOut().equals("E")) {
+								found = true;
+								break;
+							}
+						}
+						if(!found) {
+							loggerUtils.log("info", "Emergency player has already played, teamPlayerId={}; teamCode={};", emg, teamCode);
+							playedSelections = true;
+							break;
+						}
+					}
+				}
+				
 				if(!playedSelections) {
 					for(int out : outs) {
 						DflTeamPlayer teamPlayer = dflTeamPlayerService.getTeamPlayerForTeam(teamCode, out);
@@ -209,13 +233,16 @@ public class SelectedTeamValidationHandler {
 		return playedSelections;
 	}
 	
-	private SelectedTeamValidation standardValidation(int round, int currentRound, String teamCode, Map<String, List<Integer>> insAndOuts, ZonedDateTime receivedDate, ZonedDateTime lockoutTime) {
+	private SelectedTeamValidation standardValidation(int round, int currentRound, String teamCode, Map<String, List<Integer>> insAndOuts, List<Double> emergencies, ZonedDateTime receivedDate, ZonedDateTime lockoutTime) {
 		
 		SelectedTeamValidation validationResult = null;
 		
 		loggerUtils.log("info", "DFL round={}; Lockout time={};", currentRound, lockoutTime);
 		
 		List<DflSelectedPlayer> selectedTeam = null;
+		
+		boolean selectedWarning = false;
+		boolean droppedWarning = false;
 		
 		if(round < currentRound) {
 			validationResult = new SelectedTeamValidation();
@@ -250,9 +277,41 @@ public class SelectedTeamValidationHandler {
 						selectedPlayer.setRound(round);
 						selectedPlayer.setTeamCode(teamCode);
 						selectedPlayer.setTeamPlayerId(in);
+						selectedPlayer.setEmergency(0);
+						selectedPlayer.setDnp(false);
 						
 						selectedTeam.add(selectedPlayer);
 						loggerUtils.log("info", "Added selectedPlayer={}.", selectedPlayer);
+					}
+				}
+				
+				for(double emg : emergencies) {
+					int emergency = (int) emg;
+					if(emergency < 1 || emergency > 45) {
+						validationResult = new SelectedTeamValidation();
+						validationResult.selectionFileMissing = false;
+						validationResult.roundCompleted = false;
+						validationResult.lockedOut = false;
+						loggerUtils.log("info", "Emergency player outside player range, teamPlayerId={}.", emergency);
+						break;
+					} else {
+						DflSelectedPlayer selectedPlayer = new DflSelectedPlayer();
+						
+						selectedPlayer.setRound(round);
+						selectedPlayer.setTeamCode(teamCode);
+						selectedPlayer.setTeamPlayerId(emergency);
+						
+						double e1e2 = emg - emergency;
+						if(e1e2 == 0.1) {
+							selectedPlayer.setEmergency(1);
+						} else {
+							selectedPlayer.setEmergency(2);
+						}
+						
+						selectedPlayer.setDnp(false);
+						
+						selectedTeam.add(selectedPlayer);
+						loggerUtils.log("info", "Added selectedPlayer={}, as emergency", selectedPlayer);
 					}
 				}
 			} else {
@@ -268,14 +327,28 @@ public class SelectedTeamValidationHandler {
 						loggerUtils.log("info", "Selected player outside player range, teamPlayerId={}.", in);
 						break;
 					} else {
-						DflSelectedPlayer selectedPlayer = new DflSelectedPlayer();
-						
-						selectedPlayer.setRound(round);
-						selectedPlayer.setTeamCode(teamCode);
-						selectedPlayer.setTeamPlayerId(in);
-						
-						selectedTeam.add(selectedPlayer);
-						loggerUtils.log("info", "Added selectedPlayer={}.", selectedPlayer);
+						boolean found = false;
+						for(DflSelectedPlayer selectedPlayer : selectedTeam) {
+							if(in == selectedPlayer.getTeamPlayerId()) {
+								found = true;
+								break;
+							}
+						}
+						if(!found) {
+							DflSelectedPlayer selectedPlayer = new DflSelectedPlayer();
+							
+							selectedPlayer.setRound(round);
+							selectedPlayer.setTeamCode(teamCode);
+							selectedPlayer.setTeamPlayerId(in);
+							selectedPlayer.setEmergency(0);
+							selectedPlayer.setDnp(false);
+							
+							selectedTeam.add(selectedPlayer);
+							loggerUtils.log("info", "Added selectedPlayer={}.", selectedPlayer);
+						} else {
+							loggerUtils.log("info", "Player already selected, teamPlayerId={}.", in);
+							selectedWarning = true;
+						}
 					}
 				}
 				
@@ -288,12 +361,49 @@ public class SelectedTeamValidationHandler {
 						loggerUtils.log("info", "Dropped player outside player range, teamPlayerId={}.", out);
 						break;
 					} else {
+						boolean found = false;
 						for(DflSelectedPlayer selectedPlayer : selectedTeam) {
 							if(selectedPlayer.getTeamPlayerId() == out) {
 								playersToRemove.add(selectedPlayer);
+								found = true;
 								loggerUtils.log("info", "Removing selectedPlayer={}.", selectedPlayer);
+							} else if(selectedPlayer.isEmergency() != 0) {
+								playersToRemove.add(selectedPlayer);
+								loggerUtils.log("info", "Removing selectedPlayer={} as emergency", selectedPlayer);
 							}
 						}
+						if(!found) {
+							loggerUtils.log("info", "Dropped player not selected, teamPlayerId={}.", out);
+							droppedWarning = true;
+						}
+					}
+				}
+								
+				for(double emg : emergencies) {
+					int emergency = (int) emg;
+					if(emergency < 1 || emergency > 45) {
+						validationResult = new SelectedTeamValidation();
+						validationResult.selectionFileMissing = false;
+						loggerUtils.log("info", "Emergency player outside player range, teamPlayerId={}.", emergency);
+						break;
+					} else {
+						DflSelectedPlayer selectedPlayer = new DflSelectedPlayer();
+						
+						selectedPlayer.setRound(round);
+						selectedPlayer.setTeamCode(teamCode);
+						selectedPlayer.setTeamPlayerId(emergency);
+						
+						double e1e2 = emg - emergency;
+						if(e1e2 == 0.1) {
+							selectedPlayer.setEmergency(1);
+						} else {
+							selectedPlayer.setEmergency(2);
+						}
+						
+						selectedPlayer.setDnp(false);
+						
+						selectedTeam.add(selectedPlayer);
+						loggerUtils.log("info", "Added selectedPlayer={}.", selectedPlayer);
 					}
 				}
 				
@@ -303,13 +413,13 @@ public class SelectedTeamValidationHandler {
 		
 		if(validationResult == null) {
 			loggerUtils.log("info", "Pre checks PASSED, validating selected team");
-			validationResult = validateTeam(teamCode, selectedTeam);
+			validationResult = validateTeam(teamCode, selectedTeam, selectedWarning, droppedWarning);
 		}
 				
 		return validationResult;
 	}
 	
-	private SelectedTeamValidation validateTeam(String teamCode, List<DflSelectedPlayer> selectedTeam) {
+	private SelectedTeamValidation validateTeam(String teamCode, List<DflSelectedPlayer> selectedTeam, boolean selectedWarning, boolean droppedWarning) {
 		
 		SelectedTeamValidation validationResult = new SelectedTeamValidation();
 		
@@ -326,36 +436,42 @@ public class SelectedTeamValidationHandler {
 		int rckCount = 0;
 		int benchCount = 0;
 		
+		List<String> emergencyPositions = new ArrayList<>();
+		
 		for(DflSelectedPlayer selectedPlayer : selectedTeam) {
 			DflTeamPlayer teamPlayer = dflTeamPlayerService.getTeamPlayerForTeam(selectedPlayer.getTeamCode(), selectedPlayer.getTeamPlayerId());
 			DflPlayer player = dflPlayerService.get(teamPlayer.getPlayerId());		
 
 			String position = player.getPosition().toLowerCase();
 			
-			switch(position) {
-				case "ff" :
-					ffCount++;
-					break;
-				case "fwd" :
-					fwdCount++;
-					break;
-				case "rck" :
-					rckCount++;
-					break;
-				case "mid" :
-					midCount++;
-					break;
-				case "def" :
-					defCount++;
-					break;
-				case "fb" :
-					fbCount++;
-					break;
+			if(selectedPlayer.isEmergency() == 0) {
+				switch(position) {
+					case "ff" :
+						ffCount++;
+						break;
+					case "fwd" :
+						fwdCount++;
+						break;
+					case "rck" :
+						rckCount++;
+						break;
+					case "mid" :
+						midCount++;
+						break;
+					case "def" :
+						defCount++;
+						break;
+					case "fb" :
+						fbCount++;
+						break;
+				}
+			} else {
+				emergencyPositions.add(position);
 			}
 		}
 		
-		loggerUtils.log("info", "Position counts: ffCount={}; fwdCount={}; midCount={}; defCount={}; fbCount={}; rckCount={};",
-						ffCount, fwdCount, midCount, defCount, fbCount, rckCount);
+		loggerUtils.log("info", "Position counts: ffCount={}; fwdCount={}; midCount={}; defCount={}; fbCount={}; rckCount={}, emergencyPositions={};",
+						ffCount, fwdCount, midCount, defCount, fbCount, rckCount, emergencyPositions);
 			
 		if(ffCount <= 2) {
 			validationResult.ffCheckOk = true;
@@ -399,6 +515,33 @@ public class SelectedTeamValidationHandler {
 		
 		if(benchCount <= 4) {
 			validationResult.benchCheckOk = true;
+		}
+		
+		for(String position : emergencyPositions) {
+			switch(position) {
+				case "ff" :
+					ffCount++;
+					break;
+				case "fwd" :
+					fwdCount++;
+					break;
+				case "rck" :
+					rckCount++;
+					break;
+				case "mid" :
+					midCount++;
+					break;
+				case "def" :
+					defCount++;
+					break;
+				case "fb" :
+					fbCount++;
+					break;
+			}
+		}
+		
+		if(ffCount > 2 || fwdCount > 6 || midCount > 6 || defCount > 6 || fbCount > 2 || rckCount > 2) {
+			validationResult.emergencyWarning = true;
 		}
 		
 		return validationResult;

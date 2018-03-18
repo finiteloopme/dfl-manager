@@ -6,14 +6,15 @@ import java.util.List;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.Predicate;
 
-import org.eclipse.persistence.config.QueryHints;
+//import org.eclipse.persistence.config.QueryHints;
 
 import net.dflmngr.model.dao.ProcessDao;
 import net.dflmngr.model.entity.Process;
 import net.dflmngr.model.entity.Process_;
-import net.dflmngr.model.entity.keys.ProcessPK;
+//import net.dflmngr.model.entity.keys.ProcessPK;
 
-public class ProcessDaoImpl extends GenericDaoImpl<Process, ProcessPK> implements ProcessDao {
+//public class ProcessDaoImpl extends GenericDaoImpl<Process, ProcessPK> implements ProcessDao {
+public class ProcessDaoImpl extends GenericDaoImpl<Process, String> implements ProcessDao {
 	public ProcessDaoImpl() {
 		super(Process.class);
 	}
@@ -28,7 +29,7 @@ public class ProcessDaoImpl extends GenericDaoImpl<Process, ProcessPK> implement
 		
 		criteriaQuery.where(processIdEquals);
 		TypedQuery<Process> query = entityManager.createQuery(criteriaQuery);
-		query.setHint(QueryHints.QUERY_RESULTS_CACHE, "FALSE");
+		//query.setHint(QueryHints.QUERY_RESULTS_CACHE, "FALSE");
 		//List<Process> entitys = entityManager.createQuery(criteriaQuery).getResultList();
 		List<Process> entitys = query.getResultList();
 		

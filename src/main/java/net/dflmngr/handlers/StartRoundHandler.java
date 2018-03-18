@@ -200,23 +200,40 @@ public class StartRoundHandler {
 					Map<String, List<Integer>> validationInsAndOuts = new HashMap<>();
 					List<Integer> ins = new ArrayList<>();
 					List<Integer> outs = new ArrayList<>();
+					List<Double> emgs = new ArrayList<>();
 					for(DflEarlyInsAndOuts inOrOut : earlyInsAndOuts) {
 						if(inOrOut.getInOrOut().equals("I")) {
 							ins.add(inOrOut.getTeamPlayerId());
-						} else {
+						} else if (inOrOut.getInOrOut().equals("O")) {
 							outs.add(inOrOut.getTeamPlayerId());
+						} else if (inOrOut.getInOrOut().equals("E1")) {
+							emgs.add(inOrOut.getTeamPlayerId() + 0.1);
+						} else {
+							emgs.add(inOrOut.getTeamPlayerId() + 0.2);
 						}
 					}
-					validationInsAndOuts.put("in",ins);
-					validationInsAndOuts.put("out",outs);
+					validationInsAndOuts.put("in", ins);
+					validationInsAndOuts.put("out", outs);
 					
 					SelectedTeamValidationHandler validationHandler = new SelectedTeamValidationHandler();
 					validationHandler.configureLogging(mdcKey, loggerName, logfile);
-					SelectedTeamValidation validationResult = validationHandler.execute(round, team.getTeamCode(), validationInsAndOuts, dummyReceivedDate, true);
+					SelectedTeamValidation validationResult = validationHandler.execute(round, team.getTeamCode(), validationInsAndOuts, emgs, dummyReceivedDate, true);
 					
 					if(validationResult.isValid()) {
 						loggerUtils.log("info", "Early Ins and Outs are valid and are being used");
-												
+							
+						List<DflSelectedPlayer> oldEmergencies = new ArrayList<>();
+						
+						loggerUtils.log("info", "Removing previous emergencies");
+						for(DflSelectedPlayer player : tmpSelectedTeam) {
+							if(player.isEmergency() != 0) {
+								loggerUtils.log("info", "Previous emergency seletecPlayer={}", player);
+								oldEmergencies.add(player);
+							}
+						}
+						
+						tmpSelectedTeam.removeAll(oldEmergencies);
+						
 						for(DflEarlyInsAndOuts inOrOut : earlyInsAndOuts) {
 							if(inOrOut.getInOrOut().equals(DomainDecodes.INS_AND_OUTS.IN_OR_OUT.IN)) {
 								DflTeamPlayer teamPlayer = dflTeamPlayerService.getTeamPlayerForTeam(team.getTeamCode(), inOrOut.getTeamPlayerId());
@@ -226,10 +243,13 @@ public class StartRoundHandler {
 								selectedPlayer.setRound(round);
 								selectedPlayer.setTeamCode(team.getTeamCode());
 								selectedPlayer.setTeamPlayerId(inOrOut.getTeamPlayerId());
+								selectedPlayer.setEmergency(0);
+								selectedPlayer.setDnp(false);
+								selectedPlayer.setScoreUsed(false);
 								
 								loggerUtils.log("info", "Adding player to selected team: player={}", selectedPlayer);
 								tmpSelectedTeam.add(selectedPlayer);
-							} else {
+							} else if(inOrOut.getInOrOut().equals(DomainDecodes.INS_AND_OUTS.IN_OR_OUT.OUT)) {
 								DflSelectedPlayer droppedPlayer = null;
 								for(DflSelectedPlayer selectedPlayer : tmpSelectedTeam) {
 									if(inOrOut.getTeamPlayerId() == selectedPlayer.getTeamPlayerId()) {
@@ -239,14 +259,35 @@ public class StartRoundHandler {
 									}
 								}
 								tmpSelectedTeam.remove(droppedPlayer);
+							} else {
+								DflTeamPlayer teamPlayer = dflTeamPlayerService.getTeamPlayerForTeam(team.getTeamCode(), inOrOut.getTeamPlayerId());
+								
+								DflSelectedPlayer selectedPlayer = new DflSelectedPlayer();
+								selectedPlayer.setPlayerId(teamPlayer.getPlayerId());
+								selectedPlayer.setRound(round);
+								selectedPlayer.setTeamCode(team.getTeamCode());
+								selectedPlayer.setTeamPlayerId(inOrOut.getTeamPlayerId());
+								
+								if(inOrOut.getInOrOut().equals(DomainDecodes.INS_AND_OUTS.IN_OR_OUT.EMG1)) {
+									selectedPlayer.setEmergency(1);
+								} else {
+									selectedPlayer.setEmergency(2);
+								}
+								
+								selectedPlayer.setDnp(false);
+								selectedPlayer.setScoreUsed(false);
+								
+								loggerUtils.log("info", "Adding player as emergency to selected team: player={}", selectedPlayer);
+								tmpSelectedTeam.add(selectedPlayer);
 							}
 						}
-						
+												
 						if(earlyGamesCompleted) {
 							TeamInsOutsLoaderHandler selectionsLoader = new TeamInsOutsLoaderHandler();
 							selectionsLoader.configureLogging(mdcKey, loggerName, logfile);
 							
-							selectionsLoader.execute(validationResult.getTeamCode(), validationResult.getRound(), validationResult.getInsAndOuts().get("in"), validationResult.getInsAndOuts().get("out"), false);	
+							selectionsLoader.execute(validationResult.getTeamCode(), validationResult.getRound(), validationResult.getInsAndOuts().get("in"),
+									                 validationResult.getInsAndOuts().get("out"), validationResult.getEmergencies(), false);	
 						}
 						
 					} else {
@@ -256,6 +297,16 @@ public class StartRoundHandler {
 				}
 			} else {
 				if(insAndOuts != null && insAndOuts.size() > 0) {
+					List<DflSelectedPlayer> oldEmergencies = new ArrayList<>();
+					
+					loggerUtils.log("info", "Removing previous emergencies");
+					for(DflSelectedPlayer player : tmpSelectedTeam) {
+						if(player.isEmergency() != 0) {
+							loggerUtils.log("info", "Previous emergency seletecPlayer={}", player);
+							oldEmergencies.add(player);
+						}
+					}
+					
 					for(InsAndOuts inOrOut : insAndOuts) {
 						if(inOrOut.getInOrOut().equals(DomainDecodes.INS_AND_OUTS.IN_OR_OUT.IN)) {
 							DflTeamPlayer teamPlayer = dflTeamPlayerService.getTeamPlayerForTeam(team.getTeamCode(), inOrOut.getTeamPlayerId());
@@ -265,10 +316,13 @@ public class StartRoundHandler {
 							selectedPlayer.setRound(round);
 							selectedPlayer.setTeamCode(team.getTeamCode());
 							selectedPlayer.setTeamPlayerId(inOrOut.getTeamPlayerId());
+							selectedPlayer.setDnp(false);
+							selectedPlayer.setEmergency(0);
+							selectedPlayer.setScoreUsed(false);
 							
 							loggerUtils.log("info", "Adding player to selected team: player={}", selectedPlayer);
 							tmpSelectedTeam.add(selectedPlayer);
-						} else {
+						} else if(inOrOut.getInOrOut().equals(DomainDecodes.INS_AND_OUTS.IN_OR_OUT.OUT)) {
 							DflSelectedPlayer droppedPlayer = null;
 							for(DflSelectedPlayer selectedPlayer : tmpSelectedTeam) {
 								if(inOrOut.getTeamPlayerId() == selectedPlayer.getTeamPlayerId()) {
@@ -278,6 +332,26 @@ public class StartRoundHandler {
 								}
 							}
 							tmpSelectedTeam.remove(droppedPlayer);
+						} else {
+							DflTeamPlayer teamPlayer = dflTeamPlayerService.getTeamPlayerForTeam(team.getTeamCode(), inOrOut.getTeamPlayerId());
+							
+							DflSelectedPlayer selectedPlayer = new DflSelectedPlayer();
+							selectedPlayer.setPlayerId(teamPlayer.getPlayerId());
+							selectedPlayer.setRound(round);
+							selectedPlayer.setTeamCode(team.getTeamCode());
+							selectedPlayer.setTeamPlayerId(inOrOut.getTeamPlayerId());
+							
+							if(inOrOut.getInOrOut().equals(DomainDecodes.INS_AND_OUTS.IN_OR_OUT.EMG1)) {
+								selectedPlayer.setEmergency(1);
+							} else {
+								selectedPlayer.setEmergency(2);
+							}
+							
+							selectedPlayer.setDnp(false);
+							selectedPlayer.setScoreUsed(false);
+							
+							loggerUtils.log("info", "Adding player as emergency to selected team: player={}", selectedPlayer);
+							tmpSelectedTeam.add(selectedPlayer);
 						}
 					}
 				}
@@ -291,6 +365,9 @@ public class StartRoundHandler {
 				selectedPlayer.setRound(round);
 				selectedPlayer.setTeamCode(team.getTeamCode());
 				selectedPlayer.setTeamPlayerId(tmpSelectedPlayer.getTeamPlayerId());
+				selectedPlayer.setDnp(tmpSelectedPlayer.isDnp());
+				selectedPlayer.setEmergency(tmpSelectedPlayer.isEmergency());
+				selectedPlayer.setScoreUsed(tmpSelectedPlayer.isScoreUsed());
 				
 				selectedTeam.add(selectedPlayer);
 			}
@@ -380,6 +457,8 @@ public class StartRoundHandler {
 				startRound.configureLogging("batch.name", "batch-logger", "StartRound");
 				startRound.execute(round, email);
 			}
+			
+			System.exit(0);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

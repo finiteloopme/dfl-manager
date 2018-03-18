@@ -155,6 +155,8 @@ public class ResultsHandler {
 			ResultsHandler resultsHandler = new ResultsHandler();
 			resultsHandler.configureLogging("batch.name", "batch-logger", ("ResultsHandler_R" + round));
 			resultsHandler.execute(round, isFinal, email, skipStats, onHeroku);
+			
+			System.exit(0);
 
 		} catch (ParseException ex) {
 			HelpFormatter formatter = new HelpFormatter();

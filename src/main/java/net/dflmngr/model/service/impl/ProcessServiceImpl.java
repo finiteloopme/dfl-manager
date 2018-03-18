@@ -6,10 +6,11 @@ import java.util.List;
 import net.dflmngr.model.dao.ProcessDao;
 import net.dflmngr.model.dao.impl.ProcessDaoImpl;
 import net.dflmngr.model.entity.Process;
-import net.dflmngr.model.entity.keys.ProcessPK;
+//import net.dflmngr.model.entity.keys.ProcessPK;
 import net.dflmngr.model.service.ProcessService;
 
-public class ProcessServiceImpl extends GenericServiceImpl<Process, ProcessPK> implements ProcessService {
+//public class ProcessServiceImpl extends GenericServiceImpl<Process, ProcessPK> implements ProcessService {
+public class ProcessServiceImpl extends GenericServiceImpl<Process, String> implements ProcessService {
 	private ProcessDao dao;
 	
 	public ProcessServiceImpl() {

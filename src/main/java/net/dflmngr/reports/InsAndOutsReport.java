@@ -249,7 +249,7 @@ public class InsAndOutsReport {
 					if(row == null) {
 						row = sheet.createRow(rowIndex-1);
 					}
-					cell = row.getCell(columnIndex, Row.CREATE_NULL_AS_BLANK);
+					cell = row.getCell(columnIndex, Row.MissingCellPolicy.CREATE_NULL_AS_BLANK);
 					cell.setCellValue(selection);
 			}		
 		}

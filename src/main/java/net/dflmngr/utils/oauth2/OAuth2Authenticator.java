@@ -142,9 +142,11 @@ public class OAuth2Authenticator {
 
 		initialize();
 
-		IMAPStore imapStore = connectToImap("imap.gmail.com", 993, email, oauthToken, true);
+		//IMAPStore imapStore = connectToImap("imap.gmail.com", 993, email, oauthToken, true);
+		connectToImap("imap.gmail.com", 993, email, oauthToken, true);
 		System.out.println("Successfully authenticated to IMAP.\n");
-		SMTPTransport smtpTransport = connectToSmtp("smtp.gmail.com", 587, email, oauthToken, true);
+		//SMTPTransport smtpTransport = connectToSmtp("smtp.gmail.com", 587, email, oauthToken, true);
+		connectToSmtp("smtp.gmail.com", 587, email, oauthToken, true);
 		System.out.println("Successfully authenticated to SMTP.");
 	}
 }

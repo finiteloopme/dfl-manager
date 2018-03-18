@@ -6,6 +6,8 @@ public class DomainDecodes {
 		public static final class IN_OR_OUT {
 			public static final String IN = "I";
 			public static final String OUT = "O";
+			public static final String EMG1 = "E1";
+			public static final String EMG2 = "E2";
 		}
 	}
 	

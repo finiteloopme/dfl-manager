@@ -131,7 +131,8 @@ public class RawStatsReport {
 		
 		XSSFCellStyle style = workbook.createCellStyle();
 		XSSFFont font = workbook.createFont();
-		font.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
+		//font.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
+		font.setBold(true);
 		style.setFont(font);
 				
 		for(int i = 0; i < this.headers.length; i++) {

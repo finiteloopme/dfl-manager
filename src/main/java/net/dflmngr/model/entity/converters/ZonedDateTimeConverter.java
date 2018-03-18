@@ -12,26 +12,26 @@ import java.time.ZonedDateTime;
 import java.util.Date;
 
 @Converter(autoApply = true)
-public class ZonedDateTimeConverter implements AttributeConverter<ZonedDateTime, Date>{
-    @Override
-    public Date convertToDatabaseColumn(ZonedDateTime date) {
-    	if(date != null) {
-    		Instant instant = Instant.from(date);
-    		return Date.from(instant);
-    	} else {
-    		return null;
-    	}
-    }
+public class ZonedDateTimeConverter implements AttributeConverter<ZonedDateTime, Date> {
+	@Override
+	public Date convertToDatabaseColumn(ZonedDateTime date) {
+		if (date != null) {
+			Instant instant = Instant.from(date);
+			return Date.from(instant);
+		} else {
+			return null;
+		}
+	}
 
-    @Override
-    public ZonedDateTime convertToEntityAttribute(Date value) {
-    	if (value != null) {
-    		Instant instant = value.toInstant();
-    		//LocalDateTime localTime = LocalDateTime.from(instant);
-    		return ZonedDateTime.ofInstant(instant, ZoneId.of(DflmngrUtils.defaultTimezone));
-    		//return localTime.atZone(ZoneId.of("UTC"));
-    	} else {
-    		return null;
-    	}
-    }
+	@Override
+	public ZonedDateTime convertToEntityAttribute(Date value) {
+		if (value != null) {
+			Instant instant = value.toInstant();
+			// LocalDateTime localTime = LocalDateTime.from(instant);
+			return ZonedDateTime.ofInstant(instant, ZoneId.of(DflmngrUtils.defaultTimezone));
+			// return localTime.atZone(ZoneId.of("UTC"));
+		} else {
+			return null;
+		}
+	}
 }

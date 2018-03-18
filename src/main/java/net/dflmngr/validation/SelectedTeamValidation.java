@@ -21,6 +21,10 @@ public class SelectedTeamValidation {
 	
 	public boolean teamPlayerCheckOk;
 	
+	public boolean emergencyWarning;
+	public boolean selectedWarning;
+	public boolean droppedWarning;
+	
 	public boolean unknownError;
 	
 	private int round;
@@ -29,6 +33,7 @@ public class SelectedTeamValidation {
 	private String from;
 	
 	private Map<String, List<Integer>> insAndOuts;
+	private List<Double> emergencies;
 	
 	public SelectedTeamValidation() {
 		earlyGames = false;
@@ -46,6 +51,8 @@ public class SelectedTeamValidation {
 		benchCheckOk = false;
 		
 		teamPlayerCheckOk = false;
+		
+		emergencyWarning = false;
 		
 		unknownError = false;
 	}
@@ -89,6 +96,14 @@ public class SelectedTeamValidation {
 
 	public void setInsAndOuts(Map<String, List<Integer>> insAndOuts) {
 		this.insAndOuts = insAndOuts;
+	}
+	
+	public List<Double> getEmergencies() {
+		return emergencies;
+	}
+
+	public void setEmergencies(List<Double> emergencies) {
+		this.emergencies = emergencies;
 	}
 
 	public String getFrom() {

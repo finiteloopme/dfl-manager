@@ -6,22 +6,22 @@ import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
+//import javax.persistence.IdClass;
 import javax.persistence.Table;
 
-import net.dflmngr.model.entity.keys.ProcessPK;
+//import net.dflmngr.model.entity.keys.ProcessPK;
 
 @Entity
 @Cacheable(false)
 @Table(name="process")
-@IdClass(ProcessPK.class)
+//@IdClass(ProcessPK.class)
 public class Process {
 
 	@Id
 	@Column(name="process_id")
 	private String processId;
 	
-	@Id
+	//@Id
 	@Column(name="start_time")
 	private ZonedDateTime startTime;
 	

@@ -39,7 +39,7 @@ public class TeamInsOutsLoaderHandler {
 		isExecutable = true;
 	}
 	
-	public void execute(String teamCode, int round, List<Integer> ins, List<Integer> outs, boolean earlyGames) {
+	public void execute(String teamCode, int round, List<Integer> ins, List<Integer> outs, List<Double> emgs, boolean earlyGames) {
 		
 		try {
 			if(!isExecutable) {
@@ -47,7 +47,7 @@ public class TeamInsOutsLoaderHandler {
 				loggerUtils.log("info", "Default logging configured");
 			}
 			
-			loggerUtils.log("info", "Processing ins and out selections for: teamCode={}; round={}; ins={}; outs={};", teamCode, round, ins, outs);
+			loggerUtils.log("info", "Processing ins and out selections for: teamCode={}; round={}; ins={}; outs={}; emergencies={}", teamCode, round, ins, outs, emgs);
 			
 			if(earlyGames) {
 				loggerUtils.log("info", "Early Games, saving to early games ins and outs");
@@ -73,6 +73,24 @@ public class TeamInsOutsLoaderHandler {
 					out.setInOrOut(DomainDecodes.INS_AND_OUTS.IN_OR_OUT.OUT);
 					
 					earlyInsAndOuts.add(out);
+				}
+				
+				for(double e : emgs) {
+					DflEarlyInsAndOuts emg = new DflEarlyInsAndOuts();
+					emg.setRound(round);
+					emg.setTeamCode(teamCode);
+					
+					int eid = (int) e;
+					emg.setTeamPlayerId(eid);
+					
+					double e1e2 = Math.floor((e - eid) * 100) / 100;					
+					if(e1e2 == 0.1) {
+						emg.setInOrOut(DomainDecodes.INS_AND_OUTS.IN_OR_OUT.EMG1);
+					} else {
+						emg.setInOrOut(DomainDecodes.INS_AND_OUTS.IN_OR_OUT.EMG2);
+					}
+					
+					earlyInsAndOuts.add(emg);
 				}
 				
 				loggerUtils.log("info", "Saving early ins and outs to database: ", earlyInsAndOuts);
@@ -103,6 +121,24 @@ public class TeamInsOutsLoaderHandler {
 					out.setInOrOut(DomainDecodes.INS_AND_OUTS.IN_OR_OUT.OUT);
 					
 					insAndOuts.add(out);
+				}
+				
+				for(double e : emgs) {
+					InsAndOuts emg = new InsAndOuts();
+					emg.setRound(round);
+					emg.setTeamCode(teamCode);
+					
+					int eid = (int) e;
+					emg.setTeamPlayerId(eid);
+					
+					double e1e2 = Math.floor((e - eid) * 100) / 100;
+					if(e1e2 == 0.1) {
+						emg.setInOrOut(DomainDecodes.INS_AND_OUTS.IN_OR_OUT.EMG1);
+					} else {
+						emg.setInOrOut(DomainDecodes.INS_AND_OUTS.IN_OR_OUT.EMG2);
+					}
+					
+					insAndOuts.add(emg);
 				}
 				
 				loggerUtils.log("info", "Saving ins and outs to database: ", insAndOuts);

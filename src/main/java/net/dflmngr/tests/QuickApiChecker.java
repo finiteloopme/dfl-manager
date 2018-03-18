@@ -1,5 +1,6 @@
 package net.dflmngr.tests;
 
+/*
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
@@ -8,6 +9,7 @@ import java.net.URL;
 
 import org.json.simple.JsonObject;
 import org.json.simple.Jsoner;
+*/
 
 public class QuickApiChecker {
 

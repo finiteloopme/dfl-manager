@@ -67,7 +67,7 @@ public class EmailSelectionsHandler {
 	GlobalsService globalsService;
 	DflTeamService dflTeamService;
 	
-	Session mailSession;
+	//Session mailSession;
 	
 	boolean selectionsFileAttached;
 	
@@ -135,6 +135,9 @@ public class EmailSelectionsHandler {
 			sendResponses();
 			
 			globalsService.close();
+			dflTeamService.close();
+			
+			loggerUtils.log("info", "Email Selections Handler Completed");
 		} catch (Exception ex) {
 			loggerUtils.log("error", "Error in ... ", ex);
 		}
@@ -219,10 +222,12 @@ public class EmailSelectionsHandler {
 						
 						if(validationResult.earlyGames) {
 							loggerUtils.log("info", "Early Games any validation error is a warning .... Saving ins and outs to early tables in DB");
-							selectionsLoader.execute(validationResult.getTeamCode(), validationResult.getRound(), validationResult.getInsAndOuts().get("in"), validationResult.getInsAndOuts().get("out"), true);
+							selectionsLoader.execute(validationResult.getTeamCode(), validationResult.getRound(), validationResult.getInsAndOuts().get("in"),
+													 validationResult.getInsAndOuts().get("out"), validationResult.getEmergencies(), true);
 						} else {
 							loggerUtils.log("info", "Team selection is VALID.... Saving ins and outs to DB");
-							selectionsLoader.execute(validationResult.getTeamCode(), validationResult.getRound(), validationResult.getInsAndOuts().get("in"), validationResult.getInsAndOuts().get("out"), false);
+							selectionsLoader.execute(validationResult.getTeamCode(), validationResult.getRound(), validationResult.getInsAndOuts().get("in"),
+													 validationResult.getInsAndOuts().get("out"), validationResult.getEmergencies(), false);
 						}
 					} else {
 						loggerUtils.log("info", "Team selection is invalid ... No changes made.");
@@ -292,6 +297,7 @@ public class EmailSelectionsHandler {
 		int round = 0;
 		List<Integer> ins = new ArrayList<>();
 		List<Integer> outs = new ArrayList<>();
+		List<Double> emgs = new ArrayList<>();
 		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
 		
 		loggerUtils.log("info", "Moving messages to Processed folder");
@@ -315,7 +321,7 @@ public class EmailSelectionsHandler {
 			if(line.toLowerCase().contains("[round]")) {
 				while(reader.ready()) {
 					line = reader.readLine().trim();
-					if(line.toLowerCase().contains("[in]") || line.toLowerCase().contains("[out]")) {
+					if(line.toLowerCase().contains("[in]") || line.toLowerCase().contains("[out]") || line.toLowerCase().contains("[emg]")) {
 						break;
 					} else if(line.equalsIgnoreCase("")) {
 						// ignore blank lines
@@ -331,6 +337,8 @@ public class EmailSelectionsHandler {
 					line = reader.readLine().trim();
 					if(line.toLowerCase().contains("[out]")) {
 						break;
+					} else if(line.toLowerCase().contains("[emg]")) {
+						break;
 					} else if(line.equalsIgnoreCase("")) {
 						// ignore blank lines
 					} else {
@@ -345,6 +353,8 @@ public class EmailSelectionsHandler {
 					line = reader.readLine().trim();
 					if(line.toLowerCase().contains("[in]")) {
 						break;
+					} else if(line.toLowerCase().contains("[emg]")) {
+						break;
 					} else if(line.equalsIgnoreCase("")) {
 						// ignore blank lines
 					} else {
@@ -352,7 +362,31 @@ public class EmailSelectionsHandler {
 					}
 				}
 				loggerUtils.log("info", "Selection out: {}", outs);
-			}		
+			}
+			
+			if(line.toLowerCase().contains("[emg]")) {
+				int emgCount = 1;
+				while(reader.ready()) {
+					line = reader.readLine().trim();
+					if(line.toLowerCase().contains("[in]")) {
+						break;
+					} else if(line.toLowerCase().contains("[out]")) {
+						break;
+					} else if(line.equalsIgnoreCase("")) {
+						// ignore blank lines
+					} else {
+						double emg = Double.parseDouble(line);
+						if(emgCount == 1) {
+							emg = emg + 0.1;
+							emgCount++;
+						} else {
+							emg = emg + 0.2;
+						}
+						emgs.add(emg);
+					}
+				}
+				loggerUtils.log("info", "Selection emergencies: {}", emgs);
+			}	
 		}
 		
 		//TeamSelectionLoaderHandler selectionsLoader = new TeamSelectionLoaderHandler();
@@ -364,7 +398,7 @@ public class EmailSelectionsHandler {
 		
 		SelectedTeamValidationHandler validationHandler = new SelectedTeamValidationHandler();
 		validationHandler.configureLogging(mdcKey, loggerName, logfile);
-		SelectedTeamValidation validationResult = validationHandler.execute(round, teamCode, insAndOuts, receivedDate, false);
+		SelectedTeamValidation validationResult = validationHandler.execute(round, teamCode, insAndOuts, emgs, receivedDate, false);
 		
 		return validationResult;
 	}
@@ -408,7 +442,7 @@ public class EmailSelectionsHandler {
 					}
 				}
 				loggerUtils.log("info", "Message is for SUCCESS");
-				setSuccessMessage(message);
+				setSuccessMessage(message, validationResult);
 			} else {
 				loggerUtils.log("info", "Message is for FAILURE");
 				setFailureMessage(message, validationResult);
@@ -423,9 +457,26 @@ public class EmailSelectionsHandler {
 		}
 	}
 	
-	private void setSuccessMessage(Message message) throws Exception {
+	private void setSuccessMessage(Message message, SelectedTeamValidation validationResult) throws Exception {
 		message.setSubject("Selections received - SUCCESS!");
-		message.setContent("Coach, \n\n Your selections have been stored in the database .... have a nice day. \n\n DFL Manager Admin", "text/plain");
+		
+		String messageBody = "Coach, \n\n" +
+							 "Your selections have been stored in the database ....\n";
+		
+		if(validationResult.emergencyWarning) {
+			messageBody = messageBody + "\tWarning: One or both of your emergencies cannot be used as you have too many of that postion\n";
+		}
+		if(validationResult.selectedWarning) {
+			messageBody = messageBody + "\tWarning: You have seleted a player who is already selected.  You may be playing short!\n";
+		}
+		if(validationResult.droppedWarning) {
+			messageBody = messageBody + "\tWarning: You have dropped a player who is not selected.  Your team may not be as you expect or invalid!\n";
+		}
+		
+		messageBody = messageBody + "\nHave a nice day. \n\n"  +
+									"DFL Manager Admin";
+		
+		message.setContent(messageBody, "text/plain");
 	}
 	
 	private void setFailureMessage(Message message, SelectedTeamValidation validationResult) throws Exception {
@@ -484,9 +535,9 @@ public class EmailSelectionsHandler {
 			//JndiProvider.bind();
 			EmailSelectionsHandler selectionHandler = new EmailSelectionsHandler();
 			selectionHandler.execute();
+			System.exit(0);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 	}
-
 }

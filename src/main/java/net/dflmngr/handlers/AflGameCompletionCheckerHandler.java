@@ -1,9 +1,9 @@
 package net.dflmngr.handlers;
 
-import net.dflmngr.logging.LoggingUtils;
+//import net.dflmngr.logging.LoggingUtils;
 
 public class AflGameCompletionCheckerHandler {
-	private LoggingUtils loggerUtils;
+	//private LoggingUtils loggerUtils;
 	
 	boolean isExecutable;
 	
@@ -20,7 +20,7 @@ public class AflGameCompletionCheckerHandler {
 	}
 	
 	public void configureLogging(String mdcKey, String loggerName, String logfile) {
-		loggerUtils = new LoggingUtils(logfile);
+		//loggerUtils = new LoggingUtils(logfile);
 		this.mdcKey = mdcKey;
 		this.loggerName = loggerName;
 		this.logfile = logfile;

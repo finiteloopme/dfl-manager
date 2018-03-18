@@ -63,7 +63,7 @@ public class LadderCalculatorHandler {
 			dflFixtureService.close();;
 			dflTeamScoresService.close();;
 			
-			loggerUtils.log("info", "ScoresCalculator completed");
+			loggerUtils.log("info", "LadderCalculatorHandler completed");
 			
 		} catch (Exception ex) {
 			loggerUtils.log("error", "Error in ... ", ex);

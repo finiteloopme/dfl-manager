@@ -64,9 +64,10 @@ public class RawStatsDownloaderHandler {
 				loggerUtils.log("info", "Default logging configured");
 			}
 			
-			processPK.setProcessId(System.getenv("DYNO"));
-			processPK.setStartTime(now);
-			process.setProcessId(processPK.getProcessId());
+			//processPK.setProcessId(System.getenv("DYNO"));
+			//processPK.setStartTime(now);
+			//process.setProcessId(processPK.getProcessId());
+			process.setProcessId(System.getenv("HEROKU_DYNO_ID"));
 			process.setStartTime(processPK.getStartTime());
 			process.setParams(round + " " + homeTeam + " " + awayTeam + " " + statsUrl);
 			process.setStatus("Running");

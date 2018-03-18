@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
@@ -61,7 +62,7 @@ import net.dflmngr.model.service.impl.DflTeamServiceImpl;
 import net.dflmngr.model.service.impl.GlobalsServiceImpl;
 import net.dflmngr.model.service.impl.RawPlayerStatsServiceImpl;
 import net.dflmngr.reports.struct.ResultsFixtureTabTeamStruct;
-import net.dflmngr.utils.AmazonS3Utils;
+//import net.dflmngr.utils.AmazonS3Utils;
 import net.dflmngr.utils.DflmngrUtils;
 import net.dflmngr.utils.EmailUtils;
 
@@ -97,7 +98,7 @@ public class ResultsReport {
 	String[] resultsSpreadsheetHeaders = {"Player", "D", "M", "HO", "FF", "FA", "T", "G"};
 	String[] fixtureSheetHeader = {"No.", "Player", "Pos", "K", "H", "D", "M", "HO", "FF", "FA", "T", "G", "B", "Score", "Predicted", "Trend"};
 	String[] ladderHeader = {"Team", "W", "L", "D", "For", "Ave", "Agst", "Av", "Pts", "%"};
-	String[] liveLadderHeader = {"Teeam", "Pts", "%"};
+	String[] liveLadderHeader = {"Team", "Pts", "%"};
 	
 	Map<String, Integer> playersPlayedCount;
 	Map<String, Integer> selectedPlayersCount;
@@ -231,9 +232,9 @@ public class ResultsReport {
 		workbook.close();
 		out.close();
 		
-		String s3key = Paths.get("resultsReport", reportName).toString();
+		//String s3key = Paths.get("resultsReport", reportName).toString();
 		
-		AmazonS3Utils.uploadToS3(s3key, reportLocation.toString());
+		//AmazonS3Utils.uploadToS3(s3key, reportLocation.toString());
 		
 		return reportLocation.toString();
 	}
@@ -247,7 +248,8 @@ public class ResultsReport {
 		
 		XSSFCellStyle style = workbook.createCellStyle();
 		XSSFFont font = workbook.createFont();
-		font.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
+		//font.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
+		font.setBold(true);
 		style.setFont(font);
 				
 		for(int i = 0; i < this.resultsSpreadsheetHeaders.length; i++) {
@@ -289,12 +291,14 @@ public class ResultsReport {
 		
 		XSSFCellStyle style = sheet.getWorkbook().createCellStyle();
 		XSSFFont font = sheet.getWorkbook().createFont();
-		font.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
+		//font.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
+		font.setBold(true);
 		style.setFont(font);
 		
 		XSSFCellStyle teamNameStyle = sheet.getWorkbook().createCellStyle();
 		teamNameStyle.setFont(font);
-		teamNameStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+		//teamNameStyle.setAlignment(XSSFCellStyle.ALIGN_CENTER);
+		teamNameStyle.setAlignment(HorizontalAlignment.CENTER);
 		
 		DflTeam team = dflTeamService.get(fixture.getHomeTeam());
 		XSSFCell cell = row.createCell(0);
@@ -333,11 +337,14 @@ public class ResultsReport {
 		
 		XSSFCellStyle style = sheet.getWorkbook().createCellStyle();
 		XSSFFont font = sheet.getWorkbook().createFont();
-		font.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
+		//font.setBoldweight(XSSFFont.BOLDWEIGHT_BOLD);
+		font.setBold(true);
 		style.setFont(font);
 		
 		List<ResultsFixtureTabTeamStruct> homeTeamData = new ArrayList<>();
 		List<ResultsFixtureTabTeamStruct> awayTeamData = new ArrayList<>();
+		List<ResultsFixtureTabTeamStruct> homeTeamEmgData = new ArrayList<>();
+		List<ResultsFixtureTabTeamStruct> awayTeamEmgData = new ArrayList<>();
 		
 		List<DflSelectedPlayer> selectedHomeTeam = dflSelectedTeamService.getSelectedTeamForRound(fixture.getRound(), fixture.getHomeTeam());
 		List<DflSelectedPlayer> selectedAwayTeam = dflSelectedTeamService.getSelectedTeamForRound(fixture.getRound(), fixture.getAwayTeam());
@@ -357,6 +364,8 @@ public class ResultsReport {
 		int currentPredictedScore = 0;
 		int homeTotalTrend = 0;
 		
+		boolean homeEmgUsed = false;
+				
 		for(DflSelectedPlayer selectedPlayer : selectedHomeTeam) {
 			ResultsFixtureTabTeamStruct playerRec = new ResultsFixtureTabTeamStruct();
 			
@@ -364,7 +373,7 @@ public class ResultsReport {
 			DflPlayerPredictedScores predictedScore = playerPredictedScores.get(selectedPlayer.getPlayerId());
 			DflPlayer player = dflPlayerService.get(selectedPlayer.getPlayerId());
 			String playerName = player.getFirstName() + " " + player.getLastName();
-			
+						
 			playerRec.setNo(selectedPlayer.getTeamPlayerId());
 			playerRec.setPlayer(playerName);
 			playerRec.setPosition(player.getPosition());
@@ -426,17 +435,26 @@ public class ResultsReport {
 				playerRec.setTrendInt(playerRec.getScoreInt() - playerRec.getPredicted());
 			}
 			
-			if(playerRec.hasPlayed()) {
-				playersPlayed++;
-				if(!playerRec.isDnp()) {
-					currentPredictedScore = currentPredictedScore + playerRec.getScoreInt();
+			if(selectedPlayer.isScoreUsed()) {
+				if(playerRec.hasPlayed()) {
+					playersPlayed++;
+					if(!playerRec.isDnp()) {
+						currentPredictedScore = currentPredictedScore + playerRec.getScoreInt();
+					}
+					homeTotalTrend = homeTotalTrend + playerRec.getTrendInt();
+				} else {
+					currentPredictedScore = currentPredictedScore + playerRec.getPredicted();
 				}
-				homeTotalTrend = homeTotalTrend + playerRec.getTrendInt();
-			} else {
-				currentPredictedScore = currentPredictedScore + playerRec.getPredicted();
 			}
 			
-			homeTeamData.add(playerRec);
+			if(selectedPlayer.isEmergency() == 0) {
+				homeTeamData.add(playerRec);
+			} else {
+				homeTeamEmgData.add(playerRec);
+				if(selectedPlayer.isScoreUsed()) {
+					homeEmgUsed = true;
+				}
+			}
 		}
 		
 		playersPlayedCount.put(fixture.getHomeTeam(), playersPlayed);
@@ -445,6 +463,8 @@ public class ResultsReport {
 		playersPlayed = 0;
 		currentPredictedScore = 0;
 		int awayTotalTrend = 0;
+		
+		boolean awayEmgUsed = false;
 		
 		for(DflSelectedPlayer selectedPlayer : selectedAwayTeam) {
 			ResultsFixtureTabTeamStruct playerRec = new ResultsFixtureTabTeamStruct();
@@ -515,17 +535,26 @@ public class ResultsReport {
 				playerRec.setTrendInt(playerRec.getScoreInt() - playerRec.getPredicted());
 			}
 			
-			if(playerRec.hasPlayed()) {
-				playersPlayed++;
-				if(!playerRec.isDnp()) {
-					currentPredictedScore = currentPredictedScore + playerRec.getScoreInt();
+			if(selectedPlayer.isScoreUsed()) {
+				if(playerRec.hasPlayed()) {
+					playersPlayed++;
+					if(!playerRec.isDnp()) {
+						currentPredictedScore = currentPredictedScore + playerRec.getScoreInt();
+					}
+					awayTotalTrend = awayTotalTrend + playerRec.getTrendInt();
+				} else {
+					currentPredictedScore = currentPredictedScore + playerRec.getPredicted();
 				}
-				awayTotalTrend = awayTotalTrend + playerRec.getTrendInt();
-			} else {
-				currentPredictedScore = currentPredictedScore + playerRec.getPredicted();
 			}
 			
-			awayTeamData.add(playerRec);
+			if(selectedPlayer.isEmergency() == 0) {
+				awayTeamData.add(playerRec);
+			} else {
+				awayTeamEmgData.add(playerRec);
+				if(selectedPlayer.isScoreUsed()) {
+					awayEmgUsed = true;
+				}
+			}
 		}
 		
 		playersPlayedCount.put(fixture.getAwayTeam(), playersPlayed);
@@ -534,6 +563,131 @@ public class ResultsReport {
 		
 		Collections.sort(homeTeamData);
 		Collections.sort(awayTeamData);
+		
+		writeStatsData(sheet, homeTeamData, awayTeamData);
+		
+		int totalsCellBase = fixtureSheetHeader.length - 4;
+		
+		XSSFRow row = sheet.createRow(sheet.getLastRowNum()+1);
+		XSSFCell cell = row.createCell(totalsCellBase);
+		cell.setCellValue("Total");
+		cell.setCellStyle(style);
+		
+		cell = row.createCell(totalsCellBase + 1);
+		
+		if(homeEmgUsed) {
+			cell.setCellValue(teamScores.get(fixture.getHomeTeam()).getScore() + "*");
+		} else {
+			cell.setCellValue(teamScores.get(fixture.getHomeTeam()).getScore());
+		}
+		cell.setCellStyle(style);
+		
+		if(playersPlayedCount.get(fixture.getHomeTeam()) == selectedPlayersCount.get(fixture.getHomeTeam())) {
+			int teamPredictedScore = teamPredictedScores.get(fixture.getHomeTeam()).getPredictedScore();
+			cell = row.createCell(totalsCellBase + 2);
+			cell.setCellValue(teamPredictedScore);
+			cell.setCellStyle(style);
+		} else {
+			cell = row.createCell(totalsCellBase + 2);
+			cell.setCellValue(currentPredictedTeamScores.get(fixture.getHomeTeam()));
+			cell.setCellStyle(style);
+		}
+		
+		cell = row.createCell(totalsCellBase + 3);
+		cell.setCellValue(homeTotalTrend);
+		cell.setCellStyle(style);
+		
+		totalsCellBase = totalsCellBase + fixtureSheetHeader.length + 1;
+		
+		cell = row.createCell(totalsCellBase);
+		cell.setCellValue("Total");
+		cell.setCellStyle(style);
+		
+		cell = row.createCell(totalsCellBase + 1);
+		
+		if(awayEmgUsed) {
+			cell.setCellValue(teamScores.get(fixture.getAwayTeam()).getScore() + "*");
+		} else {
+			cell.setCellValue(teamScores.get(fixture.getAwayTeam()).getScore());
+		}
+		
+		cell.setCellStyle(style);
+		
+		if(playersPlayedCount.get(fixture.getAwayTeam()) == selectedPlayersCount.get(fixture.getAwayTeam())) {
+			int teamPredictedScore = teamPredictedScores.get(fixture.getAwayTeam()).getPredictedScore();
+			cell = row.createCell(totalsCellBase + 2);
+			cell.setCellValue(teamPredictedScore);
+			cell.setCellStyle(style);
+		} else {
+			cell = row.createCell(totalsCellBase + 2);
+			cell.setCellValue(currentPredictedTeamScores.get(fixture.getAwayTeam()));
+			cell.setCellStyle(style);
+		};
+		
+		cell = row.createCell(totalsCellBase + 3);
+		cell.setCellValue(awayTotalTrend);
+		cell.setCellStyle(style);
+		
+		if(!homeEmgUsed && !awayEmgUsed) {
+			sheet.createRow(sheet.getLastRowNum()+1);
+		} else {
+			row = sheet.createRow(sheet.getLastRowNum()+1);
+		}
+		
+		if(homeEmgUsed) {
+			cell = row.createCell(0);
+			cell.setCellValue("* Score includes one or more emerencies");
+			sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(),sheet.getLastRowNum(),0,(fixtureSheetHeader.length - 1)));
+		}
+		if(awayEmgUsed) {
+			cell = row.createCell(fixtureSheetHeader.length + 1);
+			cell.setCellValue("* Score includes one or more emerencies");
+			sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(),sheet.getLastRowNum(),(fixtureSheetHeader.length + 1),(fixtureSheetHeader.length * 2)));
+		}
+
+		row = sheet.createRow(sheet.getLastRowNum()+1);
+		
+		style = sheet.getWorkbook().createCellStyle();
+		font = sheet.getWorkbook().createFont();
+		font.setBold(true);
+		style.setFont(font);
+		
+		XSSFCellStyle emgStyle = sheet.getWorkbook().createCellStyle();
+		emgStyle.setFont(font);
+		emgStyle.setAlignment(HorizontalAlignment.CENTER);
+		
+		cell = row.createCell(0);
+		cell.setCellValue("Emergencies");
+		cell.setCellStyle(emgStyle);
+		
+		cell = row.createCell(fixtureSheetHeader.length + 1);
+		cell.setCellValue("Emergencies");
+		cell.setCellStyle(emgStyle);
+		
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(),sheet.getLastRowNum(),0,(fixtureSheetHeader.length - 1)));
+		sheet.addMergedRegion(new CellRangeAddress(sheet.getLastRowNum(),sheet.getLastRowNum(),(fixtureSheetHeader.length + 1),(fixtureSheetHeader.length * 2)));
+		
+		row = sheet.createRow(sheet.getLastRowNum()+1);;
+		
+		for(int i = 0; i < fixtureSheetHeader.length; i++) {
+			cell = row.createCell(i);
+			cell.setCellValue(fixtureSheetHeader[i]);
+			cell.setCellStyle(style);
+		}
+		
+		cell = row.createCell(fixtureSheetHeader.length);
+		cell.setCellValue("");
+		
+		for(int i = 0; i < fixtureSheetHeader.length; i++) {
+			cell = row.createCell(fixtureSheetHeader.length + 1 + i);
+			cell.setCellValue(fixtureSheetHeader[i]);
+			cell.setCellStyle(style);
+		}
+
+		writeStatsData(sheet, homeTeamEmgData, awayTeamEmgData);
+	}
+	
+	private void writeStatsData(XSSFSheet sheet, List<ResultsFixtureTabTeamStruct> homeTeamData, List<ResultsFixtureTabTeamStruct> awayTeamData) {
 		
 		int currentStatsRow = sheet.getLastRowNum()+1;
 		
@@ -646,57 +800,6 @@ public class ResultsReport {
 			
 			currentStatsRow++;
 		}
-		
-		int totalsCellBase = fixtureSheetHeader.length - 4;
-		
-		XSSFRow row = sheet.createRow(sheet.getLastRowNum()+1);
-		XSSFCell cell = row.createCell(totalsCellBase);
-		cell.setCellValue("Total");
-		cell.setCellStyle(style);
-		
-		cell = row.createCell(totalsCellBase + 1);
-		cell.setCellValue(teamScores.get(fixture.getHomeTeam()).getScore());
-		cell.setCellStyle(style);
-		
-		if(playersPlayedCount.get(fixture.getHomeTeam()) == selectedPlayersCount.get(fixture.getHomeTeam())) {
-			int teamPredictedScore = teamPredictedScores.get(fixture.getHomeTeam()).getPredictedScore();
-			cell = row.createCell(totalsCellBase + 2);
-			cell.setCellValue(teamPredictedScore);
-			cell.setCellStyle(style);
-		} else {
-			cell = row.createCell(totalsCellBase + 2);
-			cell.setCellValue(currentPredictedTeamScores.get(fixture.getHomeTeam()));
-			cell.setCellStyle(style);
-		}
-		
-		cell = row.createCell(totalsCellBase + 3);
-		cell.setCellValue(homeTotalTrend);
-		cell.setCellStyle(style);
-		
-		totalsCellBase = totalsCellBase + fixtureSheetHeader.length + 1;
-		
-		cell = row.createCell(totalsCellBase);
-		cell.setCellValue("Total");
-		cell.setCellStyle(style);
-		
-		cell = row.createCell(totalsCellBase + 1);
-		cell.setCellValue(teamScores.get(fixture.getAwayTeam()).getScore());
-		cell.setCellStyle(style);
-		
-		if(playersPlayedCount.get(fixture.getAwayTeam()) == selectedPlayersCount.get(fixture.getAwayTeam())) {
-			int teamPredictedScore = teamPredictedScores.get(fixture.getAwayTeam()).getPredictedScore();
-			cell = row.createCell(totalsCellBase + 2);
-			cell.setCellValue(teamPredictedScore);
-			cell.setCellStyle(style);
-		} else {
-			cell = row.createCell(totalsCellBase + 2);
-			cell.setCellValue(currentPredictedTeamScores.get(fixture.getAwayTeam()));
-			cell.setCellStyle(style);
-		};
-		
-		cell = row.createCell(totalsCellBase + 3);
-		cell.setCellValue(awayTotalTrend);
-		cell.setCellStyle(style);
 	}
 	
 	private void emailReport(String reportName, int round, boolean isFinal) throws Exception {

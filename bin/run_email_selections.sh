@@ -1,3 +1,4 @@
 #!/bin/bash
-export CLASSPATH=/app/target/dflmngr.jar:/app/target/dependency/*
+export CLASSPATH=$APP_HOME/target/dflmngr.jar:$APP_HOME/target/dependency/*
 java -classpath $CLASSPATH net.dflmngr.handlers.EmailSelectionsHandler
+echo $?

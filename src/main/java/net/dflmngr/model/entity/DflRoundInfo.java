@@ -10,8 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+//import javax.persistence.Temporal;
+//import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "dfl_round_info")
@@ -22,7 +22,7 @@ public class DflRoundInfo {
 	private int round;
 	
 	@Column(name = "hard_lockout")
-	@Temporal(TemporalType.TIMESTAMP)
+	//@Temporal(TemporalType.TIMESTAMP)
 	private ZonedDateTime hardLockoutTime;
 	
 	@Column(name = "split_round")
