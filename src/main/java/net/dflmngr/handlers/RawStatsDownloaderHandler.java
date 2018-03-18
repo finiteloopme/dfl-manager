@@ -14,7 +14,7 @@ import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import io.github.bonigarcia.wdm.PhantomJsDriverManager;
 import net.dflmngr.logging.LoggingUtils;
 import net.dflmngr.model.entity.RawPlayerStats;
-import net.dflmngr.model.entity.keys.ProcessPK;
+//import net.dflmngr.model.entity.keys.ProcessPK;
 import net.dflmngr.model.entity.Process;
 import net.dflmngr.model.service.GlobalsService;
 import net.dflmngr.model.service.ProcessService;
@@ -55,7 +55,7 @@ public class RawStatsDownloaderHandler {
 	public void execute(int round, String homeTeam, String awayTeam, String statsUrl) {
 		
 		Process process = new Process();
-		ProcessPK processPK = new ProcessPK();
+		//ProcessPK processPK = new ProcessPK();
 		ZonedDateTime now = ZonedDateTime.now(ZoneId.of(DflmngrUtils.defaultTimezone));
 		
 		try {
@@ -68,7 +68,8 @@ public class RawStatsDownloaderHandler {
 			//processPK.setStartTime(now);
 			//process.setProcessId(processPK.getProcessId());
 			process.setProcessId(System.getenv("HEROKU_DYNO_ID"));
-			process.setStartTime(processPK.getStartTime());
+			//process.setStartTime(processPK.getStartTime());
+			process.setStartTime(now);
 			process.setParams(round + " " + homeTeam + " " + awayTeam + " " + statsUrl);
 			process.setStatus("Running");
 			
