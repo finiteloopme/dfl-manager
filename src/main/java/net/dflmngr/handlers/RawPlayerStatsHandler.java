@@ -355,7 +355,7 @@ public class RawPlayerStatsHandler {
 			Thread.sleep(30000);
 			
 			if(process == null) {
-				process = processService.get(dynoId)
+				process = processService.get(dynoId);
 			} else {
 				processService.refresh(process);
 			}
