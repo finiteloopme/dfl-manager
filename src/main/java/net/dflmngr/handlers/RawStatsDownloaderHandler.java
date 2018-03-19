@@ -9,7 +9,15 @@ import java.util.concurrent.TimeUnit;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+//import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
+
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.WebClient;
+
+//import com.gargoylesoftware.htmlunit.BrowserVersion;
+//import com.gargoylesoftware.htmlunit.WebClient;
 
 import io.github.bonigarcia.wdm.PhantomJsDriverManager;
 import net.dflmngr.logging.LoggingUtils;
@@ -133,7 +141,18 @@ public class RawStatsDownloaderHandler {
 		int webdriverTimeout = globalsService.getWebdriverTimeout();
 		int webdriverWait = globalsService.getWebdriverWait();
 		
-		WebDriver driver = new PhantomJSDriver();
+		//WebDriver driver = new PhantomJSDriver();
+		WebDriver driver = new HtmlUnitDriver(BrowserVersion.CHROME) {
+	        @Override
+	        protected WebClient newWebClient(BrowserVersion version) {
+	            WebClient webClient = super.newWebClient(version);
+	            webClient.getOptions().setThrowExceptionOnScriptError(false);
+	            webClient.getOptions().setCssEnabled(false);
+	            webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
+	            return webClient;
+	        }
+		};
+		
 		driver.manage().timeouts().implicitlyWait(webdriverWait, TimeUnit.SECONDS);
 		driver.manage().timeouts().pageLoadTimeout(webdriverTimeout, TimeUnit.SECONDS);
 		
