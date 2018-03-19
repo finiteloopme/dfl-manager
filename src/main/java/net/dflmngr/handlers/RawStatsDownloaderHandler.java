@@ -4,14 +4,16 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 //import org.openqa.selenium.htmlunit.HtmlUnitDriver;
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
+//import org.openqa.selenium.phantomjs.PhantomJSDriver;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
 import com.gargoylesoftware.htmlunit.WebClient;
@@ -19,7 +21,7 @@ import com.gargoylesoftware.htmlunit.WebClient;
 //import com.gargoylesoftware.htmlunit.BrowserVersion;
 //import com.gargoylesoftware.htmlunit.WebClient;
 
-import io.github.bonigarcia.wdm.PhantomJsDriverManager;
+//import io.github.bonigarcia.wdm.PhantomJsDriverManager;
 import net.dflmngr.logging.LoggingUtils;
 import net.dflmngr.model.entity.RawPlayerStats;
 //import net.dflmngr.model.entity.keys.ProcessPK;
@@ -45,7 +47,7 @@ public class RawStatsDownloaderHandler {
 	GlobalsService globalsService;
 	
 	public RawStatsDownloaderHandler() {
-		PhantomJsDriverManager.getInstance().setup();
+		//PhantomJsDriverManager.getInstance().setup();
 		
 		rawPlayerStatsService = new RawPlayerStatsServiceImpl();
 		processService = new ProcessServiceImpl();
@@ -75,7 +77,12 @@ public class RawStatsDownloaderHandler {
 			//processPK.setProcessId(System.getenv("DYNO"));
 			//processPK.setStartTime(now);
 			//process.setProcessId(processPK.getProcessId());
-			process.setProcessId(System.getenv("HEROKU_DYNO_ID"));
+			if(System.getenv().containsKey("HEROKU_DYNO_ID")) {
+				process.setProcessId(System.getenv("HEROKU_DYNO_ID"));
+			} else {
+				process.setProcessId(UUID.randomUUID().toString());
+			}
+			
 			//process.setStartTime(processPK.getStartTime());
 			process.setStartTime(now);
 			process.setParams(round + " " + homeTeam + " " + awayTeam + " " + statsUrl);
@@ -100,6 +107,7 @@ public class RawStatsDownloaderHandler {
 					}
 				} catch (Exception ex) {
 					loggerUtils.log("info", "Exception caught downloading stats will try again");
+					loggerUtils.log("info", "Exception stacktrace={}", ExceptionUtils.getStackTrace(ex));
 				}
 			}
 			if(statsDownloaded) {
@@ -236,5 +244,7 @@ public class RawStatsDownloaderHandler {
 		RawStatsDownloaderHandler handler = new RawStatsDownloaderHandler();
 		handler.configureLogging("RawPlayerDownloader");
 		handler.execute(round, homeTeam, awayTeam, statsUrl);
+		
+		System.exit(0);
 	}
 }

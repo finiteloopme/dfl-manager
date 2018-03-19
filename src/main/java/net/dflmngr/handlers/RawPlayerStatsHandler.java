@@ -13,6 +13,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.json.simple.JsonObject;
 import org.json.simple.Jsoner;
 
@@ -122,7 +129,7 @@ public class RawPlayerStatsHandler {
 			loggerUtils.log("info", "AFL games to download stats from: {}", fixturesToProcess);
 			//loggerUtils.log("info", "Team to take stats from: {}", teamsToProcess);
 			
-			processFixtures(round, fixturesToProcess);
+			processFixtures(round, fixturesToProcess, onHeroku);
 			
 			dflRoundInfoService.close();
 			aflFixtureService.close();
@@ -136,7 +143,7 @@ public class RawPlayerStatsHandler {
 		}
 	}
 		
-	private void processFixtures(int round, List<AflFixture> fixturesToProcess) throws Exception {
+	private void processFixtures(int round, List<AflFixture> fixturesToProcess, boolean onHeroku) throws Exception {
 		
 		String year = globalsService.getCurrentYear();
 		String statsUrl = globalsService.getAflStatsUrl();
@@ -154,14 +161,21 @@ public class RawPlayerStatsHandler {
 			String fullStatsUrl = statsUrl + "/" + year + "/" + aflRound + "/" + homeTeam.toLowerCase() + "-v-" + awayTeam.toLowerCase();
 			loggerUtils.log("info", "AFL stats URL: {}", fullStatsUrl);
 
-			String command = "bin/run_raw_stats_downloader.sh " + round + " " + " " + homeTeam + " " + awayTeam + " " + fullStatsUrl;
-			
-			int tries = 1;
-			while(!spawnDyno(command)) {
-				if(tries == 3) {
-					break;
+			if(onHeroku) {
+				String command = "bin/run_raw_stats_downloader.sh " + round + " " + " " + homeTeam + " " + awayTeam + " " + fullStatsUrl;
+				
+				int tries = 1;
+				while(!spawnDyno(command)) {
+					if(tries == 3) {
+						break;
+					}
+					tries++;
 				}
-				tries++;
+			} else {
+				loggerUtils.log("info", "Running locally ... ");
+				RawStatsDownloaderHandler handler = new RawStatsDownloaderHandler();
+				handler.configureLogging("RawPlayerDownloader");
+				handler.execute(round, homeTeam, awayTeam, fullStatsUrl);
 			}
 		}	
 			/*
@@ -362,8 +376,37 @@ public class RawPlayerStatsHandler {
 	
 	// For internal testing
 	public static void main(String[] args) {
-		RawPlayerStatsHandler testing = new RawPlayerStatsHandler();
-		testing.configureLogging("batch.name", "batch-logger", "RawPlayerStatsHandlerTesting");
-		testing.execute(Integer.parseInt(args[0]), true);
+		Options options = new Options();
+		
+		Option roundOpt  = Option.builder("r").argName("round").hasArg().desc("round to run on").type(Number.class).required().build();
+		Option onHerokuOpt = new Option("h", "use Heroku one off dyno");
+		
+		options.addOption(roundOpt);
+		options.addOption(onHerokuOpt);
+		
+		try {
+			int round = 0;
+			boolean onHeroku = false;
+						
+			CommandLineParser parser = new DefaultParser();
+			CommandLine cli = parser.parse(options, args);
+			
+			round = ((Number)cli.getParsedOptionValue("r")).intValue();
+			
+			if(cli.hasOption("h")) {
+				onHeroku = true;
+			}
+		
+			RawPlayerStatsHandler testing = new RawPlayerStatsHandler();
+			testing.configureLogging("batch.name", "batch-logger", "RawPlayerStatsHandlerTesting");
+			testing.execute(round, onHeroku);
+			System.exit(0);
+			
+		} catch (ParseException ex) {
+			HelpFormatter formatter = new HelpFormatter();
+			formatter.printHelp( "RawStatsHandler", options );
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 }
