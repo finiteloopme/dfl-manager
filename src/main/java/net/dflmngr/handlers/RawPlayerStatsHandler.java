@@ -354,18 +354,20 @@ public class RawPlayerStatsHandler {
 			
 			Process process = processService.get(dynoId);
 			
-			String status = process.getStatus();
-			String params = process.getParams();
-			loggerUtils.log("info", "Dyno stauts: {} is {}", dynoId, status);
-			
-			if(status.equals("Completed")) {
-				loggerUtils.log("info", "Completed: {} {}", dynoId, params);
-				success = true;
-				break;
-			} else if(status.equals("Failed")) {
-				loggerUtils.log("info", "Completed: {} {}", dynoId, params);
-				success = false;
-				break;
+			if(process != null) {
+				String status = process.getStatus();
+				String params = process.getParams();
+				loggerUtils.log("info", "Dyno stauts: {} is {}", dynoId, status);
+				
+				if(status.equals("Completed")) {
+					loggerUtils.log("info", "Completed: {} {}", dynoId, params);
+					success = true;
+					break;
+				} else if(status.equals("Failed")) {
+					loggerUtils.log("info", "Completed: {} {}", dynoId, params);
+					success = false;
+					break;
+				}
 			}
 			
 			countDown--;
