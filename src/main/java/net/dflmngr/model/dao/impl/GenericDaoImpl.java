@@ -91,6 +91,10 @@ public abstract class GenericDaoImpl<E, K> implements GenericDao<E, K> {
 		entityManager.flush();
 	}
 	
+	public void refresh(E entity) {
+		entityManager.refresh(entity);
+	}
+	
 	public void close() {
 		entityManager.close();
 	}

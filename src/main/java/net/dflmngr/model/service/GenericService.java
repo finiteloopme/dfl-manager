@@ -12,6 +12,7 @@ public interface GenericService<E, K> {
 	public void updateAll(List<E> entitys, boolean inTx);
 	public void delete(E entity);
 	public void replaceAll(List<E> entitys);
+	public void refresh(E entity);
 	public void close();
 
 }

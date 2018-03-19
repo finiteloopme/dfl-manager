@@ -11,5 +11,6 @@ public interface GenericDao<E, K> {
 	public void commit();
 	public void beginTransaction();
 	public void flush();
+	public void refresh(E entity);
 	public void close();
 }

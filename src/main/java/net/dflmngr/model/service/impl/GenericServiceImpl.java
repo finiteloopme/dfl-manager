@@ -78,6 +78,10 @@ public class GenericServiceImpl<E, K> implements GenericService<E, K>  {
 		dao.commit();
 	}
 	
+	public void refresh(E entity) {
+		dao.refresh(entity);
+	}
+	
 	public void close() {
 		dao.close();
 	}

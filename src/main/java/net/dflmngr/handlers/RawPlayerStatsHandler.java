@@ -348,11 +348,13 @@ public class RawPlayerStatsHandler {
 		
 		int countDown = 20;
 		
+		Process process = processService.get(dynoId);
+		
 		while(countDown != 0) {
 			loggerUtils.log("info", "Wait for stats to download....");
 			Thread.sleep(30000);
 			
-			Process process = processService.get(dynoId);
+			processService.refresh(process);
 			
 			if(process != null) {
 				String status = process.getStatus();
