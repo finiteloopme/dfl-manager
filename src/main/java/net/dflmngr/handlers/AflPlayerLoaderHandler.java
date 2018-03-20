@@ -221,11 +221,11 @@ public class AflPlayerLoaderHandler {
 		Map<String, DflPlayer> dflPlayerCrossRefs = dflPlayerService.getCrossRefPlayers();
 		List<AflPlayer> aflUnmatchedPlayers = new ArrayList<>();
 		
-    	Map<String, DflPlayer> dflPlayerUpdates = new HashMap<>();
-    	Map<Integer, AflPlayer> aflPlayerUpdates = new HashMap<>();
+		Map<String, DflPlayer> dflPlayerUpdates = new HashMap<>();
+		Map<Integer, AflPlayer> aflPlayerUpdates = new HashMap<>();
 		
 		for(AflPlayer aflPlayer : aflPlayers) {
-			String aflPlayerCrossRef = (aflPlayer.getFirstName() + "-" + aflPlayer.getSecondName() + "-" + globalsService.getAflTeamMap(aflPlayer.getTeamId())).toLowerCase();
+			String aflPlayerCrossRef = (aflPlayer.getFirstName() + "-" + aflPlayer.getSecondName() + "-" + globalsService.getAflTeamMap(aflPlayer.getTeamId().toLowerCase())).toLowerCase();
 			loggerUtils.log("info", "Searching for player: {}", aflPlayerCrossRef);
 			DflPlayer dflPlayer = dflPlayerCrossRefs.get(aflPlayerCrossRef);
 			
@@ -264,7 +264,7 @@ public class AflPlayerLoaderHandler {
 		    String dflCheckTwo = (dflPlayer.getFirstName() + "-" + dflPlayer.getAflClub()).toLowerCase();
 		    
 		    for(AflPlayer aflPlayer : aflUnmatchedPlayers) {
-		    	String aflCheckOne = (aflPlayer.getSecondName() + "-" + globalsService.getAflTeamMap(aflPlayer.getTeamId())).toLowerCase();
+		    	String aflCheckOne = (aflPlayer.getSecondName() + "-" + globalsService.getAflTeamMap(aflPlayer.getTeamId().toLowerCase())).toLowerCase();
 		    	
 		    	loggerUtils.log("info", "Check one {} vs {}", dflCheckOne, aflCheckOne);
 		    			    	
