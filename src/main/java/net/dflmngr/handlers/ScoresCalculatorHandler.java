@@ -234,7 +234,7 @@ public class ScoresCalculatorHandler {
 			}
 			
 			loggerUtils.log("info", "In count={}; Out count={}", inCount, outCount);
-			
+						
 			if(inCount > outCount) {
 				int removeCount = inCount - outCount;
 				
@@ -409,7 +409,9 @@ public class ScoresCalculatorHandler {
 				selectedPlayer.setScoreUsed(false);
 				dnpPlayers.add(selectedPlayer);
 			} else {
-				scores.put(selectedPlayer.getPlayerId(), playerScore.getScore());
+				if(playerScore != null) {
+					scores.put(selectedPlayer.getPlayerId(), playerScore.getScore());
+				}
 				if(selectedPlayer.isEmergency() == 0) {
 					selectedPlayer.setScoreUsed(true);
 					played22.add(selectedPlayer);
@@ -469,7 +471,9 @@ public class ScoresCalculatorHandler {
 		
 		for(DflSelectedPlayer player : played22) {
 			if(!player.isDnp()) {
-				teamScore = teamScore + scores.get(player.getPlayerId());
+				if(scores.containsKey(player.getPlayerId())) {
+					teamScore = teamScore + scores.get(player.getPlayerId());
+				}
 			}
 		}
 		
