@@ -3,6 +3,8 @@ package net.dflmngr.validation;
 import java.util.List;
 import java.util.Map;
 
+import net.dflmngr.model.entity.DflPlayer;
+
 public class SelectedTeamValidation {
 	
 	public boolean earlyGames;
@@ -21,9 +23,17 @@ public class SelectedTeamValidation {
 	
 	public boolean teamPlayerCheckOk;
 	
-	public boolean emergencyWarning;
+	public boolean emergencyFfWarning;
+	public boolean emergencyFwdWarning;
+	public boolean emergencyRckWarning;
+	public boolean emergencyMidWarning;
+	public boolean emergencyFbWarning;
+	public boolean emergencyDefWarning;
+	
 	public boolean selectedWarning;
 	public boolean droppedWarning;
+	public List<DflPlayer> selctedWarnPlayers;
+	public List<DflPlayer> droppedWarnPlayers;
 	
 	public boolean unknownError;
 	
@@ -34,6 +44,28 @@ public class SelectedTeamValidation {
 	
 	private Map<String, List<Integer>> insAndOuts;
 	private List<Double> emergencies;
+	
+	public List<DflPlayer> ffPlayers;
+	public List<DflPlayer> fwdPlayers;
+	public List<DflPlayer> midPlayers;
+	public List<DflPlayer> defPlayers;
+	public List<DflPlayer> fbPlayers;
+	public List<DflPlayer> rckPlayers;
+	public List<DflPlayer> benchPlayers;
+	
+	public List<DflPlayer> emgFfPlayers;
+	public List<DflPlayer> emgFwdPlayers;
+	public List<DflPlayer> emgMidPlayers;
+	public List<DflPlayer> emgDefPlayers;
+	public List<DflPlayer> emgFbPlayers;
+	public List<DflPlayer> emgRckPlayers;
+	
+	public boolean duplicateIns;
+	public boolean duplicateOuts;
+	public boolean duplicateEmgs;
+	public List<DflPlayer> dupInPlayers;
+	public List<DflPlayer> dupOutPlayers;
+	public List<DflPlayer> dupEmgPlayers;
 	
 	public SelectedTeamValidation() {
 		earlyGames = false;
@@ -52,7 +84,12 @@ public class SelectedTeamValidation {
 		
 		teamPlayerCheckOk = false;
 		
-		emergencyWarning = false;
+		emergencyFfWarning = false;
+		emergencyFwdWarning = false;
+		emergencyRckWarning = false;
+		emergencyMidWarning = false;
+		emergencyFbWarning = false;
+		emergencyDefWarning = false;
 		
 		unknownError = false;
 	}
@@ -72,6 +109,18 @@ public class SelectedTeamValidation {
 		}
 		
 		return valid;
+	}
+	
+	public boolean areWarnings() {
+		
+		boolean warnings = false;
+		
+		if(emergencyFfWarning || emergencyFwdWarning || emergencyRckWarning || emergencyMidWarning || emergencyFbWarning || emergencyDefWarning ||	
+		   selectedWarning || droppedWarning || duplicateIns || 	duplicateOuts || duplicateEmgs) {
+			warnings = true;
+		}
+		
+		return warnings;
 	}
 
 	public int getRound() {
