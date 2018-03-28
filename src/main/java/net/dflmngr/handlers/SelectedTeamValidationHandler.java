@@ -255,6 +255,9 @@ public class SelectedTeamValidationHandler {
 		List<Integer> checkedIns = new ArrayList<>();
 		List<Integer> checkedOuts = new ArrayList<>();
 		List<Double> checkedEmgs = new ArrayList<>();
+		
+		List<DflPlayer> selectedWarnPlayers = new ArrayList<>();
+		List<DflPlayer> droppedWarnPlayers = new ArrayList<>();
 				
 		List<DflPlayer> dupInPlayers = new ArrayList<>();
 		List<DflPlayer> dupOutPlayers = new ArrayList<>();
@@ -355,9 +358,6 @@ public class SelectedTeamValidationHandler {
 				List<Integer> ins = insAndOuts.get("in");
 				List<Integer> outs = insAndOuts.get("out");
 				
-				List<DflPlayer> selectedWarnPlayers = new ArrayList<>();
-				List<DflPlayer> droppedWarnPlayers = new ArrayList<>();
-				
 				for(int in : ins) {
 					if(checkedIns.contains(in)) {
 						loggerUtils.log("info", "Duplicates ins, not included in={}.", in);
@@ -372,9 +372,13 @@ public class SelectedTeamValidationHandler {
 							break;
 						} else {
 							boolean found = false;
+							boolean isEmg = false;
 							for(DflSelectedPlayer selectedPlayer : selectedTeam) {
 								if(in == selectedPlayer.getTeamPlayerId()) {
 									found = true;
+									if(selectedPlayer.isEmergency() == 1 || selectedPlayer.isEmergency() == 2) {
+										isEmg = true;
+									}
 									break;
 								}
 							}
@@ -390,11 +394,12 @@ public class SelectedTeamValidationHandler {
 								selectedTeam.add(selectedPlayer);
 								loggerUtils.log("info", "Added selectedPlayer={}.", selectedPlayer);
 							} else {
-								loggerUtils.log("info", "Player already selected, teamPlayerId={}.", in);
-								DflPlayer player = dflPlayerService.get(in);
-								selectedWarnPlayers.add(player);
-								validationResult.selectedWarning = true;
-								
+								if(!isEmg) {
+									loggerUtils.log("info", "Player already selected, teamPlayerId={}.", in);
+									DflPlayer player = dflPlayerService.get(in);
+									selectedWarnPlayers.add(player);
+									validationResult.selectedWarning = true;
+								}
 							}
 						}
 					
@@ -502,6 +507,12 @@ public class SelectedTeamValidationHandler {
 			validationResult.setInsAndOuts(insAndOuts);
 			validationResult.setEmergencies(checkedEmgs);
 			
+			if(validationResult.selectedWarning) {
+				validationResult.selectedWarnPlayers = selectedWarnPlayers;
+			}
+			if(validationResult.selectedWarning) {
+				validationResult.droppedWarnPlayers = droppedWarnPlayers;
+			}
 			if(validationResult.duplicateIns) {
 				validationResult.dupInPlayers = dupInPlayers;
 			}

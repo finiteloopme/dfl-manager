@@ -469,7 +469,7 @@ public class EmailSelectionsHandler {
 			
 			if(validationResult.selectedWarning) {
 				messageBody = messageBody + "\tWarning: You have seleted a player who is already selected.  You may be playing short! Players:\n";
-				for(DflPlayer player : validationResult.selctedWarnPlayers) {
+				for(DflPlayer player : validationResult.selectedWarnPlayers) {
 					messageBody = messageBody + "\t\t" + player.getPlayerId() + " " + player.getFirstName() + " " + player.getLastName() + " " + 
 								  player.getPosition() + " " + player.getPosition() + "\n";
 				}

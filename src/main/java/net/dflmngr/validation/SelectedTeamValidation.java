@@ -32,7 +32,7 @@ public class SelectedTeamValidation {
 	
 	public boolean selectedWarning;
 	public boolean droppedWarning;
-	public List<DflPlayer> selctedWarnPlayers;
+	public List<DflPlayer> selectedWarnPlayers;
 	public List<DflPlayer> droppedWarnPlayers;
 	
 	public boolean unknownError;
