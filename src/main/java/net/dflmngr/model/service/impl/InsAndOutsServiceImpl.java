@@ -5,10 +5,9 @@ import java.util.List;
 import net.dflmngr.model.dao.InsAndOutsDao;
 import net.dflmngr.model.dao.impl.InsAndOutsDaoImpl;
 import net.dflmngr.model.entity.InsAndOuts;
-import net.dflmngr.model.entity.keys.InsAndOutsPK;
 import net.dflmngr.model.service.InsAndOutsService;
 
-public class InsAndOutsServiceImpl extends GenericServiceImpl<InsAndOuts, InsAndOutsPK> implements InsAndOutsService {
+public class InsAndOutsServiceImpl extends GenericServiceImpl<InsAndOuts, Integer> implements InsAndOutsService {
 	
 	InsAndOutsDao insAndOutsDao;
 	

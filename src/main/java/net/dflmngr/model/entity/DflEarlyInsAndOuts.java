@@ -2,30 +2,39 @@ package net.dflmngr.model.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
-
-import net.dflmngr.model.entity.keys.DflEarlyInsAndOutsPK;
 
 @Entity
 @Table(name = "dfl_early_ins_and_outs")
-@IdClass(DflEarlyInsAndOutsPK.class)
-
 public class DflEarlyInsAndOuts {
 	
-	@Id @Column(name = "team_code")
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(columnDefinition = "serial")
+	private Integer id;
+	
+	@Column(name = "team_code")
 	private String teamCode;
 	
-	@Id @Column(name = "round")
+	@Column(name = "round")
 	private int round;
 	
-	@Id @Column(name = "team_player_id")
+	@Column(name = "team_player_id")
 	private int teamPlayerId;
 	
 	@Column(name = "in_or_out")
 	private String inOrOut;
 	
+	public Integer getId() {
+		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
 	public String getTeamCode() {
 		return teamCode;
 	}
@@ -60,9 +69,8 @@ public class DflEarlyInsAndOuts {
 
 	@Override
 	public String toString() {
-		return "DflEarlyInsAndOuts [teamCode=" + teamCode + ", round=" + round
-				+ ", teamPlayerId=" + teamPlayerId + ", inOrOut=" + inOrOut
-				+ "]";
+		return "DflEarlyInsAndOuts [id=" + id + ", teamCode=" + teamCode + ", round=" + round + ", teamPlayerId="
+				+ teamPlayerId + ", inOrOut=" + inOrOut + "]";
 	}
 
 }

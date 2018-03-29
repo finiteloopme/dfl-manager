@@ -7,9 +7,8 @@ import javax.persistence.criteria.Predicate;
 import net.dflmngr.model.dao.DflEarlyInsAndOutsDao;
 import net.dflmngr.model.entity.DflEarlyInsAndOuts;
 import net.dflmngr.model.entity.DflEarlyInsAndOuts_;
-import net.dflmngr.model.entity.keys.DflEarlyInsAndOutsPK;
 
-public class DflEarlyInsAndOutsDaoImpl extends GenericDaoImpl<DflEarlyInsAndOuts, DflEarlyInsAndOutsPK>	implements DflEarlyInsAndOutsDao {
+public class DflEarlyInsAndOutsDaoImpl extends GenericDaoImpl<DflEarlyInsAndOuts, Integer>	implements DflEarlyInsAndOutsDao {
 	
 	public DflEarlyInsAndOutsDaoImpl() {
 		super(DflEarlyInsAndOuts.class);

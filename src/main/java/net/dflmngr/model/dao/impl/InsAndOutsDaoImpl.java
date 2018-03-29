@@ -7,9 +7,8 @@ import javax.persistence.criteria.Predicate;
 import net.dflmngr.model.dao.InsAndOutsDao;
 import net.dflmngr.model.entity.InsAndOuts;
 import net.dflmngr.model.entity.InsAndOuts_;
-import net.dflmngr.model.entity.keys.InsAndOutsPK;
 
-public class InsAndOutsDaoImpl extends GenericDaoImpl<InsAndOuts, InsAndOutsPK>implements InsAndOutsDao {
+public class InsAndOutsDaoImpl extends GenericDaoImpl<InsAndOuts, Integer>implements InsAndOutsDao {
 	
 	public InsAndOutsDaoImpl() {
 		super(InsAndOuts.class);

@@ -5,10 +5,9 @@ import java.util.List;
 import net.dflmngr.model.dao.DflEarlyInsAndOutsDao;
 import net.dflmngr.model.dao.impl.DflEarlyInsAndOutsDaoImpl;
 import net.dflmngr.model.entity.DflEarlyInsAndOuts;
-import net.dflmngr.model.entity.keys.DflEarlyInsAndOutsPK;
 import net.dflmngr.model.service.DflEarlyInsAndOutsService;
 
-public class DflEarlyInsAndOutsServiceImpl extends GenericServiceImpl<DflEarlyInsAndOuts, DflEarlyInsAndOutsPK> implements DflEarlyInsAndOutsService {
+public class DflEarlyInsAndOutsServiceImpl extends GenericServiceImpl<DflEarlyInsAndOuts, Integer> implements DflEarlyInsAndOutsService {
 	private DflEarlyInsAndOutsDao dao;
 	
 	public DflEarlyInsAndOutsServiceImpl() {
