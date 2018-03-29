@@ -306,6 +306,7 @@ public class StartRoundHandler {
 							oldEmergencies.add(player);
 						}
 					}
+					tmpSelectedTeam.removeAll(oldEmergencies);
 					
 					for(InsAndOuts inOrOut : insAndOuts) {
 						if(inOrOut.getInOrOut().equals(DomainDecodes.INS_AND_OUTS.IN_OR_OUT.IN)) {
