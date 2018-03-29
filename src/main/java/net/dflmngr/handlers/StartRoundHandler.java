@@ -358,18 +358,24 @@ public class StartRoundHandler {
 			}
 		
 			List<DflSelectedPlayer> selectedTeam = new ArrayList<>();
+			List<Integer> selectedPlayerIds = new ArrayList<>();
 			
 			for(DflSelectedPlayer tmpSelectedPlayer : tmpSelectedTeam) {
-				DflSelectedPlayer selectedPlayer = new DflSelectedPlayer();
-				selectedPlayer.setPlayerId(tmpSelectedPlayer.getPlayerId());
-				selectedPlayer.setRound(round);
-				selectedPlayer.setTeamCode(team.getTeamCode());
-				selectedPlayer.setTeamPlayerId(tmpSelectedPlayer.getTeamPlayerId());
-				selectedPlayer.setDnp(tmpSelectedPlayer.isDnp());
-				selectedPlayer.setEmergency(tmpSelectedPlayer.isEmergency());
-				selectedPlayer.setScoreUsed(tmpSelectedPlayer.isScoreUsed());
-				
-				selectedTeam.add(selectedPlayer);
+				if(selectedPlayerIds.contains(tmpSelectedPlayer.getPlayerId())) {
+					loggerUtils.log("info", "Duplicate selected player: player={}", tmpSelectedPlayer);
+				} else {
+					DflSelectedPlayer selectedPlayer = new DflSelectedPlayer();
+					selectedPlayer.setPlayerId(tmpSelectedPlayer.getPlayerId());
+					selectedPlayer.setRound(round);
+					selectedPlayer.setTeamCode(team.getTeamCode());
+					selectedPlayer.setTeamPlayerId(tmpSelectedPlayer.getTeamPlayerId());
+					selectedPlayer.setDnp(tmpSelectedPlayer.isDnp());
+					selectedPlayer.setEmergency(tmpSelectedPlayer.isEmergency());
+					selectedPlayer.setScoreUsed(tmpSelectedPlayer.isScoreUsed());
+					
+					selectedTeam.add(selectedPlayer);
+					selectedPlayerIds.add(tmpSelectedPlayer.getPlayerId());
+				}
 			}
 			
 			loggerUtils.log("info", "Saving selected to DB: selected team={}", selectedTeam);

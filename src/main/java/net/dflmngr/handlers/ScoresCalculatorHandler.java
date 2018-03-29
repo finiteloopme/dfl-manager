@@ -220,7 +220,7 @@ public class ScoresCalculatorHandler {
 			for(DflEarlyInsAndOuts inOrOut : earlyInsAndOuts) {
 				if(inOrOut.getInOrOut().equals("I")) {
 					inCount++;
-				} else {
+				} else if(inOrOut.getInOrOut().equals("O"))  {
 					outCount++;
 				}
 				

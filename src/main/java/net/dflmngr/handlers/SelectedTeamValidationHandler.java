@@ -355,6 +355,17 @@ public class SelectedTeamValidationHandler {
 			} else {
 				selectedTeam = dflSelectedTeamService.getSelectedTeamForRound(round-1, teamCode);
 				
+				loggerUtils.log("info", "Removeing emergencies from previous round");
+				List<DflSelectedPlayer> playersToRemove = new ArrayList<>();
+				for(DflSelectedPlayer selectedPlayer : selectedTeam) {
+					if(selectedPlayer.isEmergency() != 0) {
+						playersToRemove.add(selectedPlayer);
+						loggerUtils.log("info", "Removing emergency={}", selectedPlayer);
+					}
+				}
+				selectedTeam.removeAll(playersToRemove);
+				playersToRemove.clear();
+				
 				List<Integer> ins = insAndOuts.get("in");
 				List<Integer> outs = insAndOuts.get("out");
 				
@@ -407,8 +418,6 @@ public class SelectedTeamValidationHandler {
 					}
 				}
 				
-				List<DflSelectedPlayer> playersToRemove = new ArrayList<>();
-				
 				for(int out : outs) {
 					if(checkedOuts.contains(out)) {
 						loggerUtils.log("info", "Duplicates out, not included in={}.", out);
@@ -428,9 +437,6 @@ public class SelectedTeamValidationHandler {
 									playersToRemove.add(selectedPlayer);
 									found = true;
 									loggerUtils.log("info", "Removing selectedPlayer={}.", selectedPlayer);
-								} else if(selectedPlayer.isEmergency() != 0) {
-									playersToRemove.add(selectedPlayer);
-									loggerUtils.log("info", "Removing selectedPlayer={} as emergency", selectedPlayer);
 								}
 							}
 							if(!found) {
@@ -449,7 +455,7 @@ public class SelectedTeamValidationHandler {
 					int emergency = (int) emg;
 					
 					if(checkedEmgs.contains(emg) || checkedIns.contains(emergency)) {
-						loggerUtils.log("info", "Duplicate emgergency, not included in={}.", emergency);
+						loggerUtils.log("info", "Duplicate emgergency, not included emg={}.", emergency);
 						validationResult.duplicateEmgs = true;
 						DflPlayer player = dflPlayerService.get(emergency);
 						dupEmgPlayers.add(player);
@@ -468,7 +474,7 @@ public class SelectedTeamValidationHandler {
 								}
 							}
 							if(alreadySelected) {
-								
+								loggerUtils.log("info", "Emergency emg={}.", emergency);
 							} else {
 								DflSelectedPlayer selectedPlayer = new DflSelectedPlayer();
 								
