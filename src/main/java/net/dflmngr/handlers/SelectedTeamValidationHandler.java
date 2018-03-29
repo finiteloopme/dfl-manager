@@ -196,7 +196,7 @@ public class SelectedTeamValidationHandler {
 					if(mappedTeam.equals(aflFixture.getHomeTeam()) || mappedTeam.equals(aflFixture.getAwayTeam())) {
 						boolean found = false;
 						for(DflEarlyInsAndOuts earlyInOrOut : earlyInsAndOuts) {
-							if(earlyInOrOut.getTeamPlayerId() == emg && earlyInOrOut.getInOrOut().equals("E")) {
+							if(earlyInOrOut.getTeamPlayerId() == emg && (earlyInOrOut.getInOrOut().equals("E1") || earlyInOrOut.getInOrOut().equals("E2"))) {
 								found = true;
 								break;
 							}
@@ -219,7 +219,7 @@ public class SelectedTeamValidationHandler {
 						if(mappedTeam.equals(aflFixture.getHomeTeam()) || mappedTeam.equals(aflFixture.getAwayTeam())) {
 							boolean found = false;
 							for(DflEarlyInsAndOuts earlyInOrOut : earlyInsAndOuts) {
-								if(earlyInOrOut.getTeamPlayerId() == out && earlyInOrOut.getInOrOut().equals("I")) {
+								if(earlyInOrOut.getTeamPlayerId() == out && earlyInOrOut.getInOrOut().equals("O")) {
 									found = true;
 									break;
 								}
