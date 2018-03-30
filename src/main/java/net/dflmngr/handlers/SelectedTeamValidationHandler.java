@@ -503,40 +503,32 @@ public class SelectedTeamValidationHandler {
 				selectedTeam.removeAll(playersToRemove);
 			}
 			
+			loggerUtils.log("info", "Pre checks PASSED, validating selected team");
 			
-			validationResult.selectionFileMissing = false;
-			validationResult.roundCompleted = false;
-			validationResult.lockedOut = false;
-			validationResult.teamPlayerCheckOk = true;
+			insAndOuts.replace("in", checkedIns);
+			insAndOuts.replace("out", checkedOuts);
 			
-			if(validationResult.isValid()) {
-				loggerUtils.log("info", "Pre checks PASSED, validating selected team");
-				
-				insAndOuts.replace("in", checkedIns);
-				insAndOuts.replace("out", checkedOuts);
-				
-				validationResult.setInsAndOuts(insAndOuts);
-				validationResult.setEmergencies(checkedEmgs);
-				
-				if(validationResult.selectedWarning) {
-					validationResult.selectedWarnPlayers = selectedWarnPlayers;
-				}
-				if(validationResult.selectedWarning) {
-					validationResult.droppedWarnPlayers = droppedWarnPlayers;
-				}
-				if(validationResult.duplicateIns) {
-					validationResult.dupInPlayers = dupInPlayers;
-				}
-				if(validationResult.duplicateOuts) {
-					validationResult.dupOutPlayers = dupOutPlayers;
-				}
-				if(validationResult.duplicateEmgs) {
-					validationResult.dupEmgPlayers = dupEmgPlayers;
-				}
-				
-				//validationResult = validateTeam(teamCode, selectedTeam, insAndOuts, emergencies, selectedWarning, droppedWarning);
-				validationResult = validateTeam(teamCode, selectedTeam, validationResult);
+			validationResult.setInsAndOuts(insAndOuts);
+			validationResult.setEmergencies(checkedEmgs);
+			
+			if(validationResult.selectedWarning) {
+				validationResult.selectedWarnPlayers = selectedWarnPlayers;
 			}
+			if(validationResult.selectedWarning) {
+				validationResult.droppedWarnPlayers = droppedWarnPlayers;
+			}
+			if(validationResult.duplicateIns) {
+				validationResult.dupInPlayers = dupInPlayers;
+			}
+			if(validationResult.duplicateOuts) {
+				validationResult.dupOutPlayers = dupOutPlayers;
+			}
+			if(validationResult.duplicateEmgs) {
+				validationResult.dupEmgPlayers = dupEmgPlayers;
+			}
+			
+			//validationResult = validateTeam(teamCode, selectedTeam, insAndOuts, emergencies, selectedWarning, droppedWarning);
+			validationResult = validateTeam(teamCode, selectedTeam, validationResult);
 		}
 		
 		return validationResult;
@@ -547,10 +539,10 @@ public class SelectedTeamValidationHandler {
 		
 		//SelectedTeamValidation validationResult = new SelectedTeamValidation();
 		
-		//validationResult.selectionFileMissing = false;
-		//validationResult.roundCompleted = false;
-		//validationResult.lockedOut = false;
-		//validationResult.teamPlayerCheckOk = true;
+		validationResult.selectionFileMissing = false;
+		validationResult.roundCompleted = false;
+		validationResult.lockedOut = false;
+		validationResult.teamPlayerCheckOk = true;
 		
 		//validationResult.selectedWarning = selectedWarning;
 		//validationResult.droppedWarning = droppedWarning;
