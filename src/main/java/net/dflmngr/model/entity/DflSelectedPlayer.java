@@ -35,6 +35,9 @@ public class DflSelectedPlayer {
 	@Column(name = "score_used")
 	private boolean scoreUsed;
 	
+	@Column(name = "has_played")
+	private boolean hasPlayed;
+	
 	public int getRound() {
 		return round;
 	}
@@ -77,18 +80,24 @@ public class DflSelectedPlayer {
 	public void setScoreUsed(boolean scoreUsed) {
 		this.scoreUsed = scoreUsed;
 	}
-	
+	public boolean hasPlayed() {
+		return hasPlayed;
+	}
+	public void setHasPlayed(boolean hasPlayed) {
+		this.hasPlayed = hasPlayed;
+	}
 	@Override
 	public String toString() {
 		return "DflSelectedPlayer [round=" + round + ", playerId=" + playerId + ", teamPlayerId=" + teamPlayerId
 				+ ", teamCode=" + teamCode + ", isEmergency=" + isEmergency + ", isDnp=" + isDnp + ", scoreUsed="
-				+ scoreUsed + "]";
+				+ scoreUsed + ", hasPlayed=" + hasPlayed + "]";
 	}
 	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + (hasPlayed ? 1231 : 1237);
 		result = prime * result + (isDnp ? 1231 : 1237);
 		result = prime * result + isEmergency;
 		result = prime * result + playerId;
@@ -107,6 +116,8 @@ public class DflSelectedPlayer {
 		if (getClass() != obj.getClass())
 			return false;
 		DflSelectedPlayer other = (DflSelectedPlayer) obj;
+		if (hasPlayed != other.hasPlayed)
+			return false;
 		if (isDnp != other.isDnp)
 			return false;
 		if (isEmergency != other.isEmergency)

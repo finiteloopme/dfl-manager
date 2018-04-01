@@ -47,7 +47,7 @@ public class LadderCalculatorHandler {
 		isExecutable = true;
 	}
 	
-	public void execute(int round, boolean liveLadderOveride, int homeTeamScore, int awayTeamScore) {
+	public void execute(int round, boolean liveLadderOveride, Map<String, Integer> teamScores) {
 		
 		try{
 			if(!isExecutable) {
@@ -56,8 +56,11 @@ public class LadderCalculatorHandler {
 			}
 			
 			loggerUtils.log("info", "LadderCalculatorHandler executing round={} ...", round);
+			if(liveLadderOveride) {
+				loggerUtils.log("info", "Calculating live ladder override scores={} ...", teamScores);
+			}
 			
-			handleLadder(round, liveLadderOveride, homeTeamScore, awayTeamScore);
+			handleLadder(round, liveLadderOveride, teamScores);
 			
 			dflLadderService.close();;
 			dflFixtureService.close();;
@@ -70,7 +73,7 @@ public class LadderCalculatorHandler {
 		}
 	}
 	
-	private void handleLadder(int round, boolean liveLadderOveride, int homeTeamScore, int awayTeamScore) {
+	private void handleLadder(int round, boolean liveLadderOveride, Map<String, Integer> teamScores) {
 		
 		List<DflFixture> roundFixtures = dflFixtureService.getFixturesForRound(round);
 		Map<String, DflTeamScores> roundTeamScores = dflTeamScoresService.getForRoundWithKey(round);
@@ -78,14 +81,20 @@ public class LadderCalculatorHandler {
 		
 		List<DflLadder> roundLadder = new ArrayList<>();
 		
+		int homeTeamScore;
+		int awayTeamScore;
+		
 		for(DflFixture fixture : roundFixtures) {
 			
 			String homeTeamCode = fixture.getHomeTeam();
 			String awayTeamCode = fixture.getAwayTeam();
 			
-			if(!liveLadderOveride) {
+			if(liveLadderOveride) {
+				homeTeamScore = teamScores.get(homeTeamCode);
+				awayTeamScore = teamScores.get(awayTeamCode);
+			} else {
 				homeTeamScore = roundTeamScores.get(homeTeamCode).getScore();
-				awayTeamScore = roundTeamScores.get(awayTeamCode).getScore();
+				awayTeamScore = roundTeamScores.get(awayTeamCode).getScore();				
 			}
 			
 			DflLadder homeTeamLadder = calculateLadder(round, homeTeamCode, previousLadder.get(homeTeamCode), homeTeamScore, awayTeamScore);

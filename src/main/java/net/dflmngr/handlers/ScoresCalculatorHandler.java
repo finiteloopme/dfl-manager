@@ -443,11 +443,18 @@ public class ScoresCalculatorHandler {
 			if(playerScore == null && playedTeams.contains(DflmngrUtils.dflAflTeamMap.get(player.getAflClub()))) {
 				selectedPlayer.setDnp(true);
 				selectedPlayer.setScoreUsed(false);
+				selectedPlayer.setHasPlayed(true);
 				dnpPlayers.add(selectedPlayer);
 			} else {
 				if(playerScore != null) {
 					scores.put(selectedPlayer.getPlayerId(), playerScore.getScore());
 				}
+				if(playedTeams.contains(DflmngrUtils.dflAflTeamMap.get(player.getAflClub()))) {
+					selectedPlayer.setHasPlayed(true);
+				} else {
+					selectedPlayer.setHasPlayed(false);
+				}
+				selectedPlayer.setDnp(false);
 				if(selectedPlayer.isEmergency() == 0) {
 					selectedPlayer.setScoreUsed(true);
 					played22.add(selectedPlayer);
@@ -455,6 +462,7 @@ public class ScoresCalculatorHandler {
 					selectedPlayer.setScoreUsed(false);
 					emergencies.add(selectedPlayer);	
 				}
+				
 			}
 		}
 		
@@ -541,7 +549,10 @@ public class ScoresCalculatorHandler {
 		for(DflSelectedPlayer player : played22) {
 			if(!player.isDnp()) {
 				if(scores.containsKey(player.getPlayerId())) {
+					loggerUtils.log("info", "Calculating scores team={}, playerid={}. teamplayer{}, playerscore={}, teamscore={}",
+							         player.getTeamCode(), player.getPlayerId(), player.getTeamPlayerId(), scores.get(player.getPlayerId()), teamScore);
 					teamScore = teamScore + scores.get(player.getPlayerId());
+					
 				}
 			}
 		}

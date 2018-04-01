@@ -458,7 +458,8 @@ public class ResultsReport {
 		}
 		
 		playersPlayedCount.put(fixture.getHomeTeam(), playersPlayed);
-		selectedPlayersCount.put(fixture.getHomeTeam(), selectedHomeTeam.size());
+		//selectedPlayersCount.put(fixture.getHomeTeam(), selectedHomeTeam.size());
+		selectedPlayersCount.put(fixture.getHomeTeam(), homeTeamData.size());
 		currentPredictedTeamScores.put(fixture.getHomeTeam(), currentPredictedScore);
 		playersPlayed = 0;
 		currentPredictedScore = 0;
@@ -558,7 +559,8 @@ public class ResultsReport {
 		}
 		
 		playersPlayedCount.put(fixture.getAwayTeam(), playersPlayed);
-		selectedPlayersCount.put(fixture.getAwayTeam(), selectedAwayTeam.size());
+		//selectedPlayersCount.put(fixture.getAwayTeam(), selectedAwayTeam.size());
+		selectedPlayersCount.put(fixture.getAwayTeam(), awayTeamData.size());
 		currentPredictedTeamScores.put(fixture.getAwayTeam(), currentPredictedScore);
 		
 		Collections.sort(homeTeamData);
@@ -906,6 +908,8 @@ public class ResultsReport {
 		int awayTeamPredictedScore = 0;
 		int homeTeamPredictedScore = 0;
 		
+		Map<String, Integer> currentLadderScores = new HashMap<>();
+		
 		String body = "<html>";
 		body = body + "<body>\n";
 		body = "<p>Current scores for round " + round + ":</p>\n";
@@ -915,32 +919,32 @@ public class ResultsReport {
 			DflTeam homeTeam = dflTeamService.get(fixture.getHomeTeam());
 			int homeTeamScore = teamScores.get(fixture.getHomeTeam()).getScore();
 			
-			/*
-			if(playersPlayedCount.get(fixture.getHomeTeam()) == selectedPlayersCount.get(fixture.getHomeTeam())) {
-				homeTeamPredictedScore = teamPredictedScores.get(fixture.getHomeTeam()).getPredictedScore();
-			} else {
-				homeTeamPredictedScore = currentPredictedTeamScores.get(fixture.getHomeTeam());
-			}
-			*/
-			homeTeamPredictedScore = currentPredictedTeamScores.get(fixture.getHomeTeam());
-			
 			int homePlayersPlayed = playersPlayedCount.get(fixture.getHomeTeam());
 			int homeSelectedSize = selectedPlayersCount.get(fixture.getHomeTeam());
 			
+			//if(playersPlayedCount.get(fixture.getHomeTeam()) == selectedPlayersCount.get(fixture.getHomeTeam())) {
+			if(homePlayersPlayed == homeSelectedSize) {
+				homeTeamPredictedScore = homeTeamScore;
+				homeTeamScore = teamPredictedScores.get(fixture.getHomeTeam()).getPredictedScore();
+			} else {
+				homeTeamPredictedScore = currentPredictedTeamScores.get(fixture.getHomeTeam());
+			}
+			//homeTeamPredictedScore = currentPredictedTeamScores.get(fixture.getHomeTeam());
+			
 			DflTeam awayTeam = dflTeamService.get(fixture.getAwayTeam());
 			int awayTeamScore = teamScores.get(fixture.getAwayTeam()).getScore();
+					
+			int awayPlayersPlayed = playersPlayedCount.get(fixture.getAwayTeam());
+			int awaySelectedSize = selectedPlayersCount.get(fixture.getAwayTeam());
 			
-			/*
-			if(playersPlayedCount.get(fixture.getAwayTeam()) == selectedPlayersCount.get(fixture.getAwayTeam())) {
-				awayTeamPredictedScore = teamPredictedScores.get(fixture.getAwayTeam()).getPredictedScore();
+			//if(playersPlayedCount.get(fixture.getAwayTeam()) == selectedPlayersCount.get(fixture.getAwayTeam())) {
+			if(awayPlayersPlayed == awaySelectedSize) {
+				awayTeamPredictedScore = awayTeamScore;
+				homeTeamPredictedScore = teamPredictedScores.get(fixture.getAwayTeam()).getPredictedScore();
 			} else {
 				awayTeamPredictedScore = currentPredictedTeamScores.get(fixture.getAwayTeam());
 			}
-			*/
-			awayTeamPredictedScore = currentPredictedTeamScores.get(fixture.getAwayTeam());
-			
-			int awayPlayersPlayed = playersPlayedCount.get(fixture.getAwayTeam());
-			int awaySelectedSize = selectedPlayersCount.get(fixture.getAwayTeam());
+			//awayTeamPredictedScore = currentPredictedTeamScores.get(fixture.getAwayTeam());
 			
 			String resultString = "";
 			//if(homeTeamScore > awayTeamScore) {
@@ -962,6 +966,9 @@ public class ResultsReport {
 					   + resultString 
 					   + awayTeam.getName() + " " + awayTeamPredictedScore + " (" + awayTeamScore + " - " + awayPlayersPlayed + "/" + awaySelectedSize + " played)"
 					   + "</li>\n";
+			
+			currentLadderScores.put(fixture.getHomeTeam(), homeTeamPredictedScore);
+			currentLadderScores.put(fixture.getAwayTeam(), awayTeamPredictedScore);
 		}
 		
 		body = body + "</ul></p>\n";
@@ -970,7 +977,7 @@ public class ResultsReport {
 			loggerUtils.log("info", "Calculating Live Ladder");
 			LadderCalculatorHandler ladderCalculator = new LadderCalculatorHandler();
 			ladderCalculator.configureLogging(mdcKey, loggerName, logfile);
-			ladderCalculator.execute(round, true, homeTeamPredictedScore, awayTeamPredictedScore);
+			ladderCalculator.execute(round, true, currentLadderScores);
 			
 			List<DflLadder> ladder = dflLadderService.getLadderForRound(round);
 			Collections.sort(ladder, Collections.reverseOrder());

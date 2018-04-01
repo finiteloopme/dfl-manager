@@ -92,7 +92,7 @@ public class ResultsHandler {
 					loggerUtils.log("info", "Calculating Ladder");
 					LadderCalculatorHandler ladderCalculator = new LadderCalculatorHandler();
 					ladderCalculator.configureLogging(mdcKey, loggerName, logfile);
-					ladderCalculator.execute(round, false, 0, 0);
+					ladderCalculator.execute(round, false, null);
 				}
 				
 				loggerUtils.log("info", "Writing report");
