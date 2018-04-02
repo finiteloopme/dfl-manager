@@ -22,6 +22,7 @@ public class ResultsFixtureTabTeamStruct implements Comparator<ResultsFixtureTab
 	private String score;
 	private int predicted;
 	private String trend;
+	private int emgSort;
 	
 	
 	public boolean hasPlayed() {
@@ -204,6 +205,12 @@ public class ResultsFixtureTabTeamStruct implements Comparator<ResultsFixtureTab
 	}
 	public void setTrendInt(int trend) {
 		this.trend = Integer.toString(trend);
+	}
+	public int getEmgSort() {
+		return emgSort;
+	}
+	public void setEmgSort(int emgSort) {
+		this.emgSort = emgSort;
 	}
 	
 	@Override

@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -450,6 +451,7 @@ public class ResultsReport {
 			if(selectedPlayer.isEmergency() == 0) {
 				homeTeamData.add(playerRec);
 			} else {
+				playerRec.setEmgSort(selectedPlayer.isEmergency());
 				homeTeamEmgData.add(playerRec);
 				if(selectedPlayer.isScoreUsed()) {
 					homeEmgUsed = true;
@@ -551,6 +553,7 @@ public class ResultsReport {
 			if(selectedPlayer.isEmergency() == 0) {
 				awayTeamData.add(playerRec);
 			} else {
+				playerRec.setEmgSort(selectedPlayer.isEmergency());
 				awayTeamEmgData.add(playerRec);
 				if(selectedPlayer.isScoreUsed()) {
 					awayEmgUsed = true;
@@ -565,6 +568,10 @@ public class ResultsReport {
 		
 		Collections.sort(homeTeamData);
 		Collections.sort(awayTeamData);
+		
+		Comparator<ResultsFixtureTabTeamStruct> comparator = Comparator.comparingInt(ResultsFixtureTabTeamStruct::getEmgSort);
+		homeTeamEmgData.sort(comparator);
+		awayTeamEmgData.sort(comparator);
 		
 		writeStatsData(sheet, homeTeamData, awayTeamData);
 		
