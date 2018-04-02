@@ -4,6 +4,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -384,6 +385,7 @@ public class ScoresCalculatorHandler {
 		List<DflSelectedPlayer> played22 = new ArrayList<>();
 		List<DflSelectedPlayer> emergencies = new ArrayList<>();
 		List<DflSelectedPlayer> dnpPlayers = new ArrayList<>();
+		List<DflSelectedPlayer> replacedDnpPlayers = new ArrayList<>();
 		Map<Integer, Integer> scores = new HashMap<>();
 		
 		Map<Integer, String> playerPositions = new HashMap<>();
@@ -470,6 +472,9 @@ public class ScoresCalculatorHandler {
 		loggerUtils.log("info", "DNPs={} -- Size:{}", dnpPlayers, dnpPlayers.size());
 		loggerUtils.log("info", "Emergencies={} -- Size:{}", emergencies, emergencies.size());
 		
+		Comparator<DflSelectedPlayer> emgsComparator = Comparator.comparingInt(DflSelectedPlayer::isEmergency);
+		emergencies.sort(emgsComparator);
+		
 		if(ffCount == 2) {
 			benchPositions.add("ff");
 		}
@@ -491,6 +496,78 @@ public class ScoresCalculatorHandler {
 		
 		loggerUtils.log("info", "Bench positions={}", benchPositions);
 		
+		
+		if(emergencies.isEmpty()) {
+			loggerUtils.log("info", "No emergencies to replace DNPs");
+			for(DflSelectedPlayer dnpPlayer : dnpPlayers) {
+				if(dnpPlayer.isEmergency() == 0) {
+					dnpPlayer.setScoreUsed(true);
+					played22.add(dnpPlayer);
+				}
+				replacedDnpPlayers.add(dnpPlayer);
+			}
+			dnpPlayers.removeAll(replacedDnpPlayers);
+		} else {
+			loggerUtils.log("info", "Replacing DNPs by position");
+			for(DflSelectedPlayer dnpPlayer : dnpPlayers) {
+				DflSelectedPlayer replacement = null;
+				
+				if(dnpPlayer.isEmergency() == 0) {
+					for(DflSelectedPlayer emergency : emergencies) {
+						String dnpPosition = playerPositions.get(dnpPlayer.getPlayerId());
+						String emgPosition = playerPositions.get(emergency.getPlayerId());
+						
+						if(dnpPosition.equals(emgPosition)) {
+							replacement = emergency;
+							break;
+						}
+					}
+					
+					if(replacement != null) {
+						emergencies.remove(replacement);
+						replacement.setScoreUsed(true);
+						played22.add(replacement);
+						replacedDnpPlayers.add(dnpPlayer);
+						loggerUtils.log("info", "Replacing DNP={} with Emergency={} based on position", dnpPlayer, replacement);
+					}
+				} else {
+					loggerUtils.log("info", "DNP is an emergency, no need to replace.  DNP={}", dnpPlayer);
+					replacedDnpPlayers.add(dnpPlayer);
+				}
+			}
+			dnpPlayers.removeAll(replacedDnpPlayers);
+			if(!dnpPlayers.isEmpty()) {
+				loggerUtils.log("info", "Replacing DNPs by promoting bench players");
+				
+				for(DflSelectedPlayer dnpPlayer : dnpPlayers) {
+					DflSelectedPlayer replacement = null;
+					
+					String dnpPosition = playerPositions.get(dnpPlayer.getPlayerId());
+					
+					for(DflSelectedPlayer emergency : emergencies) {
+						if(benchPositions.contains(dnpPosition)) {
+							replacement = emergency;
+							break;
+						}
+					}
+			
+					if(replacement != null) {
+						emergencies.remove(replacement);
+						replacement.setScoreUsed(true);
+						played22.add(replacement);
+						replacedDnpPlayers.add(dnpPlayer);
+						loggerUtils.log("info", "Bench can take the ground DNP={} with Emergency={}", dnpPlayer, replacement);
+					} else {
+						dnpPlayer.setScoreUsed(true);
+						played22.add(dnpPlayer);
+						loggerUtils.log("info", "Positional rules don't allow emergency DNP={} with Emergency={}", dnpPlayer, replacement);
+					}
+				}
+			}
+			dnpPlayers.removeAll(replacedDnpPlayers);
+		}
+		
+		/*
 		for(DflSelectedPlayer dnpPlayer : dnpPlayers) {			
 			if(dnpPlayer.isEmergency() == 0) {
 				DflSelectedPlayer replacement = null;
@@ -539,12 +616,15 @@ public class ScoresCalculatorHandler {
 							played22.add(replacement);
 							loggerUtils.log("info", "Bench can take the ground DNP={} with Emergency={}", dnpPlayer, replacement);
 						} else {
+							dnpPlayer.setScoreUsed(true);
+							played22.add(dnpPlayer);
 							loggerUtils.log("info", "Positional rules don't allow emergency DNP={} with Emergency={}", dnpPlayer, replacement);
 						}						
 					}
 				}
 			}
 		}
+		*/
 		
 		for(DflSelectedPlayer player : played22) {
 			if(!player.isDnp()) {
@@ -561,8 +641,11 @@ public class ScoresCalculatorHandler {
 		if(!emergencies.isEmpty()) {
 			dflSelectedTeamService.updateAll(emergencies, false);
 		}
-		if(!dnpPlayers.isEmpty()) {
-			dflSelectedTeamService.updateAll(dnpPlayers, false);
+		//if(!dnpPlayers.isEmpty()) {
+		//	dflSelectedTeamService.updateAll(dnpPlayers, false);
+		//}
+		if(!replacedDnpPlayers.isEmpty()) {
+			dflSelectedTeamService.updateAll(replacedDnpPlayers, false);
 		}
 		
 		return teamScore;

@@ -905,8 +905,8 @@ public class ResultsReport {
 	
 	private String createEmailBody(int round) {
 		
-		int awayTeamPredictedScore = 0;
-		int homeTeamPredictedScore = 0;
+		//int awayTeamPredictedScore = 0;
+		//int homeTeamPredictedScore = 0;
 		
 		Map<String, Integer> currentLadderScores = new HashMap<>();
 		
@@ -915,34 +915,50 @@ public class ResultsReport {
 		body = "<p>Current scores for round " + round + ":</p>\n";
 		body = body + "<p><ul type=none>\n";
 		
+		System.out.println("Team Scores:" + teamScores);
+		System.out.println("Predicted Scores:" + teamPredictedScores);
+		System.out.println("Current Predicted Scores:" + currentPredictedTeamScores);
+		
+		System.out.println("Played count:" + playersPlayedCount);
+		System.out.println("Selected count:" + selectedPlayersCount);
+		
+		
 		for(DflFixture fixture : roundFixtures) {
 			DflTeam homeTeam = dflTeamService.get(fixture.getHomeTeam());
-			int homeTeamScore = teamScores.get(fixture.getHomeTeam()).getScore();
+			//int homeTeamScore = teamScores.get(fixture.getHomeTeam()).getScore();
 			
 			int homePlayersPlayed = playersPlayedCount.get(fixture.getHomeTeam());
 			int homeSelectedSize = selectedPlayersCount.get(fixture.getHomeTeam());
 			
+			int homeTeamScore;
+			int homeTeamPredictedScore;
 			//if(playersPlayedCount.get(fixture.getHomeTeam()) == selectedPlayersCount.get(fixture.getHomeTeam())) {
 			if(homePlayersPlayed == homeSelectedSize) {
-				homeTeamPredictedScore = homeTeamScore;
+				//homeTeamPredictedScore = homeTeamScore;
+				homeTeamPredictedScore = teamScores.get(fixture.getHomeTeam()).getScore();
 				homeTeamScore = teamPredictedScores.get(fixture.getHomeTeam()).getPredictedScore();
 			} else {
 				homeTeamPredictedScore = currentPredictedTeamScores.get(fixture.getHomeTeam());
+				homeTeamScore = teamScores.get(fixture.getHomeTeam()).getScore();
 			}
 			//homeTeamPredictedScore = currentPredictedTeamScores.get(fixture.getHomeTeam());
 			
 			DflTeam awayTeam = dflTeamService.get(fixture.getAwayTeam());
-			int awayTeamScore = teamScores.get(fixture.getAwayTeam()).getScore();
+			//int awayTeamScore = teamScores.get(fixture.getAwayTeam()).getScore();
 					
 			int awayPlayersPlayed = playersPlayedCount.get(fixture.getAwayTeam());
 			int awaySelectedSize = selectedPlayersCount.get(fixture.getAwayTeam());
 			
+			int awayTeamScore;
+			int awayTeamPredictedScore;
 			//if(playersPlayedCount.get(fixture.getAwayTeam()) == selectedPlayersCount.get(fixture.getAwayTeam())) {
 			if(awayPlayersPlayed == awaySelectedSize) {
-				awayTeamPredictedScore = awayTeamScore;
-				homeTeamPredictedScore = teamPredictedScores.get(fixture.getAwayTeam()).getPredictedScore();
+				//awayTeamPredictedScore = awayTeamScore;
+				awayTeamPredictedScore = teamScores.get(fixture.getAwayTeam()).getScore();
+				awayTeamScore = teamPredictedScores.get(fixture.getAwayTeam()).getPredictedScore();
 			} else {
 				awayTeamPredictedScore = currentPredictedTeamScores.get(fixture.getAwayTeam());
+				awayTeamScore = teamScores.get(fixture.getAwayTeam()).getScore();
 			}
 			//awayTeamPredictedScore = currentPredictedTeamScores.get(fixture.getAwayTeam());
 			
