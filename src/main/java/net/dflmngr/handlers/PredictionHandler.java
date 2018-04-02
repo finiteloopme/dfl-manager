@@ -144,13 +144,17 @@ public class PredictionHandler {
 			
 			int predictedScore = 0;
 			for(DflSelectedPlayer selectedPlayer : selectedTeam) {
-				DflPlayerPredictedScoresPK dflPlayerPredictedScoresPK = new DflPlayerPredictedScoresPK();
-				dflPlayerPredictedScoresPK.setPlayerId(selectedPlayer.getPlayerId());
-				dflPlayerPredictedScoresPK.setRound(round);
-				
-				DflPlayerPredictedScores predictedPlayerScore = dflPlayerPredictedScoresService.get(dflPlayerPredictedScoresPK);
-				if(predictedPlayerScore != null) {
-					predictedScore = predictedScore + predictedPlayerScore.getPredictedScore();
+				if(selectedPlayer.isEmergency() == 0) {
+					DflPlayerPredictedScoresPK dflPlayerPredictedScoresPK = new DflPlayerPredictedScoresPK();
+					dflPlayerPredictedScoresPK.setPlayerId(selectedPlayer.getPlayerId());
+					dflPlayerPredictedScoresPK.setRound(round);
+					
+					DflPlayerPredictedScores predictedPlayerScore = dflPlayerPredictedScoresService.get(dflPlayerPredictedScoresPK);
+					if(predictedPlayerScore != null) {
+						predictedScore = predictedScore + predictedPlayerScore.getPredictedScore();
+					} else {
+						predictedScore = predictedScore + 25;
+					}
 				}
 			}
 			
