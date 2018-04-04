@@ -38,6 +38,9 @@ public class DflSelectedPlayer {
 	@Column(name = "has_played")
 	private boolean hasPlayed;
 	
+	@Column(name = "replacement_ind")
+	private String replacementInd;
+	
 	public int getRound() {
 		return round;
 	}
@@ -86,11 +89,18 @@ public class DflSelectedPlayer {
 	public void setHasPlayed(boolean hasPlayed) {
 		this.hasPlayed = hasPlayed;
 	}
+	public String getReplacementInd() {
+		return replacementInd;
+	}
+	public void setReplacementInd(String replacementInd) {
+		this.replacementInd = replacementInd;
+	}
+	
 	@Override
 	public String toString() {
 		return "DflSelectedPlayer [round=" + round + ", playerId=" + playerId + ", teamPlayerId=" + teamPlayerId
 				+ ", teamCode=" + teamCode + ", isEmergency=" + isEmergency + ", isDnp=" + isDnp + ", scoreUsed="
-				+ scoreUsed + ", hasPlayed=" + hasPlayed + "]";
+				+ scoreUsed + ", hasPlayed=" + hasPlayed + ", replacementInd=" + replacementInd + "]";
 	}
 	
 	@Override
@@ -101,6 +111,7 @@ public class DflSelectedPlayer {
 		result = prime * result + (isDnp ? 1231 : 1237);
 		result = prime * result + isEmergency;
 		result = prime * result + playerId;
+		result = prime * result + ((replacementInd == null) ? 0 : replacementInd.hashCode());
 		result = prime * result + round;
 		result = prime * result + (scoreUsed ? 1231 : 1237);
 		result = prime * result + ((teamCode == null) ? 0 : teamCode.hashCode());
@@ -123,6 +134,11 @@ public class DflSelectedPlayer {
 		if (isEmergency != other.isEmergency)
 			return false;
 		if (playerId != other.playerId)
+			return false;
+		if (replacementInd == null) {
+			if (other.replacementInd != null)
+				return false;
+		} else if (!replacementInd.equals(other.replacementInd))
 			return false;
 		if (round != other.round)
 			return false;

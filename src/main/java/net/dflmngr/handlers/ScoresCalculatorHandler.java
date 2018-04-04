@@ -503,7 +503,7 @@ public class ScoresCalculatorHandler {
 				if(dnpPlayer.isEmergency() == 0) {
 					dnpPlayer.setScoreUsed(true);
 					played22.add(dnpPlayer);
-				}
+				} 
 				replacedDnpPlayers.add(dnpPlayer);
 			}
 			dnpPlayers.removeAll(replacedDnpPlayers);
@@ -526,6 +526,13 @@ public class ScoresCalculatorHandler {
 					if(replacement != null) {
 						emergencies.remove(replacement);
 						replacement.setScoreUsed(true);
+						if(replacement.isEmergency() == 1) {
+							replacement.setReplacementInd("*");
+							dnpPlayer.setReplacementInd("*");
+						} else {
+							replacement.setReplacementInd("**");
+							dnpPlayer.setReplacementInd("**");
+						}
 						played22.add(replacement);
 						replacedDnpPlayers.add(dnpPlayer);
 						loggerUtils.log("info", "Replacing DNP={} with Emergency={} based on position", dnpPlayer, replacement);
@@ -554,6 +561,13 @@ public class ScoresCalculatorHandler {
 					if(replacement != null) {
 						emergencies.remove(replacement);
 						replacement.setScoreUsed(true);
+						if(replacement.isEmergency() == 1) {
+							replacement.setReplacementInd("*");
+							dnpPlayer.setReplacementInd("*");
+						} else {
+							replacement.setReplacementInd("**");
+							dnpPlayer.setReplacementInd("**");
+						}
 						played22.add(replacement);
 						replacedDnpPlayers.add(dnpPlayer);
 						loggerUtils.log("info", "Bench can take the ground DNP={} with Emergency={}", dnpPlayer, replacement);
@@ -566,65 +580,6 @@ public class ScoresCalculatorHandler {
 			}
 			dnpPlayers.removeAll(replacedDnpPlayers);
 		}
-		
-		/*
-		for(DflSelectedPlayer dnpPlayer : dnpPlayers) {			
-			if(dnpPlayer.isEmergency() == 0) {
-				DflSelectedPlayer replacement = null;
-				
-				if(emergencies.isEmpty()) {
-					dnpPlayer.setScoreUsed(true);
-					played22.add(dnpPlayer);
-				} else {
-					if(emergencies.size() == 1) {
-						replacement = emergencies.get(0);
-					}
-					if(replacement == null) {
-						for(DflSelectedPlayer emergency : emergencies) {
-							String dnpPosition = playerPositions.get(dnpPlayer.getPlayerId());
-							String emgPosition = playerPositions.get(emergency.getPlayerId());
-							
-							if(dnpPosition.equals(emgPosition)) {
-								replacement = emergency;
-							}
-						}
-						if(replacement == null) {
-							for(DflSelectedPlayer emergency : emergencies) {								
-								if(emergency.isEmergency() == 1) {
-									replacement = emergency;
-								}
-							}
-						}
-					}
-					if(replacement == null) {
-						dnpPlayer.setScoreUsed(true);
-						played22.add(dnpPlayer);
-						loggerUtils.log("info", "No replacement found for DNP={}", dnpPlayer);
-					} else {
-						
-						String dnpPosition = playerPositions.get(dnpPlayer.getPlayerId());
-						String emgPosition = playerPositions.get(replacement.getPlayerId());
-						
-						if(dnpPosition.equals(emgPosition)) {
-							emergencies.remove(replacement);
-							replacement.setScoreUsed(true);
-							played22.add(replacement);
-							loggerUtils.log("info", "Replacing DNP={} with Emergency={}", dnpPlayer, replacement);
-						} else if(benchPositions.contains(dnpPosition)) {
-							emergencies.remove(replacement);
-							replacement.setScoreUsed(true);
-							played22.add(replacement);
-							loggerUtils.log("info", "Bench can take the ground DNP={} with Emergency={}", dnpPlayer, replacement);
-						} else {
-							dnpPlayer.setScoreUsed(true);
-							played22.add(dnpPlayer);
-							loggerUtils.log("info", "Positional rules don't allow emergency DNP={} with Emergency={}", dnpPlayer, replacement);
-						}						
-					}
-				}
-			}
-		}
-		*/
 		
 		for(DflSelectedPlayer player : played22) {
 			if(!player.isDnp()) {
@@ -641,9 +596,6 @@ public class ScoresCalculatorHandler {
 		if(!emergencies.isEmpty()) {
 			dflSelectedTeamService.updateAll(emergencies, false);
 		}
-		//if(!dnpPlayers.isEmpty()) {
-		//	dflSelectedTeamService.updateAll(dnpPlayers, false);
-		//}
 		if(!replacedDnpPlayers.isEmpty()) {
 			dflSelectedTeamService.updateAll(replacedDnpPlayers, false);
 		}
