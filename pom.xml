@@ -158,6 +158,9 @@
 						<goals>
 							<goal>copy-dependencies</goal>
 						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}</outputDirectory>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -170,7 +173,7 @@
 					<archive>
 					<manifest>
 						<addClasspath>true</addClasspath>
-						<classpathPrefix>dependency/</classpathPrefix>
+						<!-- <classpathPrefix>dependency/</classpathPrefix> -->
 						<mainClass>net.dflmngr.scheduler.JobScheduler</mainClass>
 					</manifest>
 					</archive>
