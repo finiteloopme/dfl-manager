@@ -7,4 +7,7 @@ dflmngr.iml
 .project
 .classpath
 .factorypath
-reports
+reports{
+    "java.configuration.updateBuildConfiguration": "interactive"
+}
+.vscode/
